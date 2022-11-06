@@ -1,8 +1,11 @@
 package com.hamosad1657.lib.sensors;
 
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
-public class HaEncoder {
+public class HaEncoder implements Sendable {
     // https://first.wpi.edu/wpilib/allwpilib/docs/release/java/edu/wpi/first/wpilibj/Encoder.html
     // https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/encoders-software.html
     // ^docus
@@ -41,8 +44,17 @@ public class HaEncoder {
 
     /// Meters per Second to Rotations per Minute
     public double convertMPStoRPM(double MPS) {
-        if (wheelRadius > 0){
+        if (wheelRadius > 0) {
             return (60 * MPS) / (2 * Math.PI * wheelRadius);
-        } else return -1;
+        } else
+            return -1;
+    }
+
+    @Override
+    public void initSendable(SendableBuilder builder) {
+        builder.addDoubleProperty("Wheel Radius", this::getWheelRadius, null);
+        builder.addDoubleProperty("Distance", this::getDistance, null);
+        builder.addBooleanProperty("Is in range", this::inRange, null);
+        // add more atfter the new functions are added
     }
 }

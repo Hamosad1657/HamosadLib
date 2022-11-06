@@ -3,8 +3,12 @@ package com.hamosad1657.lib;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
-public class Limelight {
+public class Limelight implements Sendable {
     private static NetworkTable table;
     private static ShuffleboardTab tab;
     private static NetworkTableEntry tv, tx, ty, ta;
@@ -49,6 +53,13 @@ public class Limelight {
         tyEntry.setDouble(getTy());
         txEntry.setDouble(getTx());
         taEntry.setDouble(getTa());
-        distanceEntry.setDouble(getDistance());
+    }
+
+    @Override // not sure if it will be needed, but just in case
+    public void initSendable(SendableBuilder builder) {
+        builder.addDoubleProperty("Tv", this::getTv, null);
+        builder.addDoubleProperty("Tx", this::getTx, null);
+        builder.addDoubleProperty("Ty", this::getTy, null);
+        builder.addDoubleProperty("Ta", this::getTa, null);
     }
 }
