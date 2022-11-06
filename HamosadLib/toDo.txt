@@ -1,0 +1,6 @@
+1.Build custom color sensor widget //https://www.chiefdelphi.com/t/shuffleboard-widget-data-source-binding-tutorial-video/163128
+2.Make a shuffleboard veiw for each class ( when needed)
+3.Ask Shaked about what function to put in the CANCoder
+4.Talk to Shaked about the PID
+5.Talk to Shaked about the swerve
+6. Add convertions to the encoder values.
