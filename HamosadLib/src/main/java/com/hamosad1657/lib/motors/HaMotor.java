@@ -1,14 +1,13 @@
 package com.hamosad1657.lib.motors;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
 public class HaMotor<motorClass extends MotorController> {
     private motorClass motor;
-    private encoderType typeOfEncoder;
 
     private long kp;
     private long ki;
@@ -19,15 +18,8 @@ public class HaMotor<motorClass extends MotorController> {
         this.motor = motor;
     }
 
-    public HaMotor(motorClass motor, encoderType typeOfEncoder) {
+    public HaMotor(motorClass motor, long kp, long ki, long kd) {
         this.motor = motor;
-        this.typeOfEncoder = typeOfEncoder;
-
-    }
-
-    public HaMotor(motorClass motor, encoderType typeOfEncoder, long kp, long ki, long kd) {
-        this.motor = motor;
-        this.typeOfEncoder = typeOfEncoder;
         this.kp = kp;
         this.ki = ki;
         this.kd = kd;
@@ -53,10 +45,6 @@ public class HaMotor<motorClass extends MotorController> {
         this.pidController = new PIDController(kp, ki, kd);
     }
 
-    public void setEncoderType(encoderType encoderType) {
-        this.typeOfEncoder = encoderType;
-    }
-
     public void setDegrees(double motorPosition) {
         this.motor.set(this.pidController.calculate(motorPosition));
     }
@@ -69,8 +57,8 @@ public class HaMotor<motorClass extends MotorController> {
         this.motor.setInverted(!this.motor.getInverted());
     }
 
-    static enum encoderType {
-        absolute,
-        incromental
+    public void shuffleboardInit(ShuffleboardTab tab, String title) {
+        ShuffleboardContainer container = tab.getLayout(title, BuiltInLayouts.kList);
+        // add more in the future
     }
 }
