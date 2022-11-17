@@ -1,14 +1,14 @@
 package com.hamosad1657.lib.sensors;
 
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
 import com.revrobotics.ColorSensorV3;
 import com.revrobotics.ColorSensorV3.RawColor;
 
-public class HaColorSensor implements Sendable {
+public class HaColorSensor {
     private ColorSensorV3 colorSensor;
 
     public HaColorSensor(I2C.Port port) {
@@ -17,6 +17,7 @@ public class HaColorSensor implements Sendable {
 
     public HaColorSensor(I2C.Port port, ShuffleboardTab tab) {
         this.colorSensor = new ColorSensorV3(port);
+        shuffleboardInit(tab, "Color Sensor");
     }
 
     /// Checks if the detected color is between [minColor] and [maxColor] using >=
@@ -53,12 +54,9 @@ public class HaColorSensor implements Sendable {
         return this.colorSensor.getProximity();
     }
 
-    @Override
-    public void initSendable(SendableBuilder builder) {
-        builder.addDoubleProperty("Red", this::getRed, null);
-        builder.addDoubleProperty("Blue", this::getBlue, null);
-        builder.addDoubleProperty("Green", this::getGreen, null);
-        // also add poximity after you learn how to use it
+    public void shuffleboardInit(ShuffleboardTab tab, String title) {
+        ShuffleboardContainer container = tab.getLayout(title, BuiltInLayouts.kList);
+        container.add("Color Sensor", this.colorSensor);
     }
 
 }

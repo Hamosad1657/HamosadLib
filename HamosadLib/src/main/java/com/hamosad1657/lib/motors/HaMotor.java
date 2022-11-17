@@ -4,13 +4,9 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.motorcontrol;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
-
-
-
-
-public class HaMotor<motorClass extends motorcontrol> {
+public class HaMotor<motorClass extends MotorController> {
     private motorClass motor;
     private encoderType typeOfEncoder;
 

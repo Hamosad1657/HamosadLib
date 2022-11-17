@@ -5,10 +5,12 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
-public class Limelight implements Sendable {
+public class Limelight {
     private static NetworkTable table;
     private static ShuffleboardTab tab;
     private static NetworkTableEntry tv, tx, ty, ta;
@@ -29,22 +31,22 @@ public class Limelight implements Sendable {
     }
 
     /// Horizontal offset from crosshair to target's center: -29.8 to 29.8
-    public static double getTx() {
+    public double getTx() {
         return tx.getDouble(RobotConstants.LimeLightConstants.kDefaultValue);
     }
 
     /// Vertical offset from crosshair to target's center: -24.85 to 24.85
-    public static double getTy() {
+    public double getTy() {
         return ty.getDouble(RobotConstants.LimeLightConstants.kDefaultValue);
     }
 
     /// Target area: 0% to 100% of the frame
-    public static double getTa() {
+    public double getTa() {
         return ta.getDouble(RobotConstants.LimeLightConstants.kDefaultValue);
     }
 
     /// Is there a valid target: 0 or 1
-    public static double getTv() {
+    public double getTv() {
         return tv.getDouble(RobotConstants.LimeLightConstants.kDefaultValue);
     }
 
@@ -53,13 +55,5 @@ public class Limelight implements Sendable {
         tyEntry.setDouble(getTy());
         txEntry.setDouble(getTx());
         taEntry.setDouble(getTa());
-    }
-
-    @Override // not sure if it will be needed, but just in case
-    public void initSendable(SendableBuilder builder) {
-        builder.addDoubleProperty("Tv", this::getTv, null);
-        builder.addDoubleProperty("Tx", this::getTx, null);
-        builder.addDoubleProperty("Ty", this::getTy, null);
-        builder.addDoubleProperty("Ta", this::getTa, null);
     }
 }
