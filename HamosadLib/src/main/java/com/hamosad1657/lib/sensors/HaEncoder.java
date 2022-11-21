@@ -42,13 +42,7 @@ public class HaEncoder {
         return this.wheelRadius;
     }
 
-    /// Meters per Second to Rotations per Minute
-    public double convertMPStoRPM(double MPS) {
-        if (wheelRadius > 0) {
-            return (60 * MPS) / (2 * Math.PI * wheelRadius);
-        } else
-            return -1;
-    }
+
 
     public void shuffleboardInit(ShuffleboardTab tab, String title) {
         ShuffleboardContainer container = tab.getLayout(title, BuiltInLayouts.kList);

@@ -4,3 +4,74 @@
 4.Talk to Shaked about the PID
 5.Talk to Shaked about the swerve
 6. Add convertions to the encoder values.
+^ outdated
+
+
+1. HaMotorController will have basic motor controlling functions
+	a. PID based control
+	b. Abstract percent, current and voltage based control
+	c. Abstarct mutual configuration settings
+2. HaBaseTalon will implement the functions that are mutual to both talons
+	a. Abstract mutual percent, current and voltage based control
+	b. Abstract mutual talon functions
+	c. Implement velocity and position based control
+3. HaTalonFX and HaTalonSRX will implement their respective functions each
+4. HaCANSparkMax will implement the functions of HaMotorController and it's own functions
+	a. Implement percent, current and voltage base control
+	b. Implement velocity and position based control
+	c. Implement other functions
+
+* Everything will have these control methods: PID, percent, current, voltage, velocity, position,Raw (have enum for control type in HaUnits) 
+* Everything will use the same velocity units: RPM, MPS, RadPS,Raw; And position units: Rad, Degrees (have enums for position and velocity types in HaUnits)
+
+
+* Make constructors overload with the exiting Motor Object and one with the MotorObjectConfig ( both) 
+* Make all motors public ( the original ones), and also add WheelRadius to all of them with the constructs and set thingies
+* Make another configureallsettings function
+
+* Make all objects sendable
+* Make initShuffleboard for all of them ( with the lambda thingi sufi said, just ask him later cuz yes i forgot about it.)
+
+Docos:
+General info:
+https://en.wikipedia.org/wiki/Radian - What is a radian
+
+Java:
+https://www.w3schools.com/java/java_enums.asp - Enum docos
+https://www.baeldung.com/java-enum-values - more Enum docos
+
+General motor info:
+https://first.wpi.edu/wpilib/allwpilib/docs/development/java/edu/wpi/first/wpilibj/motorcontrol/MotorController.html  - wpilib motor controller 
+^ if its still broken then look inside the code itself ( ctrl + click)
+
+https://api.ctr-electronics.com/phoenix/release/java/ - general CTRE docos
+
+https://codedocs.revrobotics.com/java/com/revrobotics/package-summary.html - general rev docos
+
+https://api.ctr-electronics.com/phoenix/release/java/com/ctre/phoenix/motorcontrol/IMotorController.html - ctre motor controller
+
+https://api.ctr-electronics.com/phoenix/release/java/com/ctre/phoenix/motorcontrol/can/package-summary.html - general CTRE motor docos  ( go over all buy victor)
+CANSparkMax:
+https://robotpy.readthedocs.io/projects/rev/en/stable/rev/CANSparkMax.html- CANSparkMAX docos
+https://codedocs.revrobotics.com/java/com/revrobotics/cansparkmax - CANSparkMAX lib docos
+https://codedocs.revrobotics.com/java/com/revrobotics/cansparkmaxlowlevel - further docos
+
+
+
+BaseTalon:
+
+https://docs.ctre-phoenix.com/en/stable/ch16_ClosedLoop.html - closed loop explination
+https://robotpy.readthedocs.io/projects/ctre/en/latest/ctre/BaseTalon.html - base talon docos
+
+https://api.ctr-electronics.com/phoenix/release/java/com/ctre/phoenix/motorcontrol/can/BaseTalon.html - base talon lib docos
+TalonFX:
+https://api.ctr-electronics.com/phoenix/release/java/com/ctre/phoenix/motorcontrol/can/TalonFX.html - Talon FX docos
+https://api.ctr-electronics.com/phoenix/release/java/com/ctre/phoenix/motorcontrol/can/WPI_TalonFX.html - Advanced Talon FX docos
+
+TalonSRX:
+https://api.ctr-electronics.com/phoenix/release/java/com/ctre/phoenix/motorcontrol/can/TalonSRX.html - Talon SRX docos
+https://api.ctr-electronics.com/phoenix/release/java/com/ctre/phoenix/motorcontrol/can/WPI_TalonSRX.html - Advacned Talon SRX docos
+
+TalonFX & TalonSrx:
+https://docs.ctre-phoenix.com/en/stable/ch13_MC.html - limiters docos talons
+https://docs.ctre-phoenix.com/en/stable/ch14_MCSensor.html -  units docos talons
