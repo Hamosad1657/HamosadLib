@@ -25,6 +25,7 @@ public class HaSwerveModule {
 	private CANSparkMax steerMotorSM, driveMotorSM;
 	private BaseTalon steerMotorTalon, driveMotorTalon;
 	private CANCoder steerEncoder;
+	private MotorControllerType steerType, driveType;
 
 	/**
 	 * Constructs a swerve module with a CANCoder.
@@ -41,23 +42,26 @@ public class HaSwerveModule {
 			MotorControllerType steerMotorControllerType, int steerMotorControllerID,
 			MotorControllerType driveMotorControllerType, int driveMotorControllerID,
 			int steerCANCoderID, double steerOffsetDegrees) throws IllegalArgumentException {
+		this.steerType = steerMotorControllerType;
+		this.driveType = driveMotorControllerType;
+
 		this.steerEncoder = new CANCoder(steerCANCoderID);
 		this.steerEncoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
 		this.steerEncoder.configFeedbackCoefficient(0.087890625, "deg", SensorTimeBase.PerSecond);
 		this.steerEncoder.configMagnetOffset(steerOffsetDegrees);
 		this.steerEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
 		// If steer motor is a CANSparkMax
-		if (steerMotorControllerType == MotorControllerType.kCANSparkMax) {
+		if (this.steerType == MotorControllerType.kCANSparkMax) {
 			this.steerMotorSM = new CANSparkMax(steerMotorControllerID, MotorType.kBrushless);
 			this.steerMotorSM.setIdleMode(IdleMode.kBrake);
 		}
 		// If steer motor is a TalonFX
-		else if (steerMotorControllerType == MotorControllerType.kTalonFX) {
+		else if (this.steerType == MotorControllerType.kTalonFX) {
 			this.steerMotorTalon = new WPI_TalonFX(steerMotorControllerID);
 			this.steerMotorTalon.setNeutralMode(NeutralMode.Brake);
 			this.steerMotorTalon.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
 			this.steerMotorTalon.setSelectedSensorPosition(
-					(this.steerEncoder.getAbsolutePosition() * HaSwerveConstants.kTalonFXIntegratedSensorTicksPerDegree)
+					(this.steerEncoder.getAbsolutePosition() * HaSwerveConstants.kTalonFXIntegratedEncoderTicksPerDegree)
 							/ SdsModuleConfigurations.MK4_L2.getSteerReduction());
 		}
 		// If steer motor is a TalonSRX
@@ -66,12 +70,12 @@ public class HaSwerveModule {
 		}
 
 		// If drive motor is a CANSparkMax
-		if (driveMotorControllerType == MotorControllerType.kCANSparkMax) {
+		if (this.driveType == MotorControllerType.kCANSparkMax) {
 			this.driveMotorSM = new CANSparkMax(driveMotorControllerID, MotorType.kBrushless);
 			this.driveMotorSM.setIdleMode(IdleMode.kBrake);
 		}
 		// If drive motor is a TalonFX
-		else if (driveMotorControllerType == MotorControllerType.kTalonFX) {
+		else if (this.driveType == MotorControllerType.kTalonFX) {
 			this.driveMotorTalon = new WPI_TalonFX(driveMotorControllerID);
 			this.driveMotorTalon.setNeutralMode(NeutralMode.Brake);
 			this.driveMotorTalon.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
@@ -92,7 +96,7 @@ public class HaSwerveModule {
 		return this.steerEncoder.getAbsolutePosition();
 	}
 
-	/*
+	/**
 	 * public double getWheelMPS() {}
 	 */
 
@@ -108,8 +112,20 @@ public class HaSwerveModule {
 	 * public void setDriveMotor(double MPS) {}
 	 */
 
-	/*
-	 * @Override
-	 * public String toString() {}
+	/**
+	 * Synchronises the steer integrated encoder with the
+	 * CANCoder's measurment, considering units and gear ratio.
 	 */
+	public void syncSteerEncoder() {
+		this.steerMotorTalon.setSelectedSensorPosition(
+				(this.steerEncoder.getAbsolutePosition()
+						* HaSwerveConstants.kTalonFXIntegratedEncoderTicksPerDegree)
+						/ SdsModuleConfigurations.MK4_L2.getSteerReduction());
+	}
+
+	@Override
+	public String toString() {
+	return "\n MPS: " + String.valueOf(this.getWheelMPS()) +
+			  "\n Angle: " + String.valueOf(this.encoder.getAbsolutePosition());
+	}
 }
