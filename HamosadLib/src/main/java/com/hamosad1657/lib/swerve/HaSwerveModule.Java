@@ -31,7 +31,9 @@ public class HaSwerveModule {
 	private SparkMaxPIDController steerPIDController, drivePIDController;
 	private WPI_TalonFX steerTalonFX, driveTalonFX;
 	private final CANCoder steerEncoder;
+	
 	private final MotorControllerType steerType, driveType;
+	private final double kWheelCircumferenceMeters;
 
 	/**
 	 * Constructs a swerve module with a CANCoder.
@@ -48,9 +50,11 @@ public class HaSwerveModule {
 	public HaSwerveModule(
 			MotorControllerType steerMotorControllerType, int steerMotorControllerID,
 			MotorControllerType driveMotorControllerType, int driveMotorControllerID,
-			int steerCANCoderID, double steerOffsetDegrees) {
+			int steerCANCoderID, double steerOffsetDegrees, double wheelDiameterCM) {
 		this.steerType = steerMotorControllerType;
 		this.driveType = driveMotorControllerType;
+
+		this.kWheelCircumferenceMeters = wheelDiameterCM / 10 * Math.PI;
 
 		this.steerEncoder = new CANCoder(steerCANCoderID);
 		this.steerEncoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
@@ -211,8 +215,7 @@ public class HaSwerveModule {
 			double motorRotationsPerSec = motorRPM / 60;
 			double wheelRotationsPerSec = motorRotationsPerSec *
 					SdsModuleConfigurations.MK4_L2.getDriveReduction();
-			double metersPerSecond = wheelRotationsPerSec *
-					HaSwerveConstants.kWheelCircumferenceMeters;
+			double metersPerSecond = wheelRotationsPerSec * this.kWheelCircumferenceMeters;
 			return metersPerSecond;
 		}
 		// If drive motor controller is a TalonFX
@@ -223,8 +226,7 @@ public class HaSwerveModule {
 					HaSwerveConstants.kTalonFXIntegratedEncoderTicksPerRev;
 			double wheelRotationsPerSec = motorRotationsPerSec *
 					SdsModuleConfigurations.MK4_L2.getDriveReduction();
-			double metersPerSecond = wheelRotationsPerSec *
-					HaSwerveConstants.kWheelCircumferenceMeters;
+			double metersPerSecond = wheelRotationsPerSec * this.kWheelCircumferenceMeters;
 			return metersPerSecond;
 		}
 	}
@@ -291,7 +293,7 @@ public class HaSwerveModule {
 	public void setDriveMotor(double MPS) {
 		// If drive motor controller is a Spark Max
 		if(this.driveType == MotorControllerType.kSparkMax) {
-			double desiredRPM = (((MPS * 60) / HaSwerveConstants.kWheelCircumferenceMeters)
+			double desiredRPM = (((MPS * 60) / this.kWheelCircumferenceMeters)
 					/ SdsModuleConfigurations.MK4_L2.getDriveReduction());
 			this.drivePIDController.setReference(desiredRPM, ControlType.kVelocity);
 		}
@@ -384,7 +386,7 @@ public class HaSwerveModule {
 	 * @return integrated encoder ticks per 100 ms
 	 */
 	private double MPSToIntegratedEncoderTicksPer100MS(double metersPerSecond) {
-		double wheelRotationsPerSec = metersPerSecond / HaSwerveConstants.kWheelCircumferenceMeters;
+		double wheelRotationsPerSec = metersPerSecond / this.kWheelCircumferenceMeters;
 		double motorRotationsPerSec = wheelRotationsPerSec
 				/ SdsModuleConfigurations.MK4_L2.getDriveReduction();
 		double integratedEncoderCountsPerSec = motorRotationsPerSec *
