@@ -3,7 +3,6 @@ package com.hamosad1657.lib.swerve;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
@@ -17,7 +16,6 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
 /**
@@ -31,7 +29,7 @@ public class HaSwerveModule {
 
 	private CANSparkMax steerSparkMax, driveSparkMax;
 	private SparkMaxPIDController steerPIDController, drivePIDController;
-	private BaseTalon steerTalonFX, driveTalonFX;
+	private WPI_TalonFX steerTalonFX, driveTalonFX;
 	private final CANCoder steerEncoder;
 	private final MotorControllerType steerType, driveType;
 
@@ -66,12 +64,13 @@ public class HaSwerveModule {
 			this.steerPIDController = this.steerSparkMax.getPIDController();
 		}
 		// If steer motor controller is a TalonFX
-		else if (this.steerType == MotorControllerType.kTalonFX) {
+		else {
 			this.steerTalonFX = new WPI_TalonFX(steerMotorControllerID);
 			this.steerTalonFX.setNeutralMode(NeutralMode.Brake);
 			this.steerTalonFX.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
 			this.steerTalonFX.setSelectedSensorPosition(
-					(this.steerEncoder.getAbsolutePosition() * HaSwerveConstants.kTalonFXIntegratedEncoderTicksPerDegree)
+					(this.steerEncoder.getAbsolutePosition()
+							* HaSwerveConstants.kTalonFXIntegratedEncoderTicksPerDegree)
 							/ SdsModuleConfigurations.MK4_L2.getSteerReduction());
 		}
 
@@ -87,7 +86,6 @@ public class HaSwerveModule {
 			this.driveTalonFX.setNeutralMode(NeutralMode.Brake);
 			this.driveTalonFX.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
 		}
-
 		this.syncSteerEncoder();
 	}
 
@@ -117,13 +115,11 @@ public class HaSwerveModule {
 	 * @param Derivative
 	 * @param IZone if the absloute closed-loop error is above IZone, the
 	 * 				Integral accumulator is cleared (making it ineffective).
-	 * @param slot which PID presets are you trying to configure. There are
-	 * 			   between 0 and 3.
 	 * @throws IllegalArgumentException if one or more of the PID gains are
 	 * 									negative, or if IZone is negative.
 	 */
 	public void setSteerPID(
-			double Proportional, double Integral, double Derivative, double IZone, int slot)
+			double Proportional, double Integral, double Derivative, double IZone)
 			throws IllegalArgumentException {
 		// If one of the PID gains are negative
 		if(Proportional < 0 || Integral < 0 || Derivative < 0)
@@ -133,17 +129,17 @@ public class HaSwerveModule {
 
 		// If drive motor controller is a Spark Max
 		if(this.steerType == MotorControllerType.kSparkMax) {
-			this.steerPIDController.setP(Proportional, slot);
-			this.steerPIDController.setI(Integral, slot);
-			this.steerPIDController.setD(Derivative, slot);
-			this.steerPIDController.setIZone(IZone, slot);
+			this.steerPIDController.setP(Proportional);
+			this.steerPIDController.setI(Integral);
+			this.steerPIDController.setD(Derivative);
+			this.steerPIDController.setIZone(IZone);
 		}
 		// If drive motor controller is a TalonFX
 		else {
-			this.steerTalonFX.config_kP(slot, Proportional);
-			this.steerTalonFX.config_kI(slot, Integral);
-			this.steerTalonFX.config_kD(slot, Derivative);
-			this.steerTalonFX.config_IntegralZone(slot, IZone);
+			this.steerTalonFX.config_kP(0, Proportional);
+			this.steerTalonFX.config_kI(0, Integral);
+			this.steerTalonFX.config_kD(0, Derivative);
+			this.steerTalonFX.config_IntegralZone(0, IZone);
 		}
 	}
 
@@ -213,17 +209,22 @@ public class HaSwerveModule {
 		if(this.steerType == MotorControllerType.kSparkMax) {
 			double motorRPM = this.driveSparkMax.getEncoder().getVelocity();
 			double motorRotationsPerSec = motorRPM / 60;
-			double wheelRotationsPerSec = motorRotationsPerSec * SdsModuleConfigurations.MK4_L2.getDriveReduction();
-			double metersPerSecond = wheelRotationsPerSec * HaSwerveConstants.kWheelCircumferenceMeters;
+			double wheelRotationsPerSec = motorRotationsPerSec *
+					SdsModuleConfigurations.MK4_L2.getDriveReduction();
+			double metersPerSecond = wheelRotationsPerSec *
+					HaSwerveConstants.kWheelCircumferenceMeters;
 			return metersPerSecond;
 		}
 		// If drive motor controller is a TalonFX
 		else {
 			double integratedEncoderCountsPer100MS = this.driveTalonFX.getSelectedSensorVelocity();
 			double integratedEncoderCountsPerSec = integratedEncoderCountsPer100MS * 10;
-			double motorRotationsPerSec = integratedEncoderCountsPerSec / HaSwerveConstants.kTalonFXIntegratedEncoderTicksPerRev;
-			double wheelRotationsPerSec = motorRotationsPerSec * SdsModuleConfigurations.MK4_L2.getDriveReduction();
-			double metersPerSecond = wheelRotationsPerSec * HaSwerveConstants.kWheelCircumferenceMeters;
+			double motorRotationsPerSec = integratedEncoderCountsPerSec /
+					HaSwerveConstants.kTalonFXIntegratedEncoderTicksPerRev;
+			double wheelRotationsPerSec = motorRotationsPerSec *
+					SdsModuleConfigurations.MK4_L2.getDriveReduction();
+			double metersPerSecond = wheelRotationsPerSec *
+					HaSwerveConstants.kWheelCircumferenceMeters;
 			return metersPerSecond;
 		}
 	}
@@ -248,7 +249,8 @@ public class HaSwerveModule {
 	public void setSteerMotor(double angleDegrees) {
 		// If drive motor controller is a Spark Max
 		if(this.steerType == MotorControllerType.kSparkMax) {
-			double desiredRotations = (angleDegrees / 360) / SdsModuleConfigurations.MK4_L2.getSteerReduction();
+			double desiredRotations = (angleDegrees / 360) /
+					SdsModuleConfigurations.MK4_L2.getSteerReduction();
 			this.steerPIDController.setReference(desiredRotations, ControlType.kPosition);
 		}
 		// If drive motor controller is a TalonFX
@@ -268,7 +270,8 @@ public class HaSwerveModule {
 	public void setSteerMotor(Rotation2d angle) {
 		// If drive motor controller is a Spark Max
 		if(this.steerType == MotorControllerType.kSparkMax) {
-			double desiredRotations = (angle.getDegrees() / 360) / SdsModuleConfigurations.MK4_L2.getSteerReduction();
+			double desiredRotations = (angle.getDegrees() / 360) /
+					SdsModuleConfigurations.MK4_L2.getSteerReduction();
 			this.steerPIDController.setReference(desiredRotations, ControlType.kPosition);
 		}
 		// If drive motor controller is a TalonFX
@@ -363,7 +366,8 @@ public class HaSwerveModule {
 	 * @param currentAngle
 	 * @return an optimized SwerveModuleState
 	 */
-	public static SwerveModuleState optimizeWithWPI(SwerveModuleState desiredState, Rotation2d currentRotation) {
+	public static SwerveModuleState optimizeWithWPI(
+			SwerveModuleState desiredState, Rotation2d currentRotation) {
 		return SwerveModuleState.optimize(desiredState, currentRotation);
 	}
 
@@ -380,8 +384,9 @@ public class HaSwerveModule {
 	 * @return integrated encoder ticks per 100 ms
 	 */
 	private double MPSToIntegratedEncoderTicksPer100MS(double metersPerSecond) {
-		double wheelRotationsPerSec = metersPerSecond / (HaSwerveConstants.kWheelCircumferenceMeters);
-		double motorRotationsPerSec = wheelRotationsPerSec / SdsModuleConfigurations.MK4_L2.getDriveReduction();
+		double wheelRotationsPerSec = metersPerSecond / HaSwerveConstants.kWheelCircumferenceMeters;
+		double motorRotationsPerSec = wheelRotationsPerSec
+				/ SdsModuleConfigurations.MK4_L2.getDriveReduction();
 		double integratedEncoderCountsPerSec = motorRotationsPerSec *
 				(HaSwerveConstants.kTalonFXIntegratedEncoderTicksPerRev);
 		double encoderCountsPer100MS = integratedEncoderCountsPerSec / 10;
@@ -393,7 +398,8 @@ public class HaSwerveModule {
 	 * @param targetAngleDegrees
 	 * @return equivalent angle between 0 to 360
 	 */
-	private static double placeInZeroTo360Scope(double currentAngleDegrees, double targetAngleDegrees) {
+	private static double placeInZeroTo360Scope(
+			double currentAngleDegrees, double targetAngleDegrees) {
 		double lowerBound;
 		double upperBound;
 		double lowerOffset = currentAngleDegrees % 360;
