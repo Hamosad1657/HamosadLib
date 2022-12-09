@@ -17,6 +17,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
 /**
@@ -300,11 +301,71 @@ public class HaSwerveModule {
 		}
 	}
 
-	/*
-	public SwerveModuleState Optimize(SwerveModuleState desiredState) {
-
+	/**
+	 * Our optimization method! Please do question it's
+	 * correctness if the swerve doesn't behave as intended.
+	 * A replacement for this method is is optimizeWithWPI(),
+	 * which is WPILib's SwerveModuleState.optimize() but wrapped
+	 * in this class. you can also use WPILib's method directly.
+	 * 
+	 * Optimizing means to minimize the change in heading the
+	 * desired swerve module state would require, by potentially
+	 * reversing the direction the wheel spins. If this is used
+	 * with a PID controller that has continuous input for
+	 * position control, then the most the wheel will rotate is
+	 * 90 degrees.
+	 * @param desiredState
+	 * @param currentAngleDegrees
+	 * @return an optimized SwerveModuleState
+	 */
+	public static SwerveModuleState optimize(SwerveModuleState desiredState, double currentAngleDegrees) {
+		// Make the target angle an equivalent of it between 0 and 360
+		double targetAngle = placeInZeroTo360Scope(currentAngleDegrees, desiredState.angle.getDegrees());
+		double targetMPS = desiredState.speedMetersPerSecond;
+		double delta = targetAngle - currentAngleDegrees;
+		if (Math.abs(delta) > 90) { // If you need to turn more than 90 degrees to either direction
+			targetMPS = -targetMPS; // Invert the wheel speed
+			if (delta > 90) // If you need to turn > positive 90 degrees
+				targetAngle -= 180;
+			else // If you need to turn > negative 90 degrees,
+				targetAngle += 180;
+		}
+		return new SwerveModuleState(targetMPS, Rotation2d.fromDegrees(targetAngle));
 	}
-	*/
+
+	/**
+	 * WPILib's SwerveModuleState.optimize(), wrapped.
+	 * 
+	 * Optimizing means to minimize the change in heading the
+	 * desired swerve module state would require, by potentially
+	 * reversing the direction the wheel spins. If this is used
+	 * with a PID controller that has continuous input for
+	 * position control, then the most the wheel will rotate is
+	 * 90 degrees.
+	 * @param desiredState
+	 * @param currentAngleDegrees
+	 * @return an optimized SwerveModuleState
+	 */
+	public static SwerveModuleState optimizeWithWPI(SwerveModuleState desiredState, double currentAngleDegrees) {
+		return SwerveModuleState.optimize(desiredState, Rotation2d.fromDegrees(currentAngleDegrees));
+	}
+
+	/**
+	 * WPILib's SwerveModuleState.optimize(), wrapped.
+	 * 
+	 * Optimizing means to minimize the change in heading the
+	 * desired swerve module state would require, by potentially
+	 * reversing the direction the wheel spins. If this is used
+	 * with a PID controller that has continuous input for
+	 * position control, then the most the wheel will rotate is
+	 * 90 degrees.
+	 * @param desiredState
+	 * @param currentAngle
+	 * @return an optimized SwerveModuleState
+	 */
+	public static SwerveModuleState optimizeWithWPI(SwerveModuleState desiredState, Rotation2d currentRotation) {
+		return SwerveModuleState.optimize(desiredState, currentRotation);
+	}
 
 	@Override
 	public String toString() {
@@ -312,6 +373,12 @@ public class HaSwerveModule {
 		   "\n Angle: " + String.valueOf(this.steerEncoder.getAbsolutePosition());
 	}
 
+	/**
+	 * Converts meters per second to the units the TalonFX uses for position
+	 * feedback, which are integrated encoder ticks per 100 miliseconds.
+	 * @param metersPerSecond
+	 * @return integrated encoder ticks per 100 ms
+	 */
 	private double MPSToIntegratedEncoderTicksPer100MS(double metersPerSecond) {
 		double wheelRotationsPerSec = metersPerSecond / (HaSwerveConstants.kWheelCircumferenceMeters);
 		double motorRotationsPerSec = wheelRotationsPerSec / SdsModuleConfigurations.MK4_L2.getDriveReduction();
@@ -319,5 +386,42 @@ public class HaSwerveModule {
 				(HaSwerveConstants.kTalonFXIntegratedEncoderTicksPerRev);
 		double encoderCountsPer100MS = integratedEncoderCountsPerSec / 10;
 		return encoderCountsPer100MS;
+	}
+
+	/**
+	 * @param currentAngleDegrees
+	 * @param targetAngleDegrees
+	 * @return equivalent angle between 0 to 360
+	 */
+	private static double placeInZeroTo360Scope(double currentAngleDegrees, double targetAngleDegrees) {
+		double lowerBound;
+		double upperBound;
+		double lowerOffset = currentAngleDegrees % 360;
+		if (lowerOffset >= 0) {
+			lowerBound = currentAngleDegrees - lowerOffset;
+			upperBound = currentAngleDegrees + (360 - lowerOffset);
+		} else {
+			upperBound = currentAngleDegrees - lowerOffset;
+			lowerBound = currentAngleDegrees - (360 + lowerOffset);
+		}
+		while (targetAngleDegrees < lowerBound) {
+			// Increase the angle by 360 until it's something between 0 and 360
+			targetAngleDegrees += 360;
+		}
+		while (targetAngleDegrees > upperBound) {
+			// Decrease the angle by 360 until it's something between 0 and 360
+			targetAngleDegrees -= 360;
+		}
+		// If the difference between the target and current angle
+		// is more than 180, decrease the the target angle by 360
+		if (targetAngleDegrees - currentAngleDegrees > 180) {
+			targetAngleDegrees -= 360;
+		}
+		// If the difference between the target and current angle
+		// is less than -180, increase the target angle by 360
+		else if (targetAngleDegrees - currentAngleDegrees < -180) {
+			targetAngleDegrees += 360;
+		}
+		return targetAngleDegrees;
 	}
 }
