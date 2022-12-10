@@ -30,7 +30,7 @@ public class HaNavX extends AHRS {
      * @param port serial port (usually USB)
      * @return an instance of HaNavx, which extends AHRS.
      */
-    public HaNavX getInstance(SerialPort.Port port) {
+    public static HaNavX getInstance(SerialPort.Port port) {
         AHRS navx = new AHRS(
                 port, SerialDataType.kProcessedData, (byte)60);
         navx.enableLogging(true);
@@ -50,7 +50,7 @@ public class HaNavX extends AHRS {
      * https://docs.wpilib.org/en/stable/docs/yearly-overview/known-issues.html#onboard-i2c-causing-system-lockups
      * @return an instance of HaNavx, which extends AHRS.
      */
-    public HaNavX getInstance(I2C.Port port) {
+    public static HaNavX getInstance(I2C.Port port) {
         AHRS navx = new AHRS(port);
         navx.enableLogging(true);
         while(!navx.isConnected()) {}
@@ -67,7 +67,7 @@ public class HaNavX extends AHRS {
      * @param port SPI port
      * @return an instance of HaNavx, which extends AHRS.
      */
-    public HaNavX getInstance(SPI.Port port) {
+    public static HaNavX getInstance(SPI.Port port) {
         AHRS navx = new AHRS(port);
         navx.enableLogging(true);
         while(!navx.isConnected()) {}
