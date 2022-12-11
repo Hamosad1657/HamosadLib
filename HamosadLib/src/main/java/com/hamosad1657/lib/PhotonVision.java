@@ -5,34 +5,50 @@
 
 package com.hamosad1657.lib;
 
+import java.lang.annotation.Target;
 import java.util.HashMap;
 
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 
-/// Retrieves the robot's position from PhotonVision's pipeline.
 public class PhotonVision {
+
+    /**
+     * The TagHashMap is a hashmap with the tag's ID as the key and its positin on the field.
+     * We use this hashmap to calculate a pose for the robot itself 
+     * i.e (robot x to tag + tag's actual x = robot's actual x, and so on...)
+     */
+    HashMap<Integer, Pose3d> TagHashMap = new HashMap<Integer, Pose3d>();
+
     /// This is the PhotonCamera instance, name it after your camera name in photonvision.
     PhotonCamera camera = new PhotonCamera("MicrosoftCamera");
 
-    
-
-    // Get the robot's x, y, and z.
-    public Transform3d getRobotTransform3D() {
+    /// Gets the best target from PhotonVision.
+    public PhotonTrackedTarget getTagBestTarget() {
         var result = camera.getLatestResult();
         boolean hasTargets = result.hasTargets();
         if (hasTargets) {
             PhotonTrackedTarget target = result.getBestTarget();
-           return target.getBestCameraToTarget();
+            return target;
+        }
+        return null;
+    }
+
+    /// Gets the best target's Transform3d
+    public Transform3d getTagTransform3D() {
+        PhotonTrackedTarget target = getTagBestTarget();
+        if (target != null) {
+            return target.getBestCameraToTarget();
         }
         return null;
     }
 
     /// Gets the robot's x (x is the further or closer the robot is reletive to the tag).
-    public Double robotCurrentX() {
-        var transform = this.getRobotTransform3D();
+    public Double getRobotCurrentX() {
+        var transform = this.getTagTransform3D();
         if (transform != null) {
             return transform.getX();
         }
@@ -40,8 +56,8 @@ public class PhotonVision {
     }
 
     /// Gets the robot's y (y is the further up or down the robot is reletive to the tag).
-    public Double robotCurrentY() {
-        var transform = this.getRobotTransform3D();
+    public Double getRobotCurrentY() {
+        var transform = this.getTagTransform3D();
         if (transform != null) {
             return transform.getY();
         }
@@ -49,20 +65,27 @@ public class PhotonVision {
     }
 
     /// Gets the robot's z (z is the further left or right the robot is reletive to the tag).
-    public Double robotCurrentZ() {
-        var transform = this.getRobotTransform3D();
+    public Double getRobotCurrentZ() {
+        var transform = this.getTagTransform3D();
         if (transform != null) {
             return transform.getZ();
         }
         return null;
     }
 
-    /** This function takes a hashmap of the tags and sets it as a variable
-     * @param TagHashMap
-     * @return currTagMap
-     */
-    private HashMap getHashMap(HashMap TagHashMap) {
-        HashMap currTagMap = TagHashMap;
-        return currTagMap;
+    /// Gets the robots actual position.
+    public Pose3d getRobotpose3D() {
+        
+        /// Gets tag's position
+        PhotonTrackedTarget target = getTagBestTarget();
+        int TagID = target.getFiducialId();
+        Pose3d tagPose3d = TagHashMap.get(TagID);
+
+        var transform = this.getTagTransform3D();
+        if (transform != null) {
+            Pose3d RobotPose3d = tagPose3d.transformBy(transform);
+            return RobotPose3d;
+        }
+        return null;
     }
 }
