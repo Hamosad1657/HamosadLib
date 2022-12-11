@@ -5,6 +5,8 @@
 
 package com.hamosad1657.lib;
 
+import java.util.HashMap;
+
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
@@ -14,6 +16,8 @@ import edu.wpi.first.math.geometry.Transform3d;
 public class PhotonVision {
     /// This is the PhotonCamera instance, name it after your camera name in photonvision.
     PhotonCamera camera = new PhotonCamera("MicrosoftCamera");
+
+    
 
     // Get the robot's x, y, and z.
     public Transform3d getRobotTransform3D() {
@@ -51,5 +55,14 @@ public class PhotonVision {
             return transform.getZ();
         }
         return null;
+    }
+
+    /** This function takes a hashmap of the tags and sets it as a variable
+     * @param TagHashMap
+     * @return currTagMap
+     */
+    private HashMap getHashMap(HashMap TagHashMap) {
+        HashMap currTagMap = TagHashMap;
+        return currTagMap;
     }
 }
