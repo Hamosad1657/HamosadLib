@@ -4,15 +4,40 @@
 
 package com.hamosad1657.lib.motors;
 
+import com.hamosad1657.lib.HaUnitConvertor;
 import com.hamosad1657.lib.HaUnits.PIDGains;
 import com.hamosad1657.lib.HaUnits.Positions;
 import com.hamosad1657.lib.HaUnits.Velocities;
 import com.revrobotics.CANSparkMax;
-
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.CANSparkMax.ControlType;
 import edu.wpi.first.util.sendable.SendableBuilder;
 
 /** Add your docs here. */
 public class HaCANSparkMAX extends HaMotorController {
+
+	public CANSparkMax motor;
+	private SparkMaxPIDController pid;
+	private double wheelRadiusMeters;
+	private RelativeEncoder encoder;
+
+	public HaCANSparkMAX(CANSparkMax motor, PIDGains pidGains, double wheelRadiusMeters) {
+		this.motor = motor;
+		configPID(pidGains);
+		this.wheelRadiusMeters = wheelRadiusMeters;
+		this.encoder = this.motor.getEncoder();
+
+	}
+
+	@Override
+	public void configPID(PIDGains pidGains) {
+		this.pid.setP(pidGains.p);
+		this.pid.setI(pidGains.i);
+		this.pid.setD(pidGains.d);
+		this.pid.setIZone(pidGains.iZone);
+	}
+
 	@Override
 	public void initSendable(SendableBuilder builder) {
 
@@ -26,75 +51,83 @@ public class HaCANSparkMAX extends HaMotorController {
 	@Override
 	public void set(double value, Velocities type) {
 		switch (type) {
-			case MPS:
+			case kMPS:
+				value = HaUnitConvertor.MPSToRPM(value, this.wheelRadiusMeters);
 				break;
-			case RPM:
+			case kRPM:
 				break;
-			case DegPS:
+			case kDegPS:
+				value = HaUnitConvertor.degPSToRPM(value);
 				break;
-			case RadPS:
-				break;
-			case Raw:
+			case kRadPS:
+				value = HaUnitConvertor.radPSToRPM(value);
 				break;
 		}
-
+		this.pid.setReference(value, ControlType.kVelocity);
 	}
 
 	@Override
 	public double get(Velocities type) {
 		switch (type) {
-			case MPS:
-				break;
-			case RPM:
-				break;
-			case DegPS:
-				break;
-			case RadPS:
-				break;
-			case Raw:
-				break;
+			case kMPS:
+				return HaUnitConvertor.RPMToMPS(this.encoder.getVelocity(), this.wheelRadiusMeters);
+			case kRPM:
+				return this.encoder.getVelocity();
+			case kDegPS:
+				return HaUnitConvertor.RPMToDegPS(this.encoder.getVelocity());
+			case kRadPS:
+				return HaUnitConvertor.RPMToRadPS(this.encoder.getVelocity());
+			default:
+				return this.encoder.getVelocity();
 		}
-		return 0;
-	}
-
-	@Override
-	public void set(double value, Velocities type, PIDGains pidGains) {
-		switch (type) {
-			case MPS:
-				break;
-			case RPM:
-				break;
-			case DegPS:
-				break;
-			case RadPS:
-				break;
-			case Raw:
-				break;
-		}
-
 	}
 
 	@Override
 	public void set(double value, Positions type) {
 		switch (type) {
-			case Degrees:
+			case kDegrees:
+				value = value / 360;
 				break;
-			case Rad:
+			case kRad:
+				value = value / (Math.PI * 2);
+				break;
+			case kRotations:
 				break;
 		}
-
+		this.pid.setReference(value, ControlType.kPosition);
 	}
 
 	@Override
 	public double get(Positions type) {
 		switch (type) {
-			case Degrees:
-				break;
-			case Rad:
-				break;
+			case kDegrees:
+				return this.encoder.getPosition() * 360;
+			case kRad:
+				return this.encoder.getPosition() * (Math.PI * 2);
+			case kRotations:
+				return this.encoder.getPosition();
 		}
-
 		return 0;
 	}
 
+	@Override
+	public void set(double value) {
+		this.motor.set(value);
+	}
+
+	@Override
+	public double get() {
+		return this.motor.get();
+	}
+
+	@Override
+	public void setCurrent(double value) {
+		this.pid.setReference(value, ControlType.kCurrent);
+		
+	}
+
+	@Override
+	public double getCurrent() {
+		return this.motor.getOutputCurrent();
+	}
 }

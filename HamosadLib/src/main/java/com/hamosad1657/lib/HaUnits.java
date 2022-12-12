@@ -7,23 +7,25 @@ package com.hamosad1657.lib;
 /** Add your docs here. */
 public class HaUnits {
 	public enum Velocities {
-		RPM, MPS, RadPS, DegPS, Raw,
+		kRPM, kMPS, kRadPS, kDegPS,
 
 	}
 
 	public enum Positions {
-		Rad, Degrees
+		kRad, kDegrees, kRotations;
 	}
 
 	public static class PIDGains {
-		public PIDGains(int d, int i, int p) {
+		public PIDGains(double d, double i, double p, double iZone) {
 			this.p = p;
 			this.i = i;
 			this.d = d;
+			this.iZone = iZone;
 		}
 
-		public int p;
-		public int i;
-		public int d;
+		public double p;
+		public double i;
+		public double d;
+		public double iZone;
 	}
 }
