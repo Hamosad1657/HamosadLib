@@ -4,24 +4,44 @@ public class HaUnitConvertor {
 	// for refrence
 	// https://lucidar.me/en/unit-converter/revolutions-per-minute-to-meters-per-second/
 
-	// Degrees to radians
-	public static double degToRad(double degrees) {
-		return Math.toRadians(degrees);
+	/** Degrees to radians */
+	public static double degToRad(double deg) {
+		return Math.toRadians(deg);
 	}
 
-	// Radians to degrees
-	public static double radToDeg(double radians) {
-		return Math.toDegrees(radians);
+	/** Radians to degrees */
+	public static double radToDeg(double rad) {
+		return Math.toDegrees(rad);
 	}
 
-	// radps to degps
-	public static double radPSToDegPS(double radiansPerSecond) {
-		return Math.toDegrees(radiansPerSecond);
+	/** Radians per second to degrees per second */
+	public static double radPSToDegPS(double radPS) {
+		return Math.toDegrees(radPS);
 	}
 
-	// degps to radps
-	public static double degPSToRadPS(double degreesPerSecond) {
-		return Math.toRadians(degreesPerSecond);
+	/** Degrees per second to radians per second */
+	public static double degPSToRadPS(double degPS) {
+		return Math.toRadians(degPS);
+	}
+
+	/** Degrees per second to rotations per minute */
+	public static double degPSToRPM(double degPS) {
+		return (degPS / 360) / 60;
+	}
+
+	/** Rotations per minute to degrees per secons */
+	public static double RPMToDegPS(double RPM) {
+		return (RPM * 60) * 360;
+	}
+
+	/** Radians per second to rotations per minute */
+	public static double radPSToRPM(double radPS) {
+		return (radPS / (Math.PI * 2)) / 60;
+	}
+
+	/** Rotations per minute to radians per second */
+	public static double RPMToRadPS(double RPM) {
+		return (RPM * 60) * (Math.PI * 2);
 	}
 
 	/// Meters per Second to Rotations per Minute
