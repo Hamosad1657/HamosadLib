@@ -4,6 +4,7 @@
 
 package com.hamosad1657.lib.motors;
 
+import com.hamosad1657.lib.HaUnits.PIDGains;
 import com.hamosad1657.lib.HaUnits.Velocities;
 import com.revrobotics.CANSparkMax;
 
@@ -31,6 +32,12 @@ public class HaCANSparkMAX extends HaMotorController {
 	public double get(Velocities type) {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	@Override
+	public void set(double value, Velocities type, PIDGains pidGains) {
+		// TODO Auto-generated method stub
+
 	}
 
 }
