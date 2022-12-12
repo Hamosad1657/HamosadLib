@@ -8,6 +8,7 @@ package com.hamosad1657.lib;
 public class HaUnits {
 	public enum Velocities {
 		RPM, MPS, RadPS, DegPS, Raw,
+
 	}
 
 	public enum Positions {

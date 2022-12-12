@@ -6,6 +6,7 @@ package com.hamosad1657.lib.motors;
 
 import com.hamosad1657.lib.HaUnits;
 import com.hamosad1657.lib.HaUnits.PIDGains;
+import com.hamosad1657.lib.HaUnits.Positions;
 import com.hamosad1657.lib.HaUnits.Velocities;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -25,20 +26,74 @@ public class HaTalonFX extends HaBaseTalon {
 	@Override
 	public void set(double value, Velocities type) {
 		switch (type) {
-			
-		}		
+			case MPS:
+				break;
+			case RPM:
+				break;
+			case DegPS:
+				break;
+			case RadPS:
+				break;
+			case Raw:
+				break;
+		}
 	}
 
 	@Override
 	public double get(Velocities type) {
-		// TODO Auto-generated method stub
+		switch (type) {
+			case MPS:
+				break;
+			case RPM:
+				break;
+			case DegPS:
+				break;
+			case RadPS:
+				break;
+			case Raw:
+				break;
+		}
 		return 0;
 	}
 
 	@Override
 	public void set(double value, Velocities type, PIDGains pidGains) {
-		// TODO Auto-generated method stub
-		
+		switch (type) {
+			case MPS:
+				break;
+			case RPM:
+				break;
+			case DegPS:
+				break;
+			case RadPS:
+				break;
+			case Raw:
+				break;
+		}
+
+	}
+
+	@Override
+	public void set(double value, Positions type) {
+		switch (type) {
+			case Degrees:
+				break;
+			case Rad:
+				break;
+		}
+
+	}
+
+	@Override
+	public double get(Positions type) {
+		switch (type) {
+			case Degrees:
+				break;
+			case Rad:
+				break;
+		}
+
+		return 0;
 	}
 
 }

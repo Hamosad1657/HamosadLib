@@ -9,14 +9,12 @@ abstract public class HaMotorController implements Sendable {
 
 	abstract public void set(double value, HaUnits.Velocities type);
 
+	abstract public void set(double value, HaUnits.Positions type);
+
 	abstract public void set(double value, HaUnits.Velocities type, HaUnits.PIDGains pidGains);
 
 	abstract public double get(HaUnits.Velocities type);
 
-}
+	abstract public double get(HaUnits.Positions type);
 
-/*
- * class
- * c. Abstarct mutual configuration settings
- * 
- */
+}
