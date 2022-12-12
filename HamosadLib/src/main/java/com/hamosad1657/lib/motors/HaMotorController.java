@@ -9,7 +9,7 @@ abstract public class HaMotorController implements Sendable {
 
 	/**
 	 * Configure PID gains for the motor controller.
-	 * @param PIDGains
+	 * @param PIDGains a PIDGains object
 	 */
 	abstract public void configPID(PIDGains PIDGains);
 

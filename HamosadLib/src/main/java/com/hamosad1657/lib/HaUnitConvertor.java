@@ -62,7 +62,7 @@ public class HaUnitConvertor {
 			throw new IllegalArgumentException("Wheel radius must be positive");
 	}
 
-	/// Meters per Second to Rotations per Minute
+	/** Meters per Second to Rotations per Minute */
 	static public double MPSToRPM(double MPS, double wheelRadiusMeters) throws IllegalArgumentException {
 		if (wheelRadiusMeters > 0) {
 			return 60 / (2 * Math.PI * wheelRadiusMeters) * MPS;
@@ -70,7 +70,7 @@ public class HaUnitConvertor {
 			throw new IllegalArgumentException("Wheel radius must be positive");
 	}
 
-	/// Rotations per Minute to Meters per Second
+	/** Rotations per Minute to Meters per Second */
 	static public double RPMToMPS(double RPM, double wheelRadiusMeters) throws IllegalArgumentException {
 		if (wheelRadiusMeters > 0) {
 			return wheelRadiusMeters * ((2 * Math.PI) / 60) * RPM;
@@ -78,12 +78,12 @@ public class HaUnitConvertor {
 			throw new IllegalArgumentException("Wheel radius must be positive");
 	}
 
-	/// Meters to Inchs
+	/** Meters to Inchs */
 	static public double metersToInches(double meters) {
 		return meters * inchsInMeter;
 	}
 
-	/// Inchs to Meters
+	/** Inchs to Meters */
 	static public double inchesToMeters(double inches) {
 		return inches / inchsInMeter;
 	}
