@@ -8,19 +8,37 @@ package com.hamosad1657.lib;
 public class HaUnits {
 	public enum Velocities {
 		kRPM, kMPS, kRadPS, kDegPS,
-
 	}
 
 	public enum Positions {
 		kRad, kDegrees, kRotations;
 	}
 
+	/**
+	 * Represents a set of Proportional, Integral, Derivative and IZone values.
+	 */
 	public static class PIDGains {
-		public PIDGains(double d, double i, double p, double iZone) {
-			this.p = p;
-			this.i = i;
-			this.d = d;
-			this.iZone = iZone;
+		/**
+		 * @param p Proportional
+		 * @param i Integral
+		 * @param d Derivative
+		 * @param iZone if the absloute error is above iZone, the integral
+		 * 				accumulator is cleared (making it ineffective).
+		 * @throws IllegalArgumentException If any of the values are negative.
+		 */
+		public PIDGains(double p, double i, double d, double iZone) throws IllegalArgumentException {
+			if (p < 0 || i < 0 || d < 0) {
+				throw new IllegalArgumentException("PID gains cannot be negative");
+			}
+			else if (iZone < 0) {
+				throw new IllegalArgumentException("IZone cannot be negative");
+			}
+			else {
+				this.p = p;
+				this.i = i;
+				this.d = d;
+				this.iZone = iZone;
+			}
 		}
 
 		public double p;

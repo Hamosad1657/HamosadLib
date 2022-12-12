@@ -40,16 +40,6 @@ public class HaTalonFX extends HaBaseTalon {
 		}
 	}
 
-	@Override
-	public void initSendable(SendableBuilder builder) {
-
-	}
-
-	@Override
-	public void initShuffleboard() {
-
-	}
-
 	// TalonFX takes encoder ticks per 100 ms as velocity setpoint
 	@Override
 	public void set(double value, Velocities type) {
@@ -154,5 +144,15 @@ public class HaTalonFX extends HaBaseTalon {
 		this.motor.config_kI(0, PIDGains.i);
 		this.motor.config_kD(0, PIDGains.d);
 		this.motor.config_IntegralZone(0, PIDGains.iZone);
+	}
+
+	@Override
+	public void initSendable(SendableBuilder builder) {
+
+	}
+
+	@Override
+	public void initShuffleboard() {
+
 	}
 }

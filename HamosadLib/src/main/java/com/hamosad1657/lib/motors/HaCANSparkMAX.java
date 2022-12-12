@@ -14,7 +14,7 @@ import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
 import edu.wpi.first.util.sendable.SendableBuilder;
 
-/** Add your docs here. */
+
 public class HaCANSparkMAX extends HaMotorController {
 
 	public CANSparkMax motor;
@@ -36,16 +36,6 @@ public class HaCANSparkMAX extends HaMotorController {
 		this.pid.setI(pidGains.i);
 		this.pid.setD(pidGains.d);
 		this.pid.setIZone(pidGains.iZone);
-	}
-
-	@Override
-	public void initSendable(SendableBuilder builder) {
-
-	}
-
-	@Override
-	public void initShuffleboard() {
-
 	}
 
 	@Override
@@ -129,5 +119,15 @@ public class HaCANSparkMAX extends HaMotorController {
 	@Override
 	public double getCurrent() {
 		return this.motor.getOutputCurrent();
+	}
+
+	@Override
+	public void initSendable(SendableBuilder builder) {
+
+	}
+
+	@Override
+	public void initShuffleboard() {
+
 	}
 }
