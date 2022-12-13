@@ -62,4 +62,11 @@ abstract public class HaMotorController implements Sendable {
 	 */
 	abstract public double getCurrent();
 
+	/**
+	 * Set the position of the feedback sensor.
+	 * @param value number to set to
+	 * @param type position unit
+	 */
+	abstract public void setEncoderPosition(double value, HaUnits.Positions type);
+
 }

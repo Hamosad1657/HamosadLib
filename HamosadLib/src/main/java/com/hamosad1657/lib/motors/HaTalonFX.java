@@ -155,4 +155,24 @@ public class HaTalonFX extends HaBaseTalon {
 	public void initShuffleboard() {
 
 	}
+
+	@Override
+	public void setEncoderPosition(double value, Positions type) {
+		switch (type) {
+			case kDegrees:
+				value = (value / 360) * this.encoderTicksPerRev;
+				this.motor.setSelectedSensorPosition(value);
+				break;
+			case kRad:
+				value = (value / (Math.PI * 2)) * this.encoderTicksPerRev;
+				this.motor.setSelectedSensorPosition(value);
+				break;
+			case kRotations:
+				value = value * this.encoderTicksPerRev;
+				this.motor.setSelectedSensorPosition(value);
+				break;
+			default:
+				break;
+		}
+	}
 }

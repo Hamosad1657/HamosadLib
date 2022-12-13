@@ -130,4 +130,19 @@ public class HaCANSparkMAX extends HaMotorController {
 	public void initShuffleboard() {
 
 	}
+
+	@Override
+	public void setEncoderPosition(double value, Positions type) {
+		switch (type) {
+			case kDegrees:
+				this.encoder.setPosition(value / 360);
+				break;
+			case kRad:
+				this.encoder.setPosition(Math.PI * 2);
+				break;
+			case kRotations:
+				this.encoder.setPosition(value);
+				break;
+		}
+	}
 }
