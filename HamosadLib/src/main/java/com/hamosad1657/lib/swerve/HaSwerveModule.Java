@@ -27,12 +27,11 @@ public class HaSwerveModule {
 	 * Constructs a swerve module with a CANCoder and two Falcons.
 	 * <p>
 	 * 
-	 * @param steerMotorControllerType
 	 * @param steerMotorControllerID
-	 * @param driveMotorControllerType
 	 * @param driveMotorControllerID
 	 * @param steerCANCoderID
 	 * @param steerOffsetDegrees
+	 * @param wheelDiameterCM
 	 */
 	public HaSwerveModule(
 			int steerMotorControllerID, int driveMotorControllerID, int steerCANCoderID,
