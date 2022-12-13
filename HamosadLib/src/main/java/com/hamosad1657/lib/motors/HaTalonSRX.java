@@ -6,12 +6,13 @@ package com.hamosad1657.lib.motors;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.hamosad1657.lib.HaUnitConvertor;
 import com.hamosad1657.lib.HaUnits.PIDGains;
 import com.hamosad1657.lib.HaUnits.Positions;
 import com.hamosad1657.lib.HaUnits.Velocities;
-
+import com.revrobotics.CANSparkMax.IdleMode;
 import edu.wpi.first.util.sendable.SendableBuilder;
 
 /** Add your docs here. */
@@ -164,6 +165,17 @@ public class HaTalonSRX extends HaBaseTalon {
 				break;
 			default:
 				break;
+		}
+	}
+
+	@Override
+	public void setIdleMode(IdleMode idleMode) {
+		switch (idleMode) {
+			case kBrake:
+				this.motor.setNeutralMode(NeutralMode.Brake);
+				break;
+			case kCoast:
+				this.motor.setNeutralMode(NeutralMode.Coast);
 		}
 	}
 

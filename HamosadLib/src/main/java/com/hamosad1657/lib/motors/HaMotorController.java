@@ -2,6 +2,7 @@ package com.hamosad1657.lib.motors;
 
 import com.hamosad1657.lib.HaUnits;
 import com.hamosad1657.lib.HaUnits.PIDGains;
+import com.revrobotics.CANSparkMax.IdleMode;
 import edu.wpi.first.util.sendable.Sendable;
 
 abstract public class HaMotorController implements Sendable {
@@ -68,5 +69,7 @@ abstract public class HaMotorController implements Sendable {
 	 * @param type position unit
 	 */
 	abstract public void setEncoderPosition(double value, HaUnits.Positions type);
+
+	abstract public void setIdleMode(IdleMode idleMode);
 
 }

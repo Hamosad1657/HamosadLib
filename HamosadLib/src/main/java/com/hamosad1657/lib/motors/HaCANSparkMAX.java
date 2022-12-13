@@ -12,6 +12,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
+import com.revrobotics.CANSparkMax.IdleMode;
 import edu.wpi.first.util.sendable.SendableBuilder;
 
 
@@ -119,6 +120,17 @@ public class HaCANSparkMAX extends HaMotorController {
 	@Override
 	public double getCurrent() {
 		return this.motor.getOutputCurrent();
+	}
+
+	@Override
+	public void setIdleMode(IdleMode idleMode) {
+		switch (idleMode) {
+			case kBrake:
+				this.motor.setIdleMode(idleMode);
+				break;
+			case kCoast:
+				this.motor.setIdleMode(idleMode);
+		}
 	}
 
 	@Override
