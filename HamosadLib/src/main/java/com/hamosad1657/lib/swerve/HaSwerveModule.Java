@@ -1,17 +1,19 @@
 package com.hamosad1657.lib.swerve;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.SensorTimeBase;
+import com.hamosad1657.lib.HaUnits;
+import com.hamosad1657.lib.motors.HaTalonFX;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DriverStation;
 
 /**
  * @author Shaked - ask me if you have questions🌠
@@ -19,9 +21,8 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 public class HaSwerveModule {
 
 	private WPI_TalonFX steerTalonFX, driveTalonFX;
+	private HaTalonFX steerMotor, driveMotor;
 	private final CANCoder steerEncoder;
-
-	private final double kWheelCircumferenceM;
 
 	/**
 	 * Constructs a swerve module with a CANCoder and two Falcons.
@@ -31,13 +32,12 @@ public class HaSwerveModule {
 	 * @param driveMotorControllerID
 	 * @param steerCANCoderID
 	 * @param steerOffsetDegrees
-	 * @param wheelDiameterCM
+	 * @param wheelRadiusM
 	 */
 	public HaSwerveModule(
 			int steerMotorControllerID, int driveMotorControllerID, int steerCANCoderID,
-			double steerOffsetDegrees, double wheelDiameterCM) {
-
-		this.kWheelCircumferenceM = wheelDiameterCM / 10 * Math.PI;
+			double steerOffsetDegrees, double wheelRadiusM, HaUnits.PIDGains steerPidGains,
+			HaUnits.PIDGains drivePidGains) {
 
 		this.steerEncoder = new CANCoder(steerCANCoderID);
 		this.steerEncoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
@@ -46,16 +46,20 @@ public class HaSwerveModule {
 		this.steerEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
 
 		this.steerTalonFX = new WPI_TalonFX(steerMotorControllerID);
-		this.steerTalonFX.setNeutralMode(NeutralMode.Brake);
-		this.steerTalonFX.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
-		this.steerTalonFX.setSelectedSensorPosition(
-				(this.steerEncoder.getAbsolutePosition()
-						* HaSwerveConstants.kTalonFXIntegratedEncoderTicksPerDeg)
-						/ SdsModuleConfigurations.MK4_L2.getSteerReduction());
+
+		try {
+			this.steerMotor = new HaTalonFX(this.steerTalonFX, steerPidGains, wheelRadiusM, FeedbackDevice.IntegratedSensor);
+		} catch(Exception e) {
+			DriverStation.reportError(e.toString(), true);
+		}
+		this.steerMotor.setIdleMode(IdleMode.kBrake);
 
 		this.driveTalonFX = new WPI_TalonFX(driveMotorControllerID);
-		this.driveTalonFX.setNeutralMode(NeutralMode.Brake);
-		this.driveTalonFX.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
+		try {
+			this.driveMotor = new HaTalonFX(this.driveTalonFX, drivePidGains, wheelRadiusM, FeedbackDevice.IntegratedSensor);
+		} catch(Exception e) {
+			DriverStation.reportError(e.toString(), true);
+		}
 
 		this.syncSteerEncoder();
 	}
@@ -65,66 +69,46 @@ public class HaSwerveModule {
 	 * CANCoder's measurment, considering units and gear ratio.
 	 */
 	public void syncSteerEncoder() {
-		this.steerTalonFX.setSelectedSensorPosition(
-				(this.steerEncoder.getAbsolutePosition()
-						* HaSwerveConstants.kTalonFXIntegratedEncoderTicksPerDeg)
-						/ SdsModuleConfigurations.MK4_L2.getSteerReduction());
+		this.steerMotor.setEncoderPosition(
+				this.steerEncoder.getAbsolutePosition() 
+						/ SdsModuleConfigurations.MK4_L2.getSteerReduction(),
+				HaUnits.Positions.kDegrees);
 	}
 
 	/**
-	 * @param Proportional
-	 * @param Integral
-	 * @param Derivative
-	 * @param IZone if the absloute closed-loop error is above IZone, the
-	 *            	Integral accumulator is cleared (making it ineffective).
+	 * @param pidGains
 	 * @throws IllegalArgumentException
 	 *             If one or more of the PID gains are
 	 *             negative, or if IZone is negative.
 	 */
-	public void setSteerPID(
-			double Proportional, double Integral, double Derivative, double IZone)
+	public void setSteerPID(HaUnits.PIDGains pidGains)
 			throws IllegalArgumentException {
 		// If one of the PID gains are negative
-		if (Proportional < 0 || Integral < 0 || Derivative < 0)
+		if (pidGains.p < 0 || pidGains.i < 0 || pidGains.d < 0)
 			throw new IllegalArgumentException("PID gains cannot be negative.");
 		// If IZone is negative
-		if (IZone < 0)
+		if (pidGains.iZone < 0)
 			throw new IllegalArgumentException("IZone cannot be negative.");
 
-		this.configPID(
-				this.steerTalonFX,
-				Proportional,
-				Integral,
-				Derivative,
-				IZone);
+		this.steerMotor.configPID(pidGains);
 	}
 
 	/**
-	 * @param Proportional
-	 * @param Integral
-	 * @param Derivative
-	 * @param IZone if the absloute closed-loop error is above IZone, the
-	 *            	Integral accumulator is cleared (making it ineffective).
+	 * @param pidGains
 	 * @throws IllegalArgumentException
-	 *             if one or more of the PID gains are
+	 *             If one or more of the PID gains are
 	 *             negative, or if IZone is negative.
 	 */
-	public void setDrivePID(
-			double Proportional, double Integral, double Derivative, double IZone)
+	public void setDrivePID(HaUnits.PIDGains pidGains)
 			throws IllegalArgumentException {
 		// If one of the PID gains are negative
-		if (Proportional < 0 || Integral < 0 || Derivative < 0)
-			throw new IllegalArgumentException("PID gains cannot be negative");
+		if (pidGains.p < 0 || pidGains.i < 0 || pidGains.d < 0)
+			throw new IllegalArgumentException("PID gains cannot be negative.");
 		// If IZone is negative
-		if (IZone < 0)
-			throw new IllegalArgumentException("IZone cannot be negative");
+		if (pidGains.iZone < 0)
+			throw new IllegalArgumentException("IZone cannot be negative.");
 
-		this.configPID(
-				this.driveTalonFX,
-				Proportional,
-				Integral,
-				Derivative,
-				IZone);
+		this.driveMotor.configPID(pidGains);
 	}
 
 	/**
@@ -132,7 +116,7 @@ public class HaSwerveModule {
 	 */
 	public SwerveModuleState getSwerveModuleState() {
 		return new SwerveModuleState(
-				this.getWheelMPS(),
+				this.steerMotor.get(HaUnits.Velocities.kMPS),
 				Rotation2d.fromDegrees(this.getAbsWheelAngleDeg()));
 	}
 
@@ -154,13 +138,7 @@ public class HaSwerveModule {
 	 * @return the speed of the wheel in meters per second.
 	 */
 	public double getWheelMPS() {
-		double integratedEncoderTicksPer100MS = this.driveTalonFX.getSelectedSensorVelocity();
-		double integratedEncoderTicksPS = integratedEncoderTicksPer100MS * 10;
-		double motorRevPS = integratedEncoderTicksPS /
-				HaSwerveConstants.kTalonFXIntegratedEncoderTicksPerRev;
-		double wheelRevPS = motorRevPS * SdsModuleConfigurations.MK4_L2.getDriveReduction();
-		double MPS = wheelRevPS * this.kWheelCircumferenceM;
-		return MPS;
+		return this.driveMotor.get(HaUnits.Velocities.kMPS);
 	}
 
 	/**
@@ -171,8 +149,8 @@ public class HaSwerveModule {
 	 * @param moduleState
 	 */
 	public void setSwerveModuleState(SwerveModuleState moduleState) {
-		this.setDriveMotor(moduleState.speedMetersPerSecond);
-		this.setSteerMotor(moduleState.angle);
+		this.driveMotor.set(moduleState.speedMetersPerSecond, HaUnits.Velocities.kMPS);
+		this.steerMotor.set(moduleState.angle.getDegrees(), HaUnits.Positions.kDegrees);
 	}
 
 	/**
@@ -182,10 +160,9 @@ public class HaSwerveModule {
 	 * @param angleDegrees of the wheel
 	 */
 	public void setSteerMotor(double angleDegrees) {
-		this.steerTalonFX.set(
-				ControlMode.Position,
-				(angleDegrees * HaSwerveConstants.kTalonFXIntegratedEncoderTicksPerDeg)
-						/ SdsModuleConfigurations.MK4_L2.getSteerReduction());
+		this.steerMotor.set(
+				angleDegrees / SdsModuleConfigurations.MK4_L2.getSteerReduction(),
+				HaUnits.Positions.kDegrees);
 	}
 
 	/**
@@ -196,24 +173,21 @@ public class HaSwerveModule {
 	 *            angle of the wheel as a Rotation2d
 	 */
 	public void setSteerMotor(Rotation2d angle) {
-		this.steerTalonFX.set(
-				ControlMode.Position,
-				(angle.getDegrees() * HaSwerveConstants.kTalonFXIntegratedEncoderTicksPerDeg)
-						/ SdsModuleConfigurations.MK4_L2.getSteerReduction());
+		this.steerMotor.set(
+				angle.getDegrees() / SdsModuleConfigurations.MK4_L2.getSteerReduction(),
+				HaUnits.Positions.kDegrees);
 	}
 
 	/**
 	 * Preforms velocity closed-loop control on the
 	 * drive motor. It runs on the motor controller.
 	 * 
-	 * @param MPS
-	 *            of the wheel
+	 * @param MPS of the wheel
 	 */
 	public void setDriveMotor(double MPS) {
-		this.driveTalonFX.set(
-				ControlMode.Velocity,
-				this.MPSToIntegratedEncoderTicksPer100MS(MPS)
-						/ SdsModuleConfigurations.MK4_L2.getDriveReduction());
+		this.driveMotor.set(
+				MPS / SdsModuleConfigurations.MK4_L2.getDriveReduction(),
+				HaUnits.Velocities.kMPS);
 	}
 
 	/**
@@ -290,30 +264,6 @@ public class HaSwerveModule {
 	public String toString() {
 		return "\n MPS: " + String.valueOf(this.getWheelMPS()) +
 				"\n Angle: " + String.valueOf(this.steerEncoder.getAbsolutePosition());
-	}
-
-	private void configPID(WPI_TalonFX talonFX, double P, double I, double D, double IZone) {
-		talonFX.config_kP(0, P);
-		talonFX.config_kI(0, I);
-		talonFX.config_kD(0, D);
-		talonFX.config_IntegralZone(0, IZone);
-	}
-
-	/**
-	 * Converts meters per second to the units the TalonFX uses for position
-	 * feedback, which are integrated encoder ticks per 100 miliseconds.
-	 * 
-	 * @param MPS
-	 * @return integrated encoder ticks per 100 ms
-	 */
-	private double MPSToIntegratedEncoderTicksPer100MS(double MPS) {
-		double wheelRevPS = MPS / this.kWheelCircumferenceM;
-		double motorRevPS = wheelRevPS
-				/ SdsModuleConfigurations.MK4_L2.getDriveReduction();
-		double integratedEncoderTicksPS = motorRevPS *
-				(HaSwerveConstants.kTalonFXIntegratedEncoderTicksPerRev);
-		double encoderTicksPer100MS = integratedEncoderTicksPS / 10;
-		return encoderTicksPer100MS;
 	}
 
 	/**
