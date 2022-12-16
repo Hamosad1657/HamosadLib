@@ -32,7 +32,6 @@ public class HaSwerveSubsystem extends SubsystemBase {
 	private SwerveModuleState[] desiredStates;
 	private SwerveModuleState[] empiricalStates;
 
-	private HaNavX navX;
 	private HaSwerveModule[] swerveModules;
 	private double maxChassisVelocityMPS;
 
@@ -51,7 +50,6 @@ public class HaSwerveSubsystem extends SubsystemBase {
 			double trackWidthMeters,
 			double maxChassisVelocityMPS) {
 
-		this.navX = navX;
 		this.swerveModules = swerveModules;
 		this.maxChassisVelocityMPS = maxChassisVelocityMPS;
 
@@ -62,9 +60,14 @@ public class HaSwerveSubsystem extends SubsystemBase {
 				new Translation2d(trackWidthMeters / 2.0, trackWidthMeters / 2.0));
 		this.chassisSpeeds = new ChassisSpeeds();
 		this.desiredStates = this.kinematics.toSwerveModuleStates(this.chassisSpeeds);
+		this.empiricalStates = new SwerveModuleState[] {
+				new SwerveModuleState(),
+				new SwerveModuleState(),
+				new SwerveModuleState(),
+				new SwerveModuleState()};
 
 		this.odometry = new SwerveDriveOdometry(
-				this.kinematics, this.navX.getYawRotation2d(), startingPose);
+				this.kinematics, HaNavX.getYawRotation2d(), startingPose);
 
 		this.previousRotations = new double[] { 0, 0, 0, 0 };
 		this.encodersSyncTimer = new Timer();
@@ -84,21 +87,21 @@ public class HaSwerveSubsystem extends SubsystemBase {
 	 * @param newPosition a Pose2d object. Units in meters and Rotation2d.
 	 */
 	public void setPosition(Pose2d newPosition) {
-		this.odometry.resetPosition(newPosition, this.navX.getYawRotation2d());
+		this.odometry.resetPosition(newPosition, HaNavX.getYawRotation2d());
 	}
 
 	/**
 	 * Discards the odometry measurments and sets the position to 0,0,0.
 	 */
 	public void resetPosition() {
-		this.odometry.resetPosition(new Pose2d(), this.navX.getYawRotation2d());
+		this.odometry.resetPosition(new Pose2d(), HaNavX.getYawRotation2d());
 	}
 
 	/**
 	 * Sets the angle to zero, and informs the odometry of the change.
 	 */
 	public void zeroAngle() {
-		this.navX.zeroYaw();
+		HaNavX.resetYaw();
 		this.odometry.resetPosition(this.getCurrentPosition(), new Rotation2d());
 	}
 
@@ -191,7 +194,7 @@ public class HaSwerveSubsystem extends SubsystemBase {
 		this.empiricalStates[2] = this.swerveModules[2].getSwerveModuleState();
 		this.empiricalStates[3] = this.swerveModules[3].getSwerveModuleState();
 		// Update the odometry according to the empirical states.
-		this.odometry.update(this.navX.getYawRotation2d(), this.empiricalStates);
+		this.odometry.update(HaNavX.getYawRotation2d(), this.empiricalStates);
 
 		// If the robot hasn't been moving for more than a second (5 iterations),
 		// then sync the encoders.

@@ -1,81 +1,32 @@
 package com.hamosad1657.lib.sensors;
 
 import com.kauailabs.navx.frc.AHRS;
+import com.kauailabs.navx.frc.AHRS.SerialDataType;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.I2C;
-import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SerialPort;
 
 /**
  * A wrapper class for kauailabs.navx.frc.AHRS,
  * which adheres to WPILib's coordinate system
  * conventions.
- * <p>
- * Get an instance of this class by using one
- * of the public getInstance() methods. They do
- * not return a value until the navX is connected
- * and calibrated.
- * 
  * @author Shaked - ask me if you have questions🌠
  */
-public class HaNavX extends AHRS {
+public class HaNavX {
 	private HaNavX() {}
+	private static double yawOffsetDeg = 0;
 
-	/**
-	 * Starts communtication between navX and RoboRIO,
-	 * enables logging to the RioLog & Driver Station,
-	 * waits until the navX is connected and calibrated,
-	 * then returns an instance.
-	 *
-	 * @param port serial port (usually USB)
-	 * @return an instance of HaNavx, which extends AHRS.
-	 */
-	public static HaNavX getInstance(SerialPort.Port port) {
-		AHRS navx = new AHRS(
-				port, SerialDataType.kProcessedData, (byte) 60);
+	public static AHRS navx;
+
+	static {
+		navx = new AHRS(
+				SerialPort.Port.kUSB1, SerialDataType.kProcessedData, (byte) 60);
 		navx.enableLogging(true);
 		while (!navx.isConnected()) {}
+		DriverStation.reportError("navX connected on port USB 1 \n", false);
 		while (navx.isCalibrating()) {}
-		DriverStation.reportError("navX done calibrating", false);
-		return (HaNavX) navx;
-	}
-
-	/**
-	 * Starts communtication between navX and RoboRIO,
-	 * enables logging to the RioLog & Driver Station,
-	 * waits until the navX is connected and calibrated,
-	 * then returns an instance.
-	 * 
-	 * @param port I2C port. Using the onboard I2C port is not reccomended, for more information click here:
-	 *            https://docs.wpilib.org/en/stable/docs/yearly-overview/known-issues.html#onboard-i2c-causing-system-lockups
-	 * @return an instance of HaNavx, which extends AHRS.
-	 */
-	public static HaNavX getInstance(I2C.Port port) {
-		AHRS navx = new AHRS(port);
-		navx.enableLogging(true);
-		while (!navx.isConnected()) {}
-		while (navx.isCalibrating()) {}
-		DriverStation.reportError("navX done calibrating", false);
-		return (HaNavX) navx;
-	}
-
-	/**
-	 * Starts communtication between navX and RoboRIO,
-	 * enables logging to the RioLog & Driver Station,
-	 * waits until the navX is connected and calibrated,
-	 * then returns an instance.
-	 * 
-	 * @param port SPI port
-	 * @return an instance of HaNavx, which extends AHRS.
-	 */
-	public static HaNavX getInstance(SPI.Port port) {
-		AHRS navx = new AHRS(port);
-		navx.enableLogging(true);
-		while (!navx.isConnected()) {}
-		while (navx.isCalibrating()) {}
-		DriverStation.reportError("navX done calibrating", false);
-		return (HaNavX) navx;
+		DriverStation.reportError("navX done calibrating \n", false);
 	}
 
 	/**
@@ -85,8 +36,8 @@ public class HaNavX extends AHRS {
 	 *         the angle decrease, according to WPILib's coordinate system
 	 *         conventions.
 	 */
-	public double getYawAngleDeg() {
-		return 360.0 - this.getYaw();
+	public static double getYawAngleDeg() {
+		return 360.0 - navx.getYaw() + yawOffsetDeg;
 	}
 
 	/**
@@ -96,8 +47,8 @@ public class HaNavX extends AHRS {
 	 *         angle decrease, according to WPILib's coordinate system
 	 *         conventions.
 	 */
-	public double getYawAngleRad() {
-		return Math.toRadians(360.0 - this.getYaw());
+	public static double getYawAngleRad() {
+		return Math.toRadians(360.0 - navx.getYaw() + yawOffsetDeg);
 	}
 
 	/**
@@ -107,8 +58,8 @@ public class HaNavX extends AHRS {
 	 *         the angle decrease, according to WPILib's coordinate system
 	 *         conventions.
 	 */
-	public Rotation2d getYawRotation2d() {
-		return Rotation2d.fromDegrees(360.0 - this.getYaw());
+	public static Rotation2d getYawRotation2d() {
+		return Rotation2d.fromDegrees(360.0 - navx.getYaw() + yawOffsetDeg);
 	}
 
 	/**
@@ -117,8 +68,8 @@ public class HaNavX extends AHRS {
 	 *         Rotating clockwise returns a positive value, and
 	 *         counter-clockwise returns a negative value.
 	 */
-	public double angularVelocityDegPS() {
-		return -this.getRate();
+	public static double getAngularVelocityDegPS() {
+		return -navx.getRate();
 	}
 
 	/**
@@ -127,7 +78,30 @@ public class HaNavX extends AHRS {
 	 *         Rotating clockwise returns a positive value, and
 	 *         counter-clockwise returns a negative value.
 	 */
-	public double angularVelocityRadPS() {
-		return Math.toRadians(-this.getRate());
+	public static double getAngularVelocityRadPS() {
+		return Math.toRadians(-navx.getRate());
+	}
+
+	/**
+	 * Sets the current angle on the Z axis (perpendicular to earth, "yaw") as
+	 * zero. Can be used to set the angle the robot is currently facing as the
+	 * front. The offset that was set with setYawOffsetDeg/Rad/Rotation2d is
+	 * cleared.
+	 */
+	public static void resetYaw() {
+		navx.zeroYaw();
+		yawOffsetDeg = 0;
+	}
+
+	public static void setYawOffsetDeg(double offsetDeg) {
+		yawOffsetDeg = offsetDeg;
+	}
+
+	public static void setYawOffsetRad(double offsetRad) {
+		yawOffsetDeg = Math.toDegrees(offsetRad);
+	}
+
+	public static void setYawOffsetRotation2d(Rotation2d offsetRotation2d) {
+		yawOffsetDeg = offsetRotation2d.getDegrees();
 	}
 }
