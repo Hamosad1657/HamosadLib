@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * Get an object of this class by calling the static
  * getInstance() method, and then call initialize()
  * on it. Probably best done in RobotContainer.
+ * 
  * @author Shaked - ask me if you have questions🌠
  */
 public class HaSwerveSubsystem extends SubsystemBase {
@@ -32,16 +33,21 @@ public class HaSwerveSubsystem extends SubsystemBase {
 	private SwerveModuleState[] desiredStates;
 	private SwerveModuleState[] empiricalStates;
 
+	private HaNavX navX;
 	private HaSwerveModule[] swerveModules;
 	private double maxChassisVelocityMPS;
 
 	/**
-	 * It's not singleton, so take care to not create more than one instance of this Subsystem.
+	 * It's not singleton, so take care to not create more than one instance of this
+	 * Subsystem.
+	 * 
 	 * @param startingPose
 	 * @param navX
-	 * @param swerveModules front-left, front-right, back-left, back-right
+	 * @param swerveModules
+	 *                              front-left, front-right, back-left, back-right
 	 * @param trackWidthMeters
-	 * @param maxChassisVelocityMPS How fast the robot can move in a straight line
+	 * @param maxChassisVelocityMPS
+	 *                              How fast the robot can move in a straight line
 	 */
 	public HaSwerveSubsystem(
 			Pose2d startingPose,
@@ -50,6 +56,7 @@ public class HaSwerveSubsystem extends SubsystemBase {
 			double trackWidthMeters,
 			double maxChassisVelocityMPS) {
 
+		this.navX = navX;
 		this.swerveModules = swerveModules;
 		this.maxChassisVelocityMPS = maxChassisVelocityMPS;
 
@@ -60,18 +67,15 @@ public class HaSwerveSubsystem extends SubsystemBase {
 				new Translation2d(trackWidthMeters / 2.0, trackWidthMeters / 2.0));
 		this.chassisSpeeds = new ChassisSpeeds();
 		this.desiredStates = this.kinematics.toSwerveModuleStates(this.chassisSpeeds);
-		this.empiricalStates = new SwerveModuleState[] {
-				new SwerveModuleState(),
-				new SwerveModuleState(),
-				new SwerveModuleState(),
-				new SwerveModuleState()};
 
 		this.odometry = new SwerveDriveOdometry(
-				this.kinematics, HaNavX.getYawRotation2d(), startingPose);
+				this.kinematics, this.navX.getYawRotation2d(), startingPose);
 
 		this.previousRotations = new double[] { 0, 0, 0, 0 };
 		this.encodersSyncTimer = new Timer();
 		this.encodersSyncTimer.start();
+
+		this.empiricalStates = new SwerveModuleState[4];
 	}
 
 	/**
@@ -84,24 +88,26 @@ public class HaSwerveSubsystem extends SubsystemBase {
 
 	/**
 	 * Discards the odometry measurments and sets the pose to newPosition.
-	 * @param newPosition a Pose2d object. Units in meters and Rotation2d.
+	 * 
+	 * @param newPosition
+	 *                    a Pose2d object. Units in meters and Rotation2d.
 	 */
 	public void setPosition(Pose2d newPosition) {
-		this.odometry.resetPosition(newPosition, HaNavX.getYawRotation2d());
+		this.odometry.resetPosition(newPosition, this.navX.getYawRotation2d());
 	}
 
 	/**
 	 * Discards the odometry measurments and sets the position to 0,0,0.
 	 */
 	public void resetPosition() {
-		this.odometry.resetPosition(new Pose2d(), HaNavX.getYawRotation2d());
+		this.odometry.resetPosition(new Pose2d(), this.navX.getYawRotation2d());
 	}
 
 	/**
 	 * Sets the angle to zero, and informs the odometry of the change.
 	 */
 	public void zeroAngle() {
-		HaNavX.resetYaw();
+		this.navX.zeroYaw();
 		this.odometry.resetPosition(this.getCurrentPosition(), new Rotation2d());
 	}
 
@@ -110,6 +116,7 @@ public class HaSwerveSubsystem extends SubsystemBase {
 	 * robot-relative depends on the passed ChassisSpeeds object.
 	 * Convert field-relative to robot-relative ChassisSpeeds using
 	 * the static ChassisSpeeds.fromFieldRelativeSpeeds() method.
+	 * 
 	 * @param robotRelativeSpeeds
 	 */
 	public void drive(ChassisSpeeds robotRelativeSpeeds) {
@@ -125,11 +132,13 @@ public class HaSwerveSubsystem extends SubsystemBase {
 		this.desiredStates[3] = HaSwerveModule.optimizeWithWPI(
 				this.desiredStates[3], this.swerveModules[3].getAbsWheelAngleDeg());
 
-		// If any of the wheel speeds are over the max velocity, lower them all in the same ratio.
+		// If any of the wheel speeds are over the max velocity, lower them all in the
+		// same ratio.
 		SwerveDriveKinematics.desaturateWheelSpeeds(
 				this.desiredStates, this.maxChassisVelocityMPS);
 
-		// If chassis doesn't need to move, set the modules to 0 MPS and previous rotation.
+		// If chassis doesn't need to move, set the modules to 0 MPS and previous
+		// rotation.
 		if (this.robotNeedsToMove()) {
 			// Front left
 			this.swerveModules[0].setDriveMotor(0);
@@ -193,8 +202,9 @@ public class HaSwerveSubsystem extends SubsystemBase {
 		this.empiricalStates[1] = this.swerveModules[1].getSwerveModuleState();
 		this.empiricalStates[2] = this.swerveModules[2].getSwerveModuleState();
 		this.empiricalStates[3] = this.swerveModules[3].getSwerveModuleState();
+
 		// Update the odometry according to the empirical states.
-		this.odometry.update(HaNavX.getYawRotation2d(), this.empiricalStates);
+		this.odometry.update(this.navX.getYawRotation2d(), this.empiricalStates);
 
 		// If the robot hasn't been moving for more than a second (5 iterations),
 		// then sync the encoders.
