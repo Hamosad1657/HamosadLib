@@ -5,7 +5,6 @@
 
 package com.hamosad1657.lib;
 
-import java.lang.annotation.Target;
 import java.util.HashMap;
 
 import org.photonvision.PhotonCamera;
@@ -23,69 +22,84 @@ public class PhotonVision {
      */
     HashMap<Integer, Pose3d> TagHashMap = new HashMap<Integer, Pose3d>();
 
-    /// This is the PhotonCamera instance, name it after your camera name in photonvision.
+    /** This is the PhotonCamera instance, *** important: name it after your camera name in photonvision.*/
     PhotonCamera camera = new PhotonCamera("MicrosoftCamera");
 
-    /// Gets the best target from PhotonVision.
-    public PhotonTrackedTarget getTagBestTarget() {
+    /** @return Boolean that returns weather or not PhotonVision has detected targets. */
+    public boolean hasTargets() {
         var result = camera.getLatestResult();
         boolean hasTargets = result.hasTargets();
-        if (hasTargets) {
-            PhotonTrackedTarget target = result.getBestTarget();
-            return target;
-        }
+        if (hasTargets) return true;
+        return false;
+    }
+
+    /** @return The best target Photonvision found. */
+    public PhotonTrackedTarget getBestTarget() {
+        var result = camera.getLatestResult();
+        if (hasTargets()) return result.getBestTarget();
         return null;
     }
 
-    /// Gets the best target's Transform3d
-    public Transform3d getTagTransform3D() {
-        PhotonTrackedTarget target = getTagBestTarget();
-        if (target != null) {
-            return target.getBestCameraToTarget();
-        }
+    /** @return Best target's ID. */
+    public int getTagID() {
+        if (hasTargets()) return getBestTarget().getFiducialId();
+        return -1; // this is bad! ew tfu tfu tfu knock on wood, find a way to replace this in the future, big ihsa...
+    }
+
+    /** @return Best target's Transform3D (dimentions between the camera and the tag, reletive position to the tag). */
+    public Transform3d getRelativeTransform3D() {
+        if (hasTargets()) return getBestTarget().getBestCameraToTarget();
         return null;
     }
 
-    /// Gets the robot's x (x is the further or closer the robot is reletive to the tag).
-    public Double getRobotCurrentX() {
-        var transform = this.getTagTransform3D();
-        if (transform != null) {
-            return transform.getX();
-        }
+    /** @return Best target's X. */
+    public Double getRelativeX() {
+        if (hasTargets()) return getRelativeTransform3D().getX();
         return null;
     }
 
-    /// Gets the robot's y (y is the further up or down the robot is reletive to the tag).
-    public Double getRobotCurrentY() {
-        var transform = this.getTagTransform3D();
-        if (transform != null) {
-            return transform.getY();
-        }
+    /** @return Best target's Y. */
+    public Double getRelativeY() {
+        if (hasTargets()) return getRelativeTransform3D().getY();
         return null;
     }
 
-    /// Gets the robot's z (z is the further left or right the robot is reletive to the tag).
-    public Double getRobotCurrentZ() {
-        var transform = this.getTagTransform3D();
-        if (transform != null) {
-            return transform.getZ();
-        }
+    /** @return Best target's Z. */
+    public Double getRelativeZ() {
+        if (hasTargets()) return getRelativeTransform3D().getZ();
         return null;
     }
 
-    /// Gets the robots actual position.
-    public Pose3d getRobotpose3D() {
+    /** @return Robot's Pose3D on the field. */
+    public Pose3d getFieldPose3D() {
         
-        /// Gets tag's position
-        PhotonTrackedTarget target = getTagBestTarget();
+        PhotonTrackedTarget target = getBestTarget();
         int TagID = target.getFiducialId();
         Pose3d tagPose3d = TagHashMap.get(TagID);
 
-        var transform = this.getTagTransform3D();
+        var transform = this.getRelativeTransform3D();
         if (transform != null) {
             Pose3d RobotPose3d = tagPose3d.transformBy(transform);
             return RobotPose3d;
         }
+        return null;
+    }
+
+    /** @return Robot's X on the field. */
+    public Double getFieldX() {
+        if (hasTargets()) return getFieldPose3D().getX();
+        return null;
+    }
+
+    /** @return Robot's Y on the field. */
+    public Double getFieldY() {
+        if (hasTargets()) return getFieldPose3D().getY();
+        return null;
+    }
+
+    /** @return Robot's Z on the field. */
+    public Double getFieldZ() {
+        if (hasTargets()) return getFieldPose3D().getZ();
         return null;
     }
 }
