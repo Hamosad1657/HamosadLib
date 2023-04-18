@@ -6,8 +6,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Encoder;
 
 /**
- * A sendable quadrature encoder, wrapping WPILib's Encoder class with clearer
- * comments and a little less math.
+ * A sendable quadrature encoder, wrapping WPILib's Encoder class.
  * For an explanation on quadratrue encoders, read here:
  * https://docs.wpilib.org/en/stable/docs/software/hardware-apis/sensors/encoders-software.html
  */
@@ -125,7 +124,7 @@ public class HaEncoder implements Sendable {
 	@Override
 	public void initSendable(SendableBuilder builder) {
 		builder.setSmartDashboardType("HaEncoder");
-		builder.addDoubleProperty("DistanceMeters", this::getDistanceMeters, null);
-		builder.addDoubleProperty("Speed", this::getSpeedMPS, null);
+		builder.addDoubleProperty("Rotations", this::getRotations, null);
+		builder.addDoubleProperty("RPM", this::getSpeedRPM, null);
 	}
 }
