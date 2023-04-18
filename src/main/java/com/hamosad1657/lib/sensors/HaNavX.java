@@ -11,10 +11,11 @@ import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.Robot;
+import com.hamosad1657.lib.debug.HaDriverStation;
 
 /**
- * A wrapper class for kauailabs.navx.frc.AHRS, which adheres to WPILib's coordinate system conventions.
+ * A wrapper class for kauailabs.navx.frc.AHRS, which adheres to WPILib's
+ * coordinate system conventions.
  * <p>
  * 
  * @author Shaked - ask me if you have questions🌠
@@ -27,7 +28,8 @@ public class HaNavX implements Sendable {
 	private static final double kTimeoutSec = 5.0;
 
 	/**
-	 * Starts communtication between navX and RoboRIO, enables logging to the RioLog & Driver Station, waits until the
+	 * Starts communtication between navX and RoboRIO, enables logging to the RioLog
+	 * & Driver Station, waits until the
 	 * navX is connected and calibrated, then returns an instance.
 	 *
 	 * @param port serial port (usually USB)
@@ -37,15 +39,17 @@ public class HaNavX implements Sendable {
 		try {
 			this.initialize(port);
 		} catch (RuntimeException E) {
-			Robot.print("Failed to connect to navX.");
+			HaDriverStation.print("Failed to connect to navX.");
 		}
 	}
 
 	/**
-	 * Starts communtication between navX and RoboRIO, enables logging to the RioLog & Driver Station, waits until the
+	 * Starts communtication between navX and RoboRIO, enables logging to the RioLog
+	 * & Driver Station, waits until the
 	 * navX is connected and calibrated, then returns an instance.
 	 * 
-	 * @param port I2C port. Using the onboard I2C port is not reccomended, for more information click here:
+	 * @param port I2C port. Using the onboard I2C port is not reccomended, for more
+	 *             information click here:
 	 *             https://docs.wpilib.org/en/stable/docs/yearly-overview/known-issues.html#onboard-i2c-causing-system-lockups
 	 * @return an instance of HaNavx, which wrapps AHRS.
 	 */
@@ -53,12 +57,13 @@ public class HaNavX implements Sendable {
 		try {
 			this.initialize(port);
 		} catch (RuntimeException E) {
-			Robot.print("Failed to connect to navX.");
+			HaDriverStation.print("Failed to connect to navX.");
 		}
 	}
 
 	/**
-	 * Starts communtication between navX and RoboRIO, enables logging to the RioLog & Driver Station, waits until the
+	 * Starts communtication between navX and RoboRIO, enables logging to the RioLog
+	 * & Driver Station, waits until the
 	 * navX is connected and calibrated, then returns an instance.
 	 * 
 	 * @param port SPI port
@@ -68,7 +73,7 @@ public class HaNavX implements Sendable {
 		try {
 			this.initialize(port);
 		} catch (RuntimeException E) {
-			Robot.print("Failed to connect to navX.");
+			HaDriverStation.print("Failed to connect to navX.");
 		}
 	}
 
@@ -80,7 +85,7 @@ public class HaNavX implements Sendable {
 		try {
 			this.navX.zeroYaw();
 		} catch (RuntimeException E) {
-			Robot.print("Failed to zero navX yaw.");
+			HaDriverStation.print("Failed to zero navX yaw.");
 		}
 	}
 
@@ -90,7 +95,7 @@ public class HaNavX implements Sendable {
 	public void setYaw(double offsetDeg) {
 		this.zeroYaw(); // Must be first, because zeroYaw() sets the offset as 0.
 		this.yawOffsetDeg = offsetDeg;
-		Robot.print("Gyro set to: " + Double.toString(offsetDeg) + " degrees.");
+		HaDriverStation.print("Gyro set to: " + Double.toString(offsetDeg) + " degrees.");
 	}
 
 	/**
@@ -101,8 +106,10 @@ public class HaNavX implements Sendable {
 	}
 
 	/**
-	 * @return The angle of the navX on the Z axis (perpendicular to earth, "yaw") in degrees. Rotating
-	 *         counter-clockwise makes the the angle increase, and rotating clockwise makes the angle decrease,
+	 * @return The angle of the navX on the Z axis (perpendicular to earth, "yaw")
+	 *         in degrees. Rotating
+	 *         counter-clockwise makes the the angle increase, and rotating
+	 *         clockwise makes the angle decrease,
 	 *         according to WPILib's coordinate system conventions.
 	 */
 	public double getYawAngleDeg() {
@@ -114,8 +121,10 @@ public class HaNavX implements Sendable {
 	}
 
 	/**
-	 * @return The angle of the navX on the Z axis (perpendicular to earth, "yaw") in radians. Rotating
-	 *         counter-clockwise makes the angle increase, and rotating clockwise makes the angle decrease, according to
+	 * @return The angle of the navX on the Z axis (perpendicular to earth, "yaw")
+	 *         in radians. Rotating
+	 *         counter-clockwise makes the angle increase, and rotating clockwise
+	 *         makes the angle decrease, according to
 	 *         WPILib's coordinate system conventions.
 	 */
 	public double getYawAngleRad() {
@@ -123,8 +132,10 @@ public class HaNavX implements Sendable {
 	}
 
 	/**
-	 * @return The angle of the navX on the Z axis (perpendicular to earth, "yaw") as a Rotation2d. Rotating
-	 *         counter-clockwise makes the angle increase, and rotating clockwise makes the angle decrease, according to
+	 * @return The angle of the navX on the Z axis (perpendicular to earth, "yaw")
+	 *         as a Rotation2d. Rotating
+	 *         counter-clockwise makes the angle increase, and rotating clockwise
+	 *         makes the angle decrease, according to
 	 *         WPILib's coordinate system conventions.
 	 */
 	public Rotation2d getYawRotation2d() {
@@ -133,9 +144,12 @@ public class HaNavX implements Sendable {
 
 	/**
 	 * 
-	 * @return The angle of the navX on the X axis (forward-backward tilt) in degrees. Tilting backwards makes the angle
-	 *         increase, and tilting forwards makes the angle decrease. If the angle returned is incorrect, verify that
-	 *         the navX axises are matching to the robot axises, or use the omnimount feature (as specified in
+	 * @return The angle of the navX on the X axis (forward-backward tilt) in
+	 *         degrees. Tilting backwards makes the angle
+	 *         increase, and tilting forwards makes the angle decrease. If the angle
+	 *         returned is incorrect, verify that
+	 *         the navX axises are matching to the robot axises, or use the
+	 *         omnimount feature (as specified in
 	 *         kauailabs's website).
 	 *
 	 */
@@ -148,9 +162,12 @@ public class HaNavX implements Sendable {
 	}
 
 	/**
-	 * @return The angle of the navX on the X axis (forward-backward tilt) in radians. Tilting backwards makes the angle
-	 *         increase, and tilting forwards makes the angle decrease. If the angle returned is incorrect, verify that
-	 *         the navX axises are matching to the robot axises, or use the omnimount feature (as specified in
+	 * @return The angle of the navX on the X axis (forward-backward tilt) in
+	 *         radians. Tilting backwards makes the angle
+	 *         increase, and tilting forwards makes the angle decrease. If the angle
+	 *         returned is incorrect, verify that
+	 *         the navX axises are matching to the robot axises, or use the
+	 *         omnimount feature (as specified in
 	 *         kauailabs's website).
 	 */
 	public double getPitchAngleRad() {
@@ -158,9 +175,12 @@ public class HaNavX implements Sendable {
 	}
 
 	/**
-	 * @return The angle of the navX on the X axis (forward-backward tilt) as a Rotation2d. Tilting backwards makes the
-	 *         angle increase, and tilting forwards makes the angle decrease. If the angle returned is incorrect, verify
-	 *         that the navX axises are matching to the robot axises, or use the omnimount feature (as specified in
+	 * @return The angle of the navX on the X axis (forward-backward tilt) as a
+	 *         Rotation2d. Tilting backwards makes the
+	 *         angle increase, and tilting forwards makes the angle decrease. If the
+	 *         angle returned is incorrect, verify
+	 *         that the navX axises are matching to the robot axises, or use the
+	 *         omnimount feature (as specified in
 	 *         kauailabs's website).
 	 */
 	public Rotation2d getPitchRotation2d() {
@@ -168,9 +188,12 @@ public class HaNavX implements Sendable {
 	}
 
 	/**
-	 * @return The angle of the navX on the Y axis (left-right tilt) in degrees. Tilting left makes the angle increase,
-	 *         and tilting right makes the angle decrease. If the angle returned is incorrect, verify that the navX
-	 *         axises are matching to the robot axises, or use the omnimount feature (as specified in kauailabs's
+	 * @return The angle of the navX on the Y axis (left-right tilt) in degrees.
+	 *         Tilting left makes the angle increase,
+	 *         and tilting right makes the angle decrease. If the angle returned is
+	 *         incorrect, verify that the navX
+	 *         axises are matching to the robot axises, or use the omnimount feature
+	 *         (as specified in kauailabs's
 	 *         website).
 	 */
 	public double getRollAngleDeg() {
@@ -182,9 +205,12 @@ public class HaNavX implements Sendable {
 	}
 
 	/**
-	 * @return The angle of the navX on the Y axis (left-right tilt) in radians. Tilting left makes the angle increase,
-	 *         and tilting right makes the angle decrease.If the angle returned is incorrect, verify that the navX
-	 *         axises are matching to the robot axises, or use the omnimount feature (as specified in kauailabs's
+	 * @return The angle of the navX on the Y axis (left-right tilt) in radians.
+	 *         Tilting left makes the angle increase,
+	 *         and tilting right makes the angle decrease.If the angle returned is
+	 *         incorrect, verify that the navX
+	 *         axises are matching to the robot axises, or use the omnimount feature
+	 *         (as specified in kauailabs's
 	 *         website).
 	 */
 	public double getRollAngleRad() {
@@ -192,9 +218,12 @@ public class HaNavX implements Sendable {
 	}
 
 	/**
-	 * @return The angle of the navX on the Y axis (left-right tilt) as a Rotation2d. Tilting left makes the angle
-	 *         increase, and tilting right makes the angle decrease. If the angle returned is incorrect, verify that the
-	 *         navX axises are matching to the robot axises, or use the omnimount feature (as specified in kauailabs's
+	 * @return The angle of the navX on the Y axis (left-right tilt) as a
+	 *         Rotation2d. Tilting left makes the angle
+	 *         increase, and tilting right makes the angle decrease. If the angle
+	 *         returned is incorrect, verify that the
+	 *         navX axises are matching to the robot axises, or use the omnimount
+	 *         feature (as specified in kauailabs's
 	 *         website).
 	 */
 	public Rotation2d getRollRotation2d() {
@@ -202,8 +231,10 @@ public class HaNavX implements Sendable {
 	}
 
 	/**
-	 * @return the rate of change in the angle on the Z axis (perpendicular to earth, "yaw") in degrees. Rotating
-	 *         counter-clockwise returns a positive value, and clockwise returns a negative value.
+	 * @return the rate of change in the angle on the Z axis (perpendicular to
+	 *         earth, "yaw") in degrees. Rotating
+	 *         counter-clockwise returns a positive value, and clockwise returns a
+	 *         negative value.
 	 */
 	public double getAngularVelocityDegPS() {
 		try {
@@ -214,8 +245,10 @@ public class HaNavX implements Sendable {
 	}
 
 	/**
-	 * @return the rate of change in the angle on the Z axis (perpendicular to earth, "yaw") in radians. Rotating
-	 *         counter-clockwise returns a positive value, and clockwise returns a negative value.
+	 * @return the rate of change in the angle on the Z axis (perpendicular to
+	 *         earth, "yaw") in radians. Rotating
+	 *         counter-clockwise returns a positive value, and clockwise returns a
+	 *         negative value.
 	 */
 	public double getAngularVelocityRadPS() {
 		return Math.toRadians(this.getAngularVelocityDegPS());
@@ -232,20 +265,24 @@ public class HaNavX implements Sendable {
 	}
 
 	/*
-	 * Waites until the navX is connected and calibrated, or 5 seconds have passed since startup. If the former, print
-	 * that the navX is done calibrating and continue; If the latter, print that communication has failed or navX did
+	 * Waites until the navX is connected and calibrated, or 5 seconds have passed
+	 * since startup. If the former, print
+	 * that the navX is done calibrating and continue; If the latter, print that
+	 * communication has failed or navX did
 	 * not calibrate and continue.
 	 */
 	private void initialize(SerialPort.Port port) {
 		this.commsTimoutTimer.start();
-		this.navX = new AHRS(port, SerialDataType.kProcessedData, (byte)60);
+		this.navX = new AHRS(port, SerialDataType.kProcessedData, (byte) 60);
 		this.navX.enableLogging(true);
 		this.initReport();
 	}
 
 	/*
-	 * Waites until the navX is connected and calibrated, or 5 seconds have passed since startup. If the former, print
-	 * that the navX is done calibrating and continue; If the latter, print that communication has failed or navX did
+	 * Waites until the navX is connected and calibrated, or 5 seconds have passed
+	 * since startup. If the former, print
+	 * that the navX is done calibrating and continue; If the latter, print that
+	 * communication has failed or navX did
 	 * not calibrate and continue.
 	 */
 	private void initialize(I2C.Port port) {
@@ -256,8 +293,10 @@ public class HaNavX implements Sendable {
 	}
 
 	/*
-	 * Waites until the navX is connected and calibrated, or 5 seconds have passed since startup. If the former, print
-	 * that the navX is done calibrating and continue; If the latter, print that communication has failed or navX did
+	 * Waites until the navX is connected and calibrated, or 5 seconds have passed
+	 * since startup. If the former, print
+	 * that the navX is done calibrating and continue; If the latter, print that
+	 * communication has failed or navX did
 	 * not calibrate and continue.
 	 */
 	private void initialize(SPI.Port port) {
@@ -286,7 +325,7 @@ public class HaNavX implements Sendable {
 			DriverStation.reportError("Failed to connect to navX, or navX didn't calibrate, within "
 					+ Double.toString(kTimeoutSec) + " seconds from startup.", true);
 		} else {
-			Robot.print("navX done calibrating in " + Double.toString(this.commsTimoutTimer.get())
+			HaDriverStation.print("navX done calibrating in " + Double.toString(this.commsTimoutTimer.get())
 					+ " seconds from startup.");
 		}
 		this.commsTimoutTimer.stop();

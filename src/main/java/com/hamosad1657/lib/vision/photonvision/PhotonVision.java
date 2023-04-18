@@ -3,7 +3,7 @@
  * It is used to retrive data from the PhotonVision pipeline.
  */
 
-package com.hamosad1657.lib.vision;
+package com.hamosad1657.lib.vision.photonvision;
 
 import java.util.HashMap;
 import org.photonvision.PhotonCamera;
