@@ -63,14 +63,23 @@ public class HaUnits {
 			this(0.0, 0.0, 0.0);
 		}
 
+		/**
+		 * @return A new PIDController with P, I and D gains.
+		 */
 		public PIDController toPIDController() {
 			return new PIDController(this.kP, this.kI, this.kD);
 		}
 
+		/**
+		 * @return A new ProfiledPIDController with P, I and D gains, and the given velocity and acceleration constrains.
+		 */
 		public ProfiledPIDController toProfiledPIDController(TrapezoidProfile.Constraints constraints) {
 			return new ProfiledPIDController(this.kP, this.kI, this.kD, constraints);
 		}
 
+		/**
+		 * @return A new PIDConstants object with P, I and D gains.
+		 */
 		public PIDConstants toPathPlannerPIDConstants() {
 			return new PIDConstants(this.kP, this.kI, this.kD);
 		}
