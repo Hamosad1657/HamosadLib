@@ -30,7 +30,7 @@ public class HaUnits {
 		 * @param kD    - Derivative gain.
 		 * @param kFF   - Feed Forward gain.
 		 * @param iZone - If the absolute error is above iZone, the integral accumulator is cleared (making it
-		 *              ineffective).
+		 *              ineffective). Motor controllers have this feature, but WPILib don't.
 		 */
 		public PIDGains(double kP, double kI, double kD, double kFF, double iZone) {
 			this.kP = kP;
