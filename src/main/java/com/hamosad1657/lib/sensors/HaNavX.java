@@ -28,12 +28,12 @@ public class HaNavX implements Sendable {
 	private static final double kTimeoutSec = 5.0;
 
 	/**
-	 * Starts communtication between navX and RoboRIO, enables logging to the RioLog
+	 * Starts communication between navX and RoboRIO, enables logging to the RioLog
 	 * & Driver Station, waits until the
 	 * navX is connected and calibrated, then returns an instance.
 	 *
 	 * @param port serial port (usually USB)
-	 * @return an instance of HaNavx, which wrapps AHRS.
+	 * @return An instance of HaNavx, which wraps AHRS.
 	 */
 	public HaNavX(SerialPort.Port port) {
 		try {
@@ -44,15 +44,15 @@ public class HaNavX implements Sendable {
 	}
 
 	/**
-	 * Starts communtication between navX and RoboRIO, enables logging to the RioLog
-	 * & Driver Station, waits until the
-	 * navX is connected and calibrated, then returns an instance.
-	 * 
-	 * @param port I2C port. Using the onboard I2C port is not reccomended, for more
-	 *             information click here:
-	 *             https://docs.wpilib.org/en/stable/docs/yearly-overview/known-issues.html#onboard-i2c-causing-system-lockups
-	 * @return an instance of HaNavx, which wrapps AHRS.
-	 */
+     * Starts communication between navX and RoboRIO, enables logging to the RioLog
+     * & Driver Station, waits until the
+     * navX is connected and calibrated, then returns an instance.
+     *
+     * @param port I2C port. Using the onboard I2C port is not recommended, for more
+     *             information click here:
+     *             <a href="https://docs.wpilib.org/en/stable/docs/yearly-overview/known-issues.html#onboard-i2c-causing-system-lockups">...</a>
+     * @return An instance of HaNavx, which wraps AHRS.
+     */
 	public HaNavX(I2C.Port port) {
 		try {
 			this.initialize(port);
@@ -62,12 +62,12 @@ public class HaNavX implements Sendable {
 	}
 
 	/**
-	 * Starts communtication between navX and RoboRIO, enables logging to the RioLog
+	 * Starts communication between navX and RoboRIO, enables logging to the RioLog
 	 * & Driver Station, waits until the
 	 * navX is connected and calibrated, then returns an instance.
 	 * 
 	 * @param port SPI port
-	 * @return an instance of HaNavx, which wrapps AHRS.
+	 * @return An instance of HaNavx, which wraps AHRS.
 	 */
 	public HaNavX(SPI.Port port) {
 		try {
@@ -108,7 +108,7 @@ public class HaNavX implements Sendable {
 	/**
 	 * @return The angle of the navX on the Z axis (perpendicular to earth, "yaw")
 	 *         in degrees. Rotating
-	 *         counter-clockwise makes the the angle increase, and rotating
+	 *         counter-clockwise makes the angle increase, and rotating
 	 *         clockwise makes the angle decrease,
 	 *         according to WPILib's coordinate system conventions.
 	 */
@@ -150,7 +150,7 @@ public class HaNavX implements Sendable {
 	 *         returned is incorrect, verify that
 	 *         the navX axises are matching to the robot axises, or use the
 	 *         omnimount feature (as specified in
-	 *         kauailabs's website).
+	 *         Kauailabs's website).
 	 *
 	 */
 	public double getPitchAngleDeg() {
@@ -265,7 +265,7 @@ public class HaNavX implements Sendable {
 	}
 
 	/*
-	 * Waites until the navX is connected and calibrated, or 5 seconds have passed
+	 * Waits until the navX is connected and calibrated, or 5 seconds have passed
 	 * since startup. If the former, print
 	 * that the navX is done calibrating and continue; If the latter, print that
 	 * communication has failed or navX did
@@ -279,7 +279,7 @@ public class HaNavX implements Sendable {
 	}
 
 	/*
-	 * Waites until the navX is connected and calibrated, or 5 seconds have passed
+	 * Waits until the navX is connected and calibrated, or 5 seconds have passed
 	 * since startup. If the former, print
 	 * that the navX is done calibrating and continue; If the latter, print that
 	 * communication has failed or navX did
@@ -293,7 +293,7 @@ public class HaNavX implements Sendable {
 	}
 
 	/*
-	 * Waites until the navX is connected and calibrated, or 5 seconds have passed
+	 * Waits until the navX is connected and calibrated, or 5 seconds have passed
 	 * since startup. If the former, print
 	 * that the navX is done calibrating and continue; If the latter, print that
 	 * communication has failed or navX did
