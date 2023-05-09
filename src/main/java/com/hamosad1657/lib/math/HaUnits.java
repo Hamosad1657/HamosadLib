@@ -18,6 +18,10 @@ public class HaUnits {
 		kRad, kDeg, kRot;
 	}
 
+    public enum Length {
+        kMeters, kCM, kMM, kInches, kFt;
+    }
+
 	/**
 	 * Represents a set of PID, feedforward and iZone values.
 	 */

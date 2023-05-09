@@ -105,6 +105,14 @@ public class HaUnitConvertor {
 		return meters * inchsInMeter;
 	}
 
+    public static double metersToFt(double meters) {
+        return metersToInches(meters) * 12.0;
+    }
+
+    public static double ftToMeters(double ft) {
+        return inchesToMeters(ft / 12.0);
+    }
+
 	/** Inches to meters. */
 	public static double inchesToMeters(double inches) {
 		return inches / inchsInMeter;
