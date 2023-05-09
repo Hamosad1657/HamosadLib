@@ -5,9 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="17111958-f4f7-42f6-9434-6e2a629d5c85" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/hamosad1657/lib/math/Length.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hamosad1657/lib/math/HaUnitConvertor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hamosad1657/lib/math/HaUnitConvertor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hamosad1657/lib/math/HaUnits.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hamosad1657/lib/math/HaUnits.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/hamosad1657/lib/math/Length.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hamosad1657/lib/math/Length.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,13 +43,13 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "git-widget-placeholder": "develop",
-    "node.js.detected.package.eslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;git-widget-placeholder&quot;: &quot;develop&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;
   }
-}]]></component>
+}</component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
