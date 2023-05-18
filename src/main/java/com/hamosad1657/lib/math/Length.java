@@ -78,4 +78,9 @@ public class Length {
     private Length(double meters) {
         this.meters = meters;
     }
+
+	@Override
+	public String toString() {
+		return "Length in meters: " + Double.toString(this.meters);
+	}
 }
