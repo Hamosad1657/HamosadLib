@@ -17,14 +17,19 @@ public class Length {
         switch (lengthUnit) {
             case kMeters:
                 this.meters = length;
+				break;
             case kCM:
                 this.meters = length / 100.0;
+				break;
             case kMM:
                 this.meters = length / 1000.0;
+				break;
             case kInches:
                 this.meters = HaUnitConvertor.inchesToMeters(length);
+				break;
             case kFt:
                 this.meters = HaUnitConvertor.ftToMeters(length);
+				break;
         }
     }
     public static Length fromMeters(double meters) {
