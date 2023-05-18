@@ -9,7 +9,7 @@ public class HaUnitConvertor {
 	// for refrence
 	// https://lucidar.me/en/unit-converter/revolutions-per-minute-to-meters-per-second/
 
-	private static final double inchsInMeter = 39.3700787402;
+	private static final double inchesInMeter = 39.3700787402;
 
 	/** Degrees to radians. */
 	public static double degToRad(double deg) {
@@ -102,22 +102,25 @@ public class HaUnitConvertor {
 
 	/** Meters to inches. */
 	public static double metersToInches(double meters) {
-		return meters * inchsInMeter;
+		return meters * inchesInMeter;
 	}
-
-    public static double metersToFt(double meters) {
-        return metersToInches(meters) * 12.0;
-    }
-
-    public static double ftToMeters(double ft) {
-        return inchesToMeters(ft / 12.0);
-    }
 
 	/** Inches to meters. */
 	public static double inchesToMeters(double inches) {
-		return inches / inchsInMeter;
+		return inches / inchesInMeter;
 	}
 
+	/** Meters to ft. */
+    public static double metersToFt(double meters) {
+        return metersToInches(meters) / 12.0;
+    }
+
+	/** Ft to meters. */
+    public static double ftToMeters(double ft) {
+        return inchesToMeters(ft * 12.0);
+    }
+
+	/** Degrees per second to CANCoder ticks per 100ms. */
 	public static double degPSToCANCoderTicksPer100ms(double degPS) {
 		return degreesToCANCoderTicks(degPS) / 10;
 	}
