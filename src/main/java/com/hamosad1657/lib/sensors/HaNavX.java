@@ -16,9 +16,6 @@ import com.hamosad1657.lib.debug.HaDriverStation;
 /**
  * A wrapper class for kauailabs.navx.frc.AHRS, which adheres to WPILib's
  * coordinate system conventions.
- * <p>
- * 
- * @author Shaked - ask me if you have questions🌠
  */
 public class HaNavX implements Sendable {
 	private AHRS navX;
