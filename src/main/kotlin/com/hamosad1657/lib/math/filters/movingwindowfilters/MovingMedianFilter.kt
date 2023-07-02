@@ -1,5 +1,6 @@
 package com.hamosad1657.lib.math.filters.movingwindowfilters
 
+import com.hamosad1657.lib.math.median
 import java.util.LinkedList
 
 /**
@@ -21,17 +22,4 @@ class MovingMedianFilter(window: Int) : MovingWindowFilter() {
             field = value
         }
     override val calculation = {values: LinkedList<Double> -> median(values) }
-}
-
-private fun median(linkedList: LinkedList<Double>): Double {
-    val list = linkedList.sorted()
-    val listSize = list.size
-    if(listSize == 2) return list.average()
-
-    return if(listSize % 2 == 0) {
-        (list[listSize / 2] + list[(listSize / 2) - 1]) / 2.0
-    }
-    else {
-        list[((listSize / 2) - 0.5).toInt()]
-    }
 }
