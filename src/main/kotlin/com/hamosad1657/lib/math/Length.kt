@@ -3,26 +3,26 @@ package com.hamosad1657.lib.math
 class Length {
     var meters = 0.0
 
-    var centimeters: Double = getLength(HaUnits.Length.kCM)
-        get() = getLength(HaUnits.Length.kCM)
+    var centimeters: Double = getLength(LengthUnit.CM)
+        get() = getLength(LengthUnit.CM)
         set(value) {
             field = value
             this.meters = value / 100.0
         }
-    var millimeters: Double = getLength(HaUnits.Length.kMM)
-        get() = getLength(HaUnits.Length.kMM)
+    var millimeters: Double = getLength(LengthUnit.MM)
+        get() = getLength(LengthUnit.MM)
         set(value) {
             field = value
             this.meters = value / 1000.0
         }
-    var inches: Double  = getLength(HaUnits.Length.kMM)
-        get() = getLength(HaUnits.Length.kInches)
+    var inches: Double  = getLength(LengthUnit.MM)
+        get() = getLength(LengthUnit.Inches)
         set(value) {
             field = value
             this.meters = HaUnitConvertor.inchesToMeters(value)
         }
-    var ft: Double = getLength(HaUnits.Length.kMM)
-        get() = getLength(HaUnits.Length.kFt)
+    var ft: Double = getLength(LengthUnit.MM)
+        get() = getLength(LengthUnit.Ft)
         set(value) {
             field = value
             this.meters = HaUnitConvertor.ftToMeters(value)
@@ -39,13 +39,13 @@ class Length {
      * @param length
      * @param lengthUnit
      */
-    constructor(length: Double, lengthUnit: HaUnits.Length) {
+    constructor(length: Double, lengthUnit: LengthUnit) {
         this.meters = when (lengthUnit) {
-            HaUnits.Length.kMeters -> length
-            HaUnits.Length.kCM -> length / 100.0
-            HaUnits.Length.kMM -> length / 1000.0
-            HaUnits.Length.kInches -> HaUnitConvertor.inchesToMeters(length)
-            HaUnits.Length.kFt -> HaUnitConvertor.ftToMeters(length)
+            LengthUnit.Meters -> length
+            LengthUnit.CM -> length / 100.0
+            LengthUnit.MM -> length / 1000.0
+            LengthUnit.Inches -> HaUnitConvertor.inchesToMeters(length)
+            LengthUnit.Ft -> HaUnitConvertor.ftToMeters(length)
         }
     }
 
@@ -59,29 +59,29 @@ class Length {
         }
 
         fun fromCM(CM: Double): Length {
-            return Length(CM, HaUnits.Length.kCM)
+            return Length(CM, LengthUnit.CM)
         }
 
         fun fromMM(MM: Double): Length {
-            return Length(MM, HaUnits.Length.kMM)
+            return Length(MM, LengthUnit.MM)
         }
 
         fun fromInches(inches: Double): Length {
-            return Length(inches, HaUnits.Length.kInches)
+            return Length(inches, LengthUnit.Inches)
         }
 
         fun fromFt(ft: Double): Length {
-            return Length(ft, HaUnits.Length.kFt)
+            return Length(ft, LengthUnit.Ft)
         }
     }
 
-    fun getLength(lengthUnit: HaUnits.Length): Double {
+    fun getLength(lengthUnit: LengthUnit): Double {
         return when (lengthUnit) {
-            HaUnits.Length.kMeters -> this.meters
-            HaUnits.Length.kCM -> this.meters * 100.0
-            HaUnits.Length.kMM -> this.meters * 1000.0
-            HaUnits.Length.kInches -> HaUnitConvertor.metersToInches(this.meters)
-            HaUnits.Length.kFt -> -HaUnitConvertor.metersToFt(this.meters)
+            LengthUnit.Meters -> this.meters
+            LengthUnit.CM -> this.meters * 100.0
+            LengthUnit.MM -> this.meters * 1000.0
+            LengthUnit.Inches -> HaUnitConvertor.metersToInches(this.meters)
+            LengthUnit.Ft -> -HaUnitConvertor.metersToFt(this.meters)
         }
     }
 
