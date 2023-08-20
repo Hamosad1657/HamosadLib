@@ -1,5 +1,7 @@
 package com.hamosad1657.lib.math
 
+import com.hamosad1657.lib.units.*
+
 class Length {
     var meters = 0.0
 
@@ -19,13 +21,13 @@ class Length {
         get() = getLength(LengthUnit.Inches)
         set(value) {
             field = value
-            this.meters = HaUnitConvertor.inchesToMeters(value)
+            this.meters = inchesToMeters(value)
         }
     var ft: Double = getLength(LengthUnit.MM)
         get() = getLength(LengthUnit.Ft)
         set(value) {
             field = value
-            this.meters = HaUnitConvertor.ftToMeters(value)
+            this.meters = ftToMeters(value)
         }
 
     /**
@@ -44,8 +46,8 @@ class Length {
             LengthUnit.Meters -> length
             LengthUnit.CM -> length / 100.0
             LengthUnit.MM -> length / 1000.0
-            LengthUnit.Inches -> HaUnitConvertor.inchesToMeters(length)
-            LengthUnit.Ft -> HaUnitConvertor.ftToMeters(length)
+            LengthUnit.Inches -> inchesToMeters(length)
+            LengthUnit.Ft -> ftToMeters(length)
         }
     }
 
@@ -80,8 +82,8 @@ class Length {
             LengthUnit.Meters -> this.meters
             LengthUnit.CM -> this.meters * 100.0
             LengthUnit.MM -> this.meters * 1000.0
-            LengthUnit.Inches -> HaUnitConvertor.metersToInches(this.meters)
-            LengthUnit.Ft -> -HaUnitConvertor.metersToFt(this.meters)
+            LengthUnit.Inches -> metersToInches(this.meters)
+            LengthUnit.Ft -> metersToFt(this.meters)
         }
     }
 

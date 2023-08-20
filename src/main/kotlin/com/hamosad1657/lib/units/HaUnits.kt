@@ -1,4 +1,4 @@
-package com.hamosad1657.lib.math
+package com.hamosad1657.lib.units
 
 // This file is named "HaUnits" and not "Units" to avoid name conflicts
 
