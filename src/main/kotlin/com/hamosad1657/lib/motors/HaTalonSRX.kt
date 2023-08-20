@@ -4,6 +4,10 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX
 
 
 class HaTalonSRX(deviceID: Int) : WPI_TalonSRX(deviceID) {
+    init {
+        isSafetyEnabled = true
+    }
+
     var forwardLimit: () -> Boolean = { false }
     var reverseLimit: () -> Boolean = { false }
 

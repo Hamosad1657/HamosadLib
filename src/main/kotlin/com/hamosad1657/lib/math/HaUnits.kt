@@ -4,30 +4,11 @@ import com.pathplanner.lib.auto.PIDConstants
 import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.controller.ProfiledPIDController
 import edu.wpi.first.math.trajectory.TrapezoidProfile
-import kotlin.math.abs
-import kotlin.math.sign
 
 object HaUnits {
     const val kCANCoderTicksPerRev = 4096.0
     @JvmField
     var kChargedUpFieldLength = 16.5
-    fun deadband(value: Double, deadband: Double): Double {
-        return if (abs(value) > deadband) {
-            (value - deadband * sign(value)) / (1.0 - deadband)
-        } else {
-            0.0
-        }
-    }
-
-    /**
-     * Gets a start range defined by [startMin] and [startMax] and an end range defined by [endMin] and [endMax], and a
-     * value that is relative to the first range.
-     *
-     * @return The value relative to the end range.
-     */
-    fun mapRange(value: Double, startMin: Double, startMax: Double, endMin: Double, endMax: Double): Double {
-        return endMin + (endMax - endMin) / (startMax - startMin) * (value - startMin)
-    }
 
     enum class Velocity {
         kRPM,

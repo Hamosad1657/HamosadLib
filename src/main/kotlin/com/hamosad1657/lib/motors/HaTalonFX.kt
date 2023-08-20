@@ -3,6 +3,10 @@ package com.hamosad1657.lib.motors
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX
 
 class HaTalonFX(deviceNumber: Int) : WPI_TalonFX(deviceNumber) {
+    init {
+        isSafetyEnabled = true
+    }
+
     var forwardLimit: () -> Boolean = { false }
     var reverseLimit: () -> Boolean = { false }
 
