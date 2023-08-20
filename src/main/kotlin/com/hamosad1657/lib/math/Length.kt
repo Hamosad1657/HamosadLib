@@ -1,13 +1,38 @@
 package com.hamosad1657.lib.math
 
 class Length {
-    private var m = 0.0
+    var meters = 0.0
+
+    var centimeters: Double = getLength(HaUnits.Length.kCM)
+        get() = getLength(HaUnits.Length.kCM)
+        set(value) {
+            field = value
+            this.meters = value / 100.0
+        }
+    var millimeters: Double = getLength(HaUnits.Length.kMM)
+        get() = getLength(HaUnits.Length.kMM)
+        set(value) {
+            field = value
+            this.meters = value / 1000.0
+        }
+    var inches: Double  = getLength(HaUnits.Length.kMM)
+        get() = getLength(HaUnits.Length.kInches)
+        set(value) {
+            field = value
+            this.meters = HaUnitConvertor.inchesToMeters(value)
+        }
+    var ft: Double = getLength(HaUnits.Length.kMM)
+        get() = getLength(HaUnits.Length.kFt)
+        set(value) {
+            field = value
+            this.meters = HaUnitConvertor.ftToMeters(value)
+        }
 
     /**
      * Constructs a new Length of zero.
      */
     constructor() {
-        m = 0.0
+        this.meters = 0.0
     }
 
     /**
@@ -15,7 +40,7 @@ class Length {
      * @param lengthUnit
      */
     constructor(length: Double, lengthUnit: HaUnits.Length) {
-        m = when (lengthUnit) {
+        this.meters = when (lengthUnit) {
             HaUnits.Length.kMeters -> length
             HaUnits.Length.kCM -> length / 100.0
             HaUnits.Length.kMM -> length / 1000.0
@@ -24,31 +49,8 @@ class Length {
         }
     }
 
-    fun getLength(lengthUnit: HaUnits.Length): Double {
-        return when (lengthUnit) {
-            HaUnits.Length.kMeters -> m
-            HaUnits.Length.kCM -> m * 100.0
-            HaUnits.Length.kMM -> m * 1000.0
-            HaUnits.Length.kInches -> HaUnitConvertor.metersToInches(m)
-            HaUnits.Length.kFt -> HaUnitConvertor.metersToFt(m)
-        }
-    }
-
-    val cM: Double
-        get() = getLength(HaUnits.Length.kCM)
-    val mM: Double
-        get() = getLength(HaUnits.Length.kMM)
-    val inches: Double
-        get() = getLength(HaUnits.Length.kInches)
-    val ft: Double
-        get() = getLength(HaUnits.Length.kFt)
-
     private constructor(meters: Double) {
-        m = meters
-    }
-
-    override fun toString(): String {
-        return "Length in meters: $m"
+        this.meters = meters
     }
 
     companion object {
@@ -71,5 +73,19 @@ class Length {
         fun fromFt(ft: Double): Length {
             return Length(ft, HaUnits.Length.kFt)
         }
+    }
+
+    fun getLength(lengthUnit: HaUnits.Length): Double {
+        return when (lengthUnit) {
+            HaUnits.Length.kMeters -> this.meters
+            HaUnits.Length.kCM -> this.meters * 100.0
+            HaUnits.Length.kMM -> this.meters * 1000.0
+            HaUnits.Length.kInches -> HaUnitConvertor.metersToInches(this.meters)
+            HaUnits.Length.kFt -> -HaUnitConvertor.metersToFt(this.meters)
+        }
+    }
+
+    override fun toString(): String {
+        return "Length in meters: $meters"
     }
 }
