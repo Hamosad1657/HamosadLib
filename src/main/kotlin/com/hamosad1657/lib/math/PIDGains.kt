@@ -5,36 +5,7 @@ import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.controller.ProfiledPIDController
 import edu.wpi.first.math.trajectory.TrapezoidProfile
 
-object HaUnits {
-    const val kCANCoderTicksPerRev = 4096.0
-    @JvmField
-    var kChargedUpFieldLength = 16.5
-
-    enum class Velocity {
-        kRPM,
-        kMPS,
-        kRadPS,
-        kDegPS
-    }
-
-    enum class Position {
-        kRad,
-        kDeg,
-        kRot
-    }
-
-    enum class Length {
-        kMeters,
-        kCM,
-        kMM,
-        kInches,
-        kFt
-    }
-
-    /**
-     * Represents a set of PID, feedforward and iZone values.
-     */
-    class PIDGains
+class PIDGains
     /**
      * @param kP  - Proportional gain.
      * @param kI  - Integral gain.
@@ -81,4 +52,4 @@ object HaUnits {
             return PIDConstants(kP, kI, kD)
         }
     }
-}
+
