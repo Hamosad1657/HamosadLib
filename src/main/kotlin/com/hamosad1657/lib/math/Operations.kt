@@ -45,3 +45,23 @@ fun median(array: DoubleArray): Double {
         array[((size / 2) - 0.5).toInt()]
     }
 }
+
+/**
+ * Modify the setpoint to wrap position (see comment in HaTalonFX.enablePositionWrap()).
+ */
+fun modifyPositionSetpoint(realSetpoint: Double, measurement: Double, minPossibleMeasurement: Double, maxPossibleMeasurement: Double) : Double {
+    require(minPossibleMeasurement < maxPossibleMeasurement)
+    require(measurement > minPossibleMeasurement && measurement < maxPossibleMeasurement)
+    require(realSetpoint > minPossibleMeasurement && realSetpoint < maxPossibleMeasurement)
+
+    val realError = realSetpoint - measurement
+    val maxRealError = maxPossibleMeasurement - minPossibleMeasurement
+
+    val minModifiedError = maxRealError / -2.0
+    val maxModifiedError = maxRealError / 2.0
+
+    val modifiedError = MathUtil.inputModulus(realError, minModifiedError, maxModifiedError)
+
+    val modifiedSetpoint = modifiedError + measurement // same as [error = setpoint - measurement]
+    return modifiedSetpoint
+}

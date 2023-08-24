@@ -2,8 +2,8 @@ package com.hamosad1657.lib.motors
 
 import com.ctre.phoenix.motorcontrol.ControlMode
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX
-import edu.wpi.first.math.MathUtil
 import com.hamosad1657.lib.math.clamp
+import com.hamosad1657.lib.math.modifyPositionSetpoint
 
 /**
  * Max safe temperature for the time span of a match.
@@ -90,24 +90,4 @@ class HaTalonFX(deviceNumber: Int) : WPI_TalonFX(deviceNumber) {
     fun disablePositionWrap() {
         isPositionWrapEnabled = false
     }
-}
-
-/**
- * Modify the setpoint to wrap position (see comment in enablePositionWrap()).
- */
-private fun modifyPositionSetpoint(realSetpoint: Double, measurement: Double, minPossibleMeasurement: Double, maxPossibleMeasurement: Double) : Double {
-    require(minPossibleMeasurement < maxPossibleMeasurement)
-    require(measurement > minPossibleMeasurement && measurement < maxPossibleMeasurement)
-    require(realSetpoint > minPossibleMeasurement && realSetpoint < maxPossibleMeasurement)
-
-    val realError = realSetpoint - measurement
-    val maxRealError = maxPossibleMeasurement - minPossibleMeasurement
-
-    val minModifiedError = maxRealError / -2.0
-    val maxModifiedError = maxRealError / 2.0
-
-    val modifiedError = MathUtil.inputModulus(realError, minModifiedError, maxModifiedError)
-
-    val modifiedSetpoint = modifiedError + measurement // same as [error = setpoint - measurement]
-    return modifiedSetpoint
 }
