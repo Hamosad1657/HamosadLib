@@ -1,7 +1,7 @@
 package com.hamosad1657.lib.motors
 
+import com.ctre.phoenix.motorcontrol.ControlMode
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX
-import com.hamosad1657.lib.debug.HaDriverStation
 import edu.wpi.first.math.MathUtil
 
 /**
@@ -22,22 +22,85 @@ class HaTalonFX(deviceNumber: Int) : WPI_TalonFX(deviceNumber) {
     var reverseLimit: () -> Boolean = { false }
 
     var minPercentOutput = -1.0
+        set(value) {
+            field = if(value <= -1.0) -1.0 else value
+        }
     var maxPercentOutput = 1.0
+        set(value) {
+            field = if(value >= 1.0) 1.0 else value
+        }
 
     var isTempSafe = true
         get() = temperature < FalconSafeTempC
         private set
 
-    override fun set(output: Double) {
+    private var minPossibleMeasurement: Double = 0.0
+    private var maxPossibleMeasurement: Double = 0.0
+    private var isPositionWrapEnabled = false
+
+    /**
+     * percentOutput is clamped between properties minPercentOutput and maxPercentOutput.
+     */
+    override fun set(percentOutput: Double) {
         require(maxPercentOutput >= minPercentOutput)
-        super.set(MathUtil.clamp(output, minPercentOutput, maxPercentOutput))
+        super.set(MathUtil.clamp(percentOutput, minPercentOutput, maxPercentOutput))
     }
 
-    fun setWithLimits(output: Double) {
-        if ((forwardLimit() && output > 0.0) || (reverseLimit() && output < 0.0)) {
-            set(0.0)
-        } else {
-            set(output)
+    override fun set(mode: ControlMode, value: Double) {
+        if(isPositionWrapEnabled && mode == ControlMode.Position) {
+             val newValue = modifyPositionSetpoint(value, selectedSensorPosition, minPossibleMeasurement, maxPossibleMeasurement)
+            super.set(ControlMode.Position, newValue)
+        }
+        else {
+            super.set(mode, value)
         }
     }
+
+    fun setWithLimits(percentOutput: Double) {
+        if ((forwardLimit() && percentOutput > 0.0) || (reverseLimit() && percentOutput < 0.0)) {
+            this.set(0.0)
+        } else {
+            this.set(percentOutput)
+        }
+    }
+
+    /**
+     * "Position wrap" means always going the shorter way. For example, if the current
+     * position is 359 degrees and the setpoint is 2 degrees, then with position wrap
+     * it would just move three degrees to the setpoint (while without position wrap it
+     * would go all the way around).
+     *
+     * @param minPossibleMeasurement The smallest possible measurement.
+     * @param maxPossibleMeasurement The largest possible measurement.
+     */
+    fun enablePositionWrap(minPossibleMeasurement: Double, maxPossibleMeasurement: Double) {
+        require(minPossibleMeasurement < maxPossibleMeasurement)
+        this.minPossibleMeasurement = minPossibleMeasurement
+        this.maxPossibleMeasurement = maxPossibleMeasurement
+        isPositionWrapEnabled = true
+    }
+
+    fun disablePositionWrap() {
+        isPositionWrapEnabled = false
+    }
+}
+
+/**
+ * Modify the setpoint to wrap position (see comment in enablePositionWrap()).
+ */
+private fun modifyPositionSetpoint(realSetpoint: Double, measurement: Double, minPossibleMeasurement: Double, maxPossibleMeasurement: Double) : Double {
+    require(minPossibleMeasurement < maxPossibleMeasurement)
+    require(measurement > minPossibleMeasurement && measurement < maxPossibleMeasurement)
+    require(realSetpoint > minPossibleMeasurement && realSetpoint < maxPossibleMeasurement)
+
+    val realError = realSetpoint - measurement
+    val maxRealError = maxPossibleMeasurement - minPossibleMeasurement
+
+    val minModifiedError = maxRealError / -2.0
+    val maxModifiedError = maxRealError / 2.0
+
+    val modifiedError = MathUtil.inputModulus(realError, minModifiedError, maxModifiedError)
+
+    val modifiedSetpoint = modifiedError + measurement // same as [error = setpoint - measurement]
+    return modifiedSetpoint
 }
