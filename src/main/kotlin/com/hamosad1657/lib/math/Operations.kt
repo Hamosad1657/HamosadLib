@@ -1,5 +1,6 @@
 package com.hamosad1657.lib.math
 
+import edu.wpi.first.math.MathUtil
 import kotlin.math.abs
 import kotlin.math.sign
 
@@ -9,6 +10,10 @@ fun deadband(value: Double, deadband: Double): Double {
     } else {
         0.0
     }
+}
+
+fun clamp(value: Double, min: Double, max: Double) : Double {
+    return if(min >= max) 0.0 else MathUtil.clamp(value, min, max)
 }
 
 /**

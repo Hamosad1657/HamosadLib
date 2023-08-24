@@ -1,5 +1,6 @@
 package com.hamosad1657.lib.motors
 
+import com.hamosad1657.lib.math.clamp
 import com.revrobotics.CANSparkMax
 import edu.wpi.first.math.MathUtil
 
@@ -17,23 +18,35 @@ class HaCANSparkMax(deviceID: Int) : CANSparkMax(deviceID, MotorType.kBrushless)
     var reverseLimit: () -> Boolean = { false }
 
     var minPercentOutput = -1.0
+        set(value) {
+            field = if(value <= -1.0) -1.0 else value
+        }
     var maxPercentOutput = 1.0
+        set(value) {
+            field = if(value >= 1.0) 1.0 else value
+        }
 
     /** The NEO motor has a temperature sensor inside it.*/
     var isMotorTempSafe = true
         get() = motorTemperature < NEOSafeTempC
         private set
 
-    override fun set(output: Double) {
+    /**
+     * percentOutput is clamped between properties minPercentOutput and maxPercentOutput.
+     */
+    override fun set(percentOutput: Double) {
         require(maxPercentOutput >= minPercentOutput)
-        super.set(MathUtil.clamp(output, minPercentOutput, maxPercentOutput))
+        super.set(clamp(percentOutput, minPercentOutput, maxPercentOutput))
     }
 
-    fun setWithLimits(output: Double) {
-        if ((forwardLimit() && output > 0.0) || (reverseLimit() && output < 0.0)) {
-            set(0.0)
+    /**
+     * percentOutput is clamped between properties minPercentOutput and maxPercentOutput.
+     */
+    fun setWithLimits(percentOutput: Double) {
+        if ((forwardLimit() && percentOutput > 0.0) || (reverseLimit() && percentOutput < 0.0)) {
+            this.set(0.0)
         } else {
-            set(output)
+            this.set(percentOutput)
         }
     }
 }

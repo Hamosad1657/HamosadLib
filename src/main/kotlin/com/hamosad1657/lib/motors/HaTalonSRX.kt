@@ -1,9 +1,7 @@
 package com.hamosad1657.lib.motors
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX
-import com.hamosad1657.lib.debug.HaDriverStation
-import edu.wpi.first.math.MathUtil
-
+import com.hamosad1657.lib.math.clamp
 
 class HaTalonSRX(deviceID: Int) : WPI_TalonSRX(deviceID) {
     init {
@@ -14,18 +12,30 @@ class HaTalonSRX(deviceID: Int) : WPI_TalonSRX(deviceID) {
     var reverseLimit: () -> Boolean = { false }
 
     var minPercentOutput = -1.0
+        set(value) {
+            field = if(value <= -1.0) -1.0 else value
+        }
     var maxPercentOutput = 1.0
+        set(value) {
+            field = if(value >= 1.0) 1.0 else value
+        }
 
-    override fun set(output: Double) {
+    /**
+     * percentOutput is clamped between properties minPercentOutput and maxPercentOutput.
+     */
+    override fun set(percentOutput: Double) {
         require(maxPercentOutput >= minPercentOutput)
-        super.set(MathUtil.clamp(output, minPercentOutput, maxPercentOutput))
+        super.set(clamp(percentOutput, minPercentOutput, maxPercentOutput))
     }
 
-    fun setWithLimits(output: Double) {
-        if ((forwardLimit() && output > 0.0) || (reverseLimit() && output < 0.0)) {
-            set(0.0)
+    /**
+     * percentOutput is clamped between properties minPercentOutput and maxPercentOutput.
+     */
+    fun setWithLimits(percentOutput: Double) {
+        if ((forwardLimit() && percentOutput > 0.0) || (reverseLimit() && percentOutput < 0.0)) {
+            this.set(0.0)
         } else {
-            set(output)
+            this.set(percentOutput)
         }
     }
 }

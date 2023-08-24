@@ -3,6 +3,7 @@ package com.hamosad1657.lib.motors
 import com.ctre.phoenix.motorcontrol.ControlMode
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX
 import edu.wpi.first.math.MathUtil
+import com.hamosad1657.lib.math.clamp
 
 /**
  * Max safe temperature for the time span of a match.
@@ -43,7 +44,7 @@ class HaTalonFX(deviceNumber: Int) : WPI_TalonFX(deviceNumber) {
      */
     override fun set(percentOutput: Double) {
         require(maxPercentOutput >= minPercentOutput)
-        super.set(MathUtil.clamp(percentOutput, minPercentOutput, maxPercentOutput))
+        super.set(clamp(percentOutput, minPercentOutput, maxPercentOutput))
     }
 
     override fun set(mode: ControlMode, value: Double) {
@@ -56,6 +57,9 @@ class HaTalonFX(deviceNumber: Int) : WPI_TalonFX(deviceNumber) {
         }
     }
 
+    /**
+     * percentOutput is clamped between properties minPercentOutput and maxPercentOutput.
+     */
     fun setWithLimits(percentOutput: Double) {
         if ((forwardLimit() && percentOutput > 0.0) || (reverseLimit() && percentOutput < 0.0)) {
             this.set(0.0)
