@@ -47,6 +47,9 @@ class HaTalonFX(deviceNumber: Int) : WPI_TalonFX(deviceNumber) {
         super.set(clamp(percentOutput, minPercentOutput, maxPercentOutput))
     }
 
+    /**
+     * In PercentOutput control mode, value is clamped between properties minPercentOutput and maxPercentOutput
+     */
     override fun set(mode: ControlMode, value: Double) {
         if(mode == ControlMode.PercentOutput) {
             this.set(value)
