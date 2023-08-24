@@ -48,7 +48,10 @@ class HaTalonFX(deviceNumber: Int) : WPI_TalonFX(deviceNumber) {
     }
 
     override fun set(mode: ControlMode, value: Double) {
-        if(isPositionWrapEnabled && mode == ControlMode.Position) {
+        if(mode == ControlMode.PercentOutput) {
+            this.set(value)
+        }
+        else if(isPositionWrapEnabled && mode == ControlMode.Position) {
              val newValue = modifyPositionSetpoint(value, selectedSensorPosition, minPossibleMeasurement, maxPossibleMeasurement)
             super.set(ControlMode.Position, newValue)
         }
