@@ -2,8 +2,13 @@ package com.hamosad1657.lib.math
 
 import com.hamosad1657.lib.units.*
 
-class Length {
+class Length : Comparable<Length> {
     var meters = 0.0
+        set(value) {
+            require(!value.isNaN()) {" Length cannot contain NaN "}
+            require(value.isFinite()) {" Length cannot contain infinity "}
+            field = value
+        }
 
     var centimeters: Double = getLength(LengthUnit.CM)
         get() = getLength(LengthUnit.CM)
@@ -34,7 +39,6 @@ class Length {
      * Constructs a new Length of zero.
      */
     constructor() {
-        this.meters = 0.0
     }
 
     /**
@@ -89,5 +93,9 @@ class Length {
 
     override fun toString(): String {
         return "Length in meters: $meters"
+    }
+
+    override fun compareTo(other: Length): Int {
+        return (this.meters - other.meters).toInt()
     }
 }
