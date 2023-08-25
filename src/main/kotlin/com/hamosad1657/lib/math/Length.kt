@@ -10,26 +10,26 @@ class Length : Comparable<Length> {
             field = value
         }
 
-    var centimeters: Double = getLength(LengthUnit.CM)
-        get() = getLength(LengthUnit.CM)
+    var centimeters: Double = getLength(LengthUnit.Centimeters)
+        get() = getLength(LengthUnit.Centimeters)
         set(value) {
             field = value
             this.meters = value / 100.0
         }
-    var millimeters: Double = getLength(LengthUnit.MM)
-        get() = getLength(LengthUnit.MM)
+    var millimeters: Double = getLength(LengthUnit.Millimeters)
+        get() = getLength(LengthUnit.Millimeters)
         set(value) {
             field = value
             this.meters = value / 1000.0
         }
-    var inches: Double  = getLength(LengthUnit.MM)
+    var inches: Double  = getLength(LengthUnit.Millimeters)
         get() = getLength(LengthUnit.Inches)
         set(value) {
             field = value
             this.meters = inchesToMeters(value)
         }
-    var ft: Double = getLength(LengthUnit.MM)
-        get() = getLength(LengthUnit.Ft)
+    var ft: Double = getLength(LengthUnit.Millimeters)
+        get() = getLength(LengthUnit.Feet)
         set(value) {
             field = value
             this.meters = ftToMeters(value)
@@ -48,10 +48,10 @@ class Length : Comparable<Length> {
     constructor(length: Double, lengthUnit: LengthUnit) {
         this.meters = when (lengthUnit) {
             LengthUnit.Meters -> length
-            LengthUnit.CM -> length / 100.0
-            LengthUnit.MM -> length / 1000.0
+            LengthUnit.Centimeters -> length / 100.0
+            LengthUnit.Millimeters -> length / 1000.0
             LengthUnit.Inches -> inchesToMeters(length)
-            LengthUnit.Ft -> ftToMeters(length)
+            LengthUnit.Feet -> ftToMeters(length)
         }
     }
 
@@ -65,11 +65,11 @@ class Length : Comparable<Length> {
         }
 
         fun fromCM(CM: Double): Length {
-            return Length(CM, LengthUnit.CM)
+            return Length(CM, LengthUnit.Centimeters)
         }
 
         fun fromMM(MM: Double): Length {
-            return Length(MM, LengthUnit.MM)
+            return Length(MM, LengthUnit.Millimeters)
         }
 
         fun fromInches(inches: Double): Length {
@@ -77,17 +77,17 @@ class Length : Comparable<Length> {
         }
 
         fun fromFt(ft: Double): Length {
-            return Length(ft, LengthUnit.Ft)
+            return Length(ft, LengthUnit.Feet)
         }
     }
 
     fun getLength(lengthUnit: LengthUnit): Double {
         return when (lengthUnit) {
             LengthUnit.Meters -> this.meters
-            LengthUnit.CM -> this.meters * 100.0
-            LengthUnit.MM -> this.meters * 1000.0
+            LengthUnit.Centimeters -> this.meters * 100.0
+            LengthUnit.Millimeters -> this.meters * 1000.0
             LengthUnit.Inches -> metersToInches(this.meters)
-            LengthUnit.Ft -> metersToFt(this.meters)
+            LengthUnit.Feet -> metersToFt(this.meters)
         }
     }
 
