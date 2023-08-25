@@ -7,9 +7,11 @@ import edu.wpi.first.wpilibj.DriverStation
 // for reference
 // https://lucidar.me/en/unit-converter/revolutions-per-minute-to-meters-per-second/
 
-private const val inchesInMeter = 39.3700787402
+private const val InchesInMeter = 39.3700787402
 
 const val CANCoderTicksPerRev = 4096
+
+// TODO: Update to current field's length.
 const val ChargedUpFieldLengthM = 16.7
 
 /** Degrees to radians.  */
@@ -49,10 +51,8 @@ fun RPMToRadPS(RPM: Double): Double {
  */
 @Throws(IllegalArgumentException::class)
 fun radPSToMPS(radPS: Double, wheelRadiusMeters: Double): Double {
-	return if (wheelRadiusMeters > 0) RPMToMPS(
-		radPSToRPM(radPS),
-		wheelRadiusMeters
-	) else throw IllegalArgumentException("Wheel radius must be positive")
+	return if (wheelRadiusMeters > 0) RPMToMPS(radPSToRPM(radPS), wheelRadiusMeters)
+	else throw IllegalArgumentException("Wheel radius must be positive")
 }
 
 /**
@@ -105,12 +105,12 @@ fun RPMToMPS(RPM: Double, wheelRadiusMeters: Double): Double {
 
 /** Meters to inches.  */
 fun metersToInches(meters: Double): Double {
-	return meters * inchesInMeter
+	return meters * InchesInMeter
 }
 
 /** Inches to meters.  */
 fun inchesToMeters(inches: Double): Double {
-	return inches / inchesInMeter
+	return inches / InchesInMeter
 }
 
 /** Meters to ft.  */
