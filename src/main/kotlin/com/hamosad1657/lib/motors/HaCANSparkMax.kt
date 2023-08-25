@@ -2,6 +2,8 @@ package com.hamosad1657.lib.motors
 
 import com.hamosad1657.lib.math.clamp
 import com.revrobotics.CANSparkMax
+import edu.wpi.first.util.sendable.Sendable
+import edu.wpi.first.util.sendable.SendableBuilder
 
 /**
  * Max safe temperature for the time span of a match.
@@ -12,23 +14,21 @@ import com.revrobotics.CANSparkMax
  */
 const val NEOSafeTempC = 90
 
-class HaCANSparkMax(deviceID: Int) : CANSparkMax(deviceID, MotorType.kBrushless) {
+class HaCANSparkMax(deviceID: Int) : CANSparkMax(deviceID, MotorType.kBrushless), Sendable {
 	var forwardLimit: () -> Boolean = { false }
 	var reverseLimit: () -> Boolean = { false }
 
 	var minPercentOutput = -1.0
 		set(value) {
-			field = if (value <= -1.0) -1.0 else value
+			field = value.coerceAtLeast(-1.0)
 		}
 	var maxPercentOutput = 1.0
 		set(value) {
-			field = if (value >= 1.0) 1.0 else value
+			field = value.coerceAtMost(1.0)
 		}
 
 	/** The NEO motor has a temperature sensor inside it.*/
-	var isMotorTempSafe = true
-		get() = motorTemperature < NEOSafeTempC
-		private set
+	val isMotorTempSafe get() = motorTemperature < NEOSafeTempC
 
 	/**
 	 * percentOutput is clamped between properties minPercentOutput and maxPercentOutput.
@@ -46,6 +46,15 @@ class HaCANSparkMax(deviceID: Int) : CANSparkMax(deviceID, MotorType.kBrushless)
 			this.set(0.0)
 		} else {
 			this.set(percentOutput)
+		}
+	}
+
+	override fun initSendable(builder: SendableBuilder?) {
+		if (builder != null) {
+			builder.setSmartDashboardType("Motor Controller")
+			builder.setActuator(true)
+			builder.setSafeState { stopMotor() }
+			builder.addDoubleProperty("Value", this::get, this::set)
 		}
 	}
 }
