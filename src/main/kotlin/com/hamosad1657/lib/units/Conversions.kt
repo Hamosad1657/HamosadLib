@@ -7,39 +7,41 @@ import edu.wpi.first.wpilibj.DriverStation
 // for reference
 // https://lucidar.me/en/unit-converter/revolutions-per-minute-to-meters-per-second/
 
-private const val inchesInMeter = 39.3700787402
+private const val InchesInMeter = 39.3700787402
 
 const val CANCoderTicksPerRev = 4096
+
+// TODO: Update to current field's length.
 const val ChargedUpFieldLengthM = 16.7
 
 /** Degrees to radians.  */
 fun degToRad(deg: Double): Double {
-    return Math.toRadians(deg)
+	return Math.toRadians(deg)
 }
 
 /** Radians to degrees.  */
 fun radToDeg(rad: Double): Double {
-    return Math.toDegrees(rad)
+	return Math.toDegrees(rad)
 }
 
 /** Degrees per second to rotations per minute.  */
 fun degPSToRPM(degPS: Double): Double {
-    return degPS / 360 / 60
+	return degPS / 360 / 60
 }
 
 /** Rotations per minute to degrees per seconds.  */
 fun RPMToDegPS(RPM: Double): Double {
-    return RPM * 60 * 360
+	return RPM * 60 * 360
 }
 
 /** Radians per second to rotations per minute.  */
 fun radPSToRPM(radPS: Double): Double {
-    return radPS / (Math.PI * 2) / 60
+	return radPS / (Math.PI * 2) / 60
 }
 
 /** Rotations per minute to radians per second.  */
 fun RPMToRadPS(RPM: Double): Double {
-    return RPM * 60 * (Math.PI * 2)
+	return RPM * 60 * (Math.PI * 2)
 }
 
 /**
@@ -49,10 +51,8 @@ fun RPMToRadPS(RPM: Double): Double {
  */
 @Throws(IllegalArgumentException::class)
 fun radPSToMPS(radPS: Double, wheelRadiusMeters: Double): Double {
-    return if (wheelRadiusMeters > 0) RPMToMPS(
-        radPSToRPM(radPS),
-        wheelRadiusMeters
-    ) else throw IllegalArgumentException("Wheel radius must be positive")
+	return if (wheelRadiusMeters > 0) RPMToMPS(radPSToRPM(radPS), wheelRadiusMeters)
+	else throw IllegalArgumentException("Wheel radius must be positive")
 }
 
 /**
@@ -65,15 +65,15 @@ fun radPSToMPS(radPS: Double, wheelRadiusMeters: Double): Double {
  */
 @Throws(IllegalArgumentException::class)
 fun degPSToMPS(degPS: Double, wheelRadiusMeters: Double): Double {
-    return if (wheelRadiusMeters > 0) RPMToMPS(
-        degPSToRPM(degPS),
-        wheelRadiusMeters
-    ) else throw IllegalArgumentException("Wheel radius must be positive")
+	return if (wheelRadiusMeters > 0) RPMToMPS(
+		degPSToRPM(degPS),
+		wheelRadiusMeters
+	) else throw IllegalArgumentException("Wheel radius must be positive")
 }
 
 /** Meters per second to degrees per second.  */
 fun MPSToDegPS(MPS: Double, wheelRadiusM: Double): Double {
-    return RPMToDegPS(MPSToRPM(MPS, wheelRadiusM))
+	return RPMToDegPS(MPSToRPM(MPS, wheelRadiusM))
 }
 
 /**
@@ -83,9 +83,9 @@ fun MPSToDegPS(MPS: Double, wheelRadiusM: Double): Double {
  */
 @Throws(IllegalArgumentException::class)
 fun MPSToRPM(MPS: Double, wheelRadiusMeters: Double): Double {
-    return if (wheelRadiusMeters > 0) 60 / (2 * Math.PI * wheelRadiusMeters) * MPS else throw IllegalArgumentException(
-        "Wheel radius must be positive"
-    )
+	return if (wheelRadiusMeters > 0) 60 / (2 * Math.PI * wheelRadiusMeters) * MPS else throw IllegalArgumentException(
+		"Wheel radius must be positive"
+	)
 }
 
 /**
@@ -98,34 +98,34 @@ fun MPSToRPM(MPS: Double, wheelRadiusMeters: Double): Double {
  */
 @Throws(IllegalArgumentException::class)
 fun RPMToMPS(RPM: Double, wheelRadiusMeters: Double): Double {
-    return if (wheelRadiusMeters > 0) wheelRadiusMeters * (2 * Math.PI / 60) * RPM else throw IllegalArgumentException(
-        "Wheel radius must be positive"
-    )
+	return if (wheelRadiusMeters > 0) wheelRadiusMeters * (2 * Math.PI / 60) * RPM else throw IllegalArgumentException(
+		"Wheel radius must be positive"
+	)
 }
 
 /** Meters to inches.  */
 fun metersToInches(meters: Double): Double {
-    return meters * inchesInMeter
+	return meters * InchesInMeter
 }
 
 /** Inches to meters.  */
 fun inchesToMeters(inches: Double): Double {
-    return inches / inchesInMeter
+	return inches / InchesInMeter
 }
 
 /** Meters to ft.  */
 fun metersToFt(meters: Double): Double {
-    return metersToInches(meters) / 12.0
+	return metersToInches(meters) / 12.0
 }
 
 /** Ft to meters.  */
 fun ftToMeters(ft: Double): Double {
-    return inchesToMeters(ft * 12.0)
+	return inchesToMeters(ft * 12.0)
 }
 
 /** Degrees per second to CANCoder ticks per 100ms.  */
 fun degPSToCANCoderTicksPer100ms(degPS: Double): Double {
-    return degreesToCANCoderTicks(degPS) / 10
+	return degreesToCANCoderTicks(degPS) / 10
 }
 
 /**
@@ -135,7 +135,7 @@ fun degPSToCANCoderTicksPer100ms(degPS: Double): Double {
  * @return CANCoder position counts (4096)
  */
 fun degreesToCANCoderTicks(degrees: Double): Double {
-    return degrees / 360.0 * CANCoderTicksPerRev
+	return degrees / 360.0 * CANCoderTicksPerRev
 }
 
 /**
@@ -144,7 +144,7 @@ fun degreesToCANCoderTicks(degrees: Double): Double {
  * @return Degrees of rotation of mechanism
  */
 fun CANCoderTicksToDegrees(positionCounts: Double, gearRatio: Double): Double {
-    return positionCounts * (360.0 / (gearRatio * 4096.0))
+	return positionCounts * (360.0 / (gearRatio * 4096.0))
 }
 
 /**
@@ -153,7 +153,7 @@ fun CANCoderTicksToDegrees(positionCounts: Double, gearRatio: Double): Double {
  * @return CANCoder position counts (4096)
  */
 fun degreesToCANCoderTicks(degrees: Double, gearRatio: Double): Double {
-    return degrees / (360.0 / (gearRatio * 4096.0))
+	return degrees / (360.0 / (gearRatio * 4096.0))
 }
 
 /**
@@ -162,7 +162,7 @@ fun degreesToCANCoderTicks(degrees: Double, gearRatio: Double): Double {
  * @return Degrees of rotation of mechanism
  */
 fun falconTicksToDegrees(positionCounts: Double, gearRatio: Double): Double {
-    return positionCounts * (360.0 / (gearRatio * 2048.0))
+	return positionCounts * (360.0 / (gearRatio * 2048.0))
 }
 
 /**
@@ -171,7 +171,7 @@ fun falconTicksToDegrees(positionCounts: Double, gearRatio: Double): Double {
  * @return Falcon position counts in integrated encoder ticks (2048)
  */
 fun degreesToFalconTicks(degrees: Double, gearRatio: Double): Double {
-    return degrees / (360.0 / (gearRatio * 2048.0))
+	return degrees / (360.0 / (gearRatio * 2048.0))
 }
 
 /**
@@ -180,8 +180,8 @@ fun degreesToFalconTicks(degrees: Double, gearRatio: Double): Double {
  * @return RPM of mechanism
  */
 fun falconTicksToRPM(velocityCounts: Double, gearRatio: Double): Double {
-    val motorRPM = velocityCounts * (600.0 / 2048.0)
-    return motorRPM / gearRatio
+	val motorRPM = velocityCounts * (600.0 / 2048.0)
+	return motorRPM / gearRatio
 }
 
 /**
@@ -190,8 +190,8 @@ fun falconTicksToRPM(velocityCounts: Double, gearRatio: Double): Double {
  * @return RPM of Mechanism
  */
 fun RPMToFalconTicks(RPM: Double, gearRatio: Double): Double {
-    val motorRPM = RPM * gearRatio
-    return motorRPM * (2048.0 / 600.0)
+	val motorRPM = RPM * gearRatio
+	return motorRPM * (2048.0 / 600.0)
 }
 
 /**
@@ -201,12 +201,12 @@ fun RPMToFalconTicks(RPM: Double, gearRatio: Double): Double {
  * @return Falcon Velocity Counts
  */
 fun falconTicksToMPS(
-    velocityCounts: Double,
-    wheelCircumferenceM: Double,
-    gearRatio: Double
+	velocityCounts: Double,
+	wheelCircumferenceM: Double,
+	gearRatio: Double,
 ): Double {
-    val wheelRPM = falconTicksToRPM(velocityCounts, gearRatio)
-    return wheelRPM * wheelCircumferenceM / 60
+	val wheelRPM = falconTicksToRPM(velocityCounts, gearRatio)
+	return wheelRPM * wheelCircumferenceM / 60
 }
 
 /**
@@ -216,12 +216,12 @@ fun falconTicksToMPS(
  * @return Falcon Velocity Counts
  */
 fun MPSToFalconTicks(
-    MPS: Double,
-    wheelCircumferenceM: Double,
-    gearRatio: Double
+	MPS: Double,
+	wheelCircumferenceM: Double,
+	gearRatio: Double,
 ): Double {
-    val wheelRPM = MPS * 60 / wheelCircumferenceM
-    return RPMToFalconTicks(wheelRPM, gearRatio)
+	val wheelRPM = MPS * 60 / wheelCircumferenceM
+	return RPMToFalconTicks(wheelRPM, gearRatio)
 }
 
 /**
@@ -231,7 +231,7 @@ fun MPSToFalconTicks(
  * @return Meters
  */
 fun falconTicksToMeters(positionCounts: Double, wheelCircumferenceM: Double, gearRatio: Double): Double {
-    return positionCounts * (wheelCircumferenceM / (gearRatio * 2048.0))
+	return positionCounts * (wheelCircumferenceM / (gearRatio * 2048.0))
 }
 
 /**
@@ -241,7 +241,7 @@ fun falconTicksToMeters(positionCounts: Double, wheelCircumferenceM: Double, gea
  * @return Falcon position counts in integrated encoder ticks (2048)
  */
 fun metersToFalconTicks(meters: Double, wheelCircumferenceM: Double, gearRatio: Double): Double {
-    return meters / (wheelCircumferenceM / (gearRatio * 2048.0))
+	return meters / (wheelCircumferenceM / (gearRatio * 2048.0))
 }
 
 /**
@@ -250,8 +250,8 @@ fun metersToFalconTicks(meters: Double, wheelCircumferenceM: Double, gearRatio: 
  * @return New position relative to robot's alliance.
  */
 fun matchPoseToAlliance(position: Pose2d): Pose2d {
-    return if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) position else Pose2d(
-        ChargedUpFieldLengthM - position.x, position.y,
-        position.rotation.rotateBy(Rotation2d.fromDegrees(180.0))
-    )
+	return if (DriverStation.getAlliance() == DriverStation.Alliance.Blue) position else Pose2d(
+		ChargedUpFieldLengthM - position.x, position.y,
+		position.rotation.rotateBy(Rotation2d.fromDegrees(180.0))
+	)
 }
