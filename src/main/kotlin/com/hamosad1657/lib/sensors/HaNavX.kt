@@ -99,6 +99,7 @@ class HaNavX : Sendable {
 	constructor(port: SerialPort.Port) {
 		try {
 			navX = AHRS(port)
+			this.initialize()
 		} catch (e: RuntimeException) {
 			robotPrintError("Failed to initialize navX.", printStackTrace = true)
 		}
@@ -108,6 +109,7 @@ class HaNavX : Sendable {
 
 		try {
 			navX = AHRS(port)
+			this.initialize()
 		} catch (e: RuntimeException) {
 			robotPrintError("Failed to initialize navX.", printStackTrace = true)
 		}
@@ -118,6 +120,7 @@ class HaNavX : Sendable {
 	constructor(port: I2C.Port) {
 		try {
 			navX = AHRS(port)
+			this.initialize()
 		} catch (e: RuntimeException) {
 			robotPrintError("Failed to initialize navX.", printStackTrace = true)
 		}
@@ -125,7 +128,7 @@ class HaNavX : Sendable {
 
 	/** Enables logging to the RioLog & Driver Station, then waits until
 	 * the navX is connected and calibrated, or 5 seconds have passed. */
-	init {
+	private fun initialize() {
 		navX!!.enableLogging(true)
 
 		val connectionTimeoutTimer = Timer()
@@ -169,7 +172,6 @@ class HaNavX : Sendable {
 
 	/** Sets the currently facing yaw angle as the zero minus the offset. */
 	fun setYaw(offset: Rotation2d) = this.setYaw(offset.degrees)
-
 	override fun initSendable(builder: SendableBuilder) {
 		builder.setSmartDashboardType("HaNavX")
 		builder.addDoubleProperty("Yaw Angle Degrees", { yawDeg }, null)
