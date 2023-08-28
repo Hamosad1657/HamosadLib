@@ -26,6 +26,16 @@ fun mapRange(value: Double, startMin: Double, startMax: Double, endMin: Double, 
 	return endMin + (endMax - endMin) / (startMax - startMin) * (value - startMin)
 }
 
+/**
+ * Gets a start range defined by [startMin] and [startMax] and an end range defined by [endMin] and [endMax], and a
+ * value that is relative to the first range.
+ *
+ * @return The value relative to the end range.
+ */
+fun mapRange(value: Int, startMin: Int, startMax: Int, endMin: Int, endMax: Int): Int {
+	return endMin + (endMax - endMin) / (startMax - startMin) * (value - startMin)
+}
+
 fun median(collection: Collection<Double>): Double {
 	return median(collection.toDoubleArray())
 }
