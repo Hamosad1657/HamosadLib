@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.util.Color
 class HaColorSensor(port: I2C.Port) : Sendable {
 	private val colorSensor: ColorSensorV3
 
-	/** The raw color detected by the sensor. */
+	/** The raw color detected by the sensor. Contains red, green, blue and IR. */
 	val colorRaw: RawColor get() = colorSensor.rawColor
 
 	/** The red value of the raw detected color. */
@@ -32,7 +32,7 @@ class HaColorSensor(port: I2C.Port) : Sendable {
 	val proximityRaw get() = MAX_PROXIMITY - colorSensor.proximity // Flip the range from [2047, 0] to [0, 2047]
 
 	/** The proximity of the sensor. */
-	val proximity: Length
+	val proximityCentimeters: Length
 		get() = mapRange(proximityRaw, MIN_PROXIMITY, MAX_PROXIMITY, MIN_DISTANCE_CM, MAX_DISTANCE_CM).centimeters
 
 	/** The detected color, normalized to percents. */
@@ -88,7 +88,7 @@ class HaColorSensor(port: I2C.Port) : Sendable {
 		builder.addDoubleProperty("Red %", { red }, null)
 		builder.addDoubleProperty("Green %", { green }, null)
 		builder.addDoubleProperty("Blue %", { blue }, null)
-		builder.addDoubleProperty("Proximity (CM)", { proximity.centimeters }, null)
+		builder.addDoubleProperty("Proximity (CM)", { proximityCentimeters.centimeters }, null)
 		builder.addIntegerProperty("Proximity (0-2047)", { proximityRaw.toLong() }, null)
 	}
 
