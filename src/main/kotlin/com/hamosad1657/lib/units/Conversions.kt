@@ -5,8 +5,8 @@ import edu.wpi.first.wpilibj.DriverStation
 
 const val ChargedUpFieldLengthM = 16.7 // TODO: Update to current field's length.
 const val INCHES_IN_METER = 39.3700787402
-const val CANCODER_TICKS_PER_REVOLUTION = 4096.0
-const val FALCON_TICKS_PER_REVOLUTION = 2048.0
+const val CANCODER_TICKS_PER_ROTATION = 4096.0
+const val FALCON_TICKS_PER_ROTATION = 2048.0
 
 
 /// --- Angles to Angles Conversions ---
@@ -30,13 +30,13 @@ fun rpmToDegPs(rpm: Double) = rpm * 60.0 * 360.0
 fun radPsToRpm(radPs: Double) = radPs / (Math.PI * 2.0) / 60.0
 
 /** Radians per second to degrees per second. */
-fun radPsToDegPs(radPs: Double) = radPs * (180.0 / Math.PI)
+fun radPsToDegPs(radPs: Double) = Math.toDegrees(radPs)
 
 /** Degrees per second to rotations per minute. */
 fun degPsToRpm(degPs: Double) = degPs / 360.0 / 60.0
 
 /** Degrees per second to radians per second. */
-fun degPsToRadPs(degPs: Double) = degPs * (Math.PI / 180.0)
+fun degPsToRadPs(degPs: Double) = Math.toRadians(degPs)
 
 
 /// --- Angular Velocities to Linear Velocity Conversions ---
@@ -45,7 +45,7 @@ fun degPsToRadPs(degPs: Double) = degPs * (Math.PI / 180.0)
  *
  * Wheel radius should be greater than 0. */
 fun rpmToMps(rpm: Double, wheelRadius: Length) =
-	require(wheelRadius.meters > 0.0).run { wheelRadius.meters * (2.0 * Math.PI / 60.0) * rpm }
+	require(wheelRadius.meters > 0.0).run { rpm * 60.0 * wheelRadius.meters * 2.0 * Math.PI }
 
 /** Radians per second to meters per second.
  *
@@ -61,7 +61,7 @@ fun degPsToMps(degPs: Double, wheelRadius: Length) = rpmToMps(degPsToRpm(degPs),
  *
  * Wheel radius should be greater than 0. */
 fun mpsToRpm(mps: Double, wheelRadius: Length) =
-	require(wheelRadius.meters > 0.0).run { 60.0 / (2.0 * Math.PI * wheelRadius.meters) * mps }
+	require(wheelRadius.meters > 0.0).run { mps / 60.0 / (wheelRadius.meters * 2.0 * Math.PI) }
 
 /** Meters per second to radians per second.
  *
@@ -99,62 +99,83 @@ fun feetToInches(feet: Double) = feet * 12.0
 
 /**
  * Convert degrees to CANCoder ticks.
- * @param gearRatio Gear ratio between Falcon and mechanism
- * (e.g. 3.0 means that for each 3 rotations the Falcon makes, the mechanism makes 1).
+ * @param mechanismDeg
+ * @param gearRatio Gear ratio between motor and mechanism
+ * (e.g. 3.0 means that for each 3 rotations the motor makes, the mechanism makes 1).
+ *
+ * @return The angle of the motor in CANCoder ticks.
  */
-fun degToCANCoderTicks(deg: Double, gearRatio: Double = 1.0) =
-	deg / 360.0 * gearRatio * CANCODER_TICKS_PER_REVOLUTION
+fun degToCANCoderTicks(mechanismDeg: Double, gearRatio: Double = 1.0) =
+	mechanismDeg / 360.0 * gearRatio * CANCODER_TICKS_PER_ROTATION
 
 /**
  * CANCoder ticks to degrees.
- * @param gearRatio Gear ratio between Falcon and mechanism.
- * (e.g. 3.0 means that for each 3 rotations the Falcon makes, the mechanism makes 1).
+ * @param ticks The angle of the motor in CANCoder ticks.
+ * @param gearRatio Gear ratio between motor and mechanism
+ * (e.g. 3.0 means that for each 3 rotations the motor makes, the mechanism makes 1).
+ *
+ * @return The angle of the mechanism in degrees.
  */
 fun CANCoderTicksToDeg(ticks: Double, gearRatio: Double = 1.0) =
-	ticks / gearRatio / CANCODER_TICKS_PER_REVOLUTION * 360.0
+	ticks / CANCODER_TICKS_PER_ROTATION / gearRatio * 360.0
 
 /**
  * Degrees per second to CANCoder ticks per 100ms.
- * @param gearRatio Gear ratio between Falcon and mechanism.
- * (e.g. 3.0 means that for each 3 rotations the Falcon makes, the mechanism makes 1).
+ * @param mechanismDegPs
+ * @param gearRatio Gear ratio between motor and mechanism.
+ * (e.g. 3.0 means that for each 3 rotations the motor makes, the mechanism makes 1).
+ *
+ * @return The velocity of the motor in CANCoder ticks per 100 milliseconds.
  */
-fun degPsToCANCoderTicksPer100ms(degPs: Double, gearRatio: Double = 1.0) =
-	degToCANCoderTicks(degPs, gearRatio) / 10.0
+fun degPsToCANCoderTicksPer100ms(mechanismDegPs: Double, gearRatio: Double = 1.0) =
+	degToCANCoderTicks(mechanismDegPs, gearRatio) / 10.0
 
 
 /// --- Falcon Ticks to Angles and Angular Velocities Conversions ---
 
 /**
- * Falcon's integrated encoder ticks (2048 per revolution) to degrees.
+ * Falcon's integrated encoder ticks (2048 per rotation) to degrees.
+ * @param mechanismDeg
  * @param gearRatio Gear ratio between Falcon and mechanism.
  * (e.g. 3.0 means that for each 3 rotations the Falcon makes, the mechanism makes 1).
+ *
+ * @return The angle of the Falcon in integrated encoder ticks.
  */
-fun degToFalconTicks(deg: Double, gearRatio: Double = 1.0) =
-	deg / 360.0 * gearRatio * FALCON_TICKS_PER_REVOLUTION
+fun degToFalconTicks(mechanismDeg: Double, gearRatio: Double = 1.0) =
+	mechanismDeg / 360.0 * gearRatio * FALCON_TICKS_PER_ROTATION
 
 /**
- * Falcon's integrated encoder ticks (2048 per revolution) to degrees.
+ * Falcon's integrated encoder ticks (2048 per rotation) to degrees.
+ * @param ticks The angle of the Falcon in integrated encoder ticks.
  * @param gearRatio Gear ratio between Falcon and mechanism.
  * (e.g. 3.0 means that for each 3 rotations the Falcon makes, the mechanism makes 1).
+ *
+ * @return The angle of the mechanism in degrees.
  */
 fun falconTicksToDeg(ticks: Double, gearRatio: Double = 1.0) =
-	ticks / gearRatio / FALCON_TICKS_PER_REVOLUTION * 360.0
+	ticks / FALCON_TICKS_PER_ROTATION / gearRatio * 360.0
 
 /**
- * Revolutions per minute to Falcon's integrated encoder ticks (2048 per revolution) per 100ms.
+ * Rotations per minute to Falcon's integrated encoder ticks (2048 per rotation) per 100ms.
+ * @param mechanismRpm
  * @param gearRatio Gear ratio between Falcon and mechanism.
  * (e.g. 3.0 means that for each 3 rotations the Falcon makes, the mechanism makes 1).
+ *
+ * @return The velocity of the falcon in integrated encoder ticks per 100 milliseconds.
  */
-fun rpmToFalconTicksPer100ms(rpm: Double, gearRatio: Double = 1.0) =
-	rpm / 600.0 * gearRatio * FALCON_TICKS_PER_REVOLUTION
+fun rpmToFalconTicksPer100ms(mechanismRpm: Double, gearRatio: Double = 1.0) =
+	mechanismRpm / 600.0 * gearRatio * FALCON_TICKS_PER_ROTATION
 
 /**
- * Falcon's integrated encoder ticks (2048 per revolution) per 100ms tp revolutions per minute.
+ * Falcon's integrated encoder ticks (2048 per rotation) per 100ms tp rotation per minute.
+ * @param ticksPer100ms The velocity of the Falcon in integrated encoder ticks per 100 milliseconds.
  * @param gearRatio Gear ratio between Falcon and mechanism.
  * (e.g. 3.0 means that for each 3 rotations the Falcon makes, the mechanism makes 1).
+ *
+ * @return The velocity of the mechanism in rotations per minute.
  */
 fun falconTicksPer100msToRpm(ticksPer100ms: Double, gearRatio: Double = 1.0) =
-	ticksPer100ms / gearRatio / FALCON_TICKS_PER_REVOLUTION * 600.0
+	ticksPer100ms / gearRatio / FALCON_TICKS_PER_ROTATION * 600.0
 
 /**
  *
