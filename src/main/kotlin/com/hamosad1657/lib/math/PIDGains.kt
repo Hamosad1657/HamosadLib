@@ -30,7 +30,7 @@ class PIDGains @JvmOverloads constructor(
 	fun toPIDController() = PIDController(kP, kI, kD)
 
 	/** Creates a WPILib [ProfiledPIDController] with the P, I, and D gains and the given [constraints]. */
-	fun toProfiledPIDController(constraints: TrapezoidProfile.Constraints?) =
+	fun toProfiledPIDController(constraints: TrapezoidProfile.Constraints) =
 		ProfiledPIDController(kP, kI, kD, constraints)
 
 	/** Converts the P, I and D gains to a Path Planner [PIDConstants]. */
