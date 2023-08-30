@@ -1,7 +1,7 @@
 package com.hamosad1657.lib.math.filters.movingwindowfilters
 
 import com.hamosad1657.lib.math.median
-import java.util.LinkedList
+import java.util.*
 
 /**
  * A class for a moving median filter, a type of low-pass filter with a finite memory.
@@ -16,10 +16,10 @@ import java.util.LinkedList
  *                  and that will also be the approximate phase lag.
  */
 class MovingMedianFilter(window: Int) : MovingWindowFilter() {
-    override var window: Int = window
-        set(value) {
-            require(value > 0) {"window must be positive"}
-            field = value
-        }
-    override val calculation = {values: LinkedList<Double> -> median(values) }
+	override var window: Int = window
+		set(value) {
+			require(value > 0) { "window must be positive" }
+			field = value
+		}
+	override val calculation = { values: LinkedList<Double> -> median(values) }
 }

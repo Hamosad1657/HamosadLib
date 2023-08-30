@@ -1,8 +1,10 @@
 package com.hamosad1657.lib.sensors
 
-import com.hamosad1657.lib.debug.HaDriverStation.print
+import com.hamosad1657.lib.robotPrint
+import com.hamosad1657.lib.robotPrintError
+import com.hamosad1657.lib.units.AngularVelocity
+import com.hamosad1657.lib.units.degToRad
 import com.kauailabs.navx.frc.AHRS
-import com.kauailabs.navx.frc.AHRS.SerialDataType
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.util.sendable.Sendable
 import edu.wpi.first.util.sendable.SendableBuilder
@@ -11,296 +13,179 @@ import edu.wpi.first.wpilibj.*
 /**
  * A wrapper class for kauailabs.navx.frc.AHRS, which adheres to WPILib's
  * coordinate system conventions.
+ * @see <a href="https://en.wikipedia.org/wiki/Aircraft_principal_axes">Aircraft principal axes</a>
+ * for an explanation on the different axes.
  */
+// Note: this class is a wrapper over AHRS instead of a child that inherits AHRS, in order to prevent usage
+// of AHRS functions directly. Instead, it provides a better API that is suited to Kotlin and our team.
 class HaNavX : Sendable {
-    private var navX: AHRS? = null
-    private var yawOffsetDeg = 0.0
-    private val commsTimoutTimer = Timer()
+	private var navX: AHRS? = null
+	private var yawOffsetDeg = 0.0
 
-    /**
-     * Starts communication between navX and RoboRIO, enables logging to the RioLog
-     * & Driver Station, waits until the
-     * navX is connected and calibrated, then returns an instance.
-     *
-     * @param port serial port (usually USB)
-     * @return An instance of HaNavx, which wraps AHRS.
-     */
-    constructor(port: SerialPort.Port) {
-        try {
-            this.initialize(port)
-        } catch (E: RuntimeException) {
-            print("Failed to connect to navX.")
-        }
-    }
+	/** The angle of the navX in range [[-180, 180]] on the Vertical-axis (perpendicular to earth, left / right rotation).
+	 *
+	 * Larger value is counter-clockwise, according to WPILib's coordinate system. */
+	val yawDeg get() = -navX!!.yaw.toDouble() - yawOffsetDeg
 
-    /**
-     * Starts communication between navX and RoboRIO, enables logging to the RioLog
-     * & Driver Station, waits until the
-     * navX is connected and calibrated, then returns an instance.
-     *
-     * @param port I2C port. Using the onboard I2C port is not recommended, for more
-     * information click here:
-     * [...](https://docs.wpilib.org/en/stable/docs/yearly-overview/known-issues.html#onboard-i2c-causing-system-lockups)
-     */
-    constructor(port: I2C.Port) {
-        try {
-            this.initialize(port)
-        } catch (E: RuntimeException) {
-            print("Failed to connect to navX.")
-        }
-    }
+	/** The angle of the navX in range [[-PI, PI]] on the Vertical-axis (perpendicular to earth, left / right rotation).
+	 *
+	 * Larger value is counter-clockwise, according to WPILib's coordinate system. */
+	val yawRad get() = degToRad(yawDeg)
 
-    /**
-     * Starts communication between navX and RoboRIO, enables logging to the RioLog
-     * & Driver Station, waits until the
-     * navX is connected and calibrated, then returns an instance.
-     *
-     * @param port SPI port
-     */
-    constructor(port: SPI.Port) {
-        try {
-            this.initialize(port)
-        } catch (E: RuntimeException) {
-            print("Failed to connect to navX.")
-        }
-    }
+	/** The angle of the navX in range [[-180, 180]] on the Vertical-axis (perpendicular to earth, left / right rotation).
+	 *
+	 * Larger value is counter-clockwise, according to WPILib's coordinate system. */
+	val yaw: Rotation2d get() = Rotation2d.fromDegrees(yawDeg)
 
-    /**
-     * Used to set the angle the navX is currently facing as zero.
-     */
-    fun zeroYaw() {
-        yawOffsetDeg = 0.0
-        try {
-            navX!!.zeroYaw()
-        } catch (E: RuntimeException) {
-            print("Failed to zero navX yaw.")
-        }
-    }
+	/** The angle of the navX in range [[-180, 180]] on the Transverse-axis (down / up rotation).
+	 *
+	 * Larger value is counter-clockwise, according to WPILib's coordinate system. */
+	val pitchDeg get() = navX!!.pitch.toDouble()
 
-    /**
-     * Used to set the angle the navX is currently facing minus the offset as zero.
-     */
-    fun setYaw(offsetDeg: Double) {
-        zeroYaw() // Must be first, because zeroYaw() sets the offset as 0.
-        yawOffsetDeg = offsetDeg
-        print("Gyro set to: " + java.lang.Double.toString(offsetDeg) + " degrees.")
-    }
+	/** The angle of the navX in range [[-PI, PI]] on the Transverse-axis (down / up rotation).
+	 *
+	 * Larger value is counter-clockwise, according to WPILib's coordinate system. */
+	val pitchRad get() = degToRad(pitchDeg)
 
-    /**
-     * Used to set the angle the navX is currently facing minus the offset as zero.
-     */
-    fun setYaw(offset: Rotation2d) {
-        this.setYaw(offset.degrees)
-    }
+	/** The angle of the navX in range [[-180, 180]] on the Transverse-axis (down / up rotation).
+	 *
+	 * Larger value is counter-clockwise, according to WPILib's coordinate system. */
+	val pitch: Rotation2d get() = Rotation2d.fromDegrees(pitchDeg)
 
-    private val yawAngleDeg: Double
-        /**
-         * @return The angle of the navX on the Z axis (perpendicular to earth, "yaw")
-         * in degrees. Rotating
-         * counter-clockwise makes the angle increase, and rotating
-         * clockwise makes the angle decrease,
-         * according to WPILib's coordinate system conventions.
-         */
-        get() = try {
-            -navX!!.yaw - yawOffsetDeg
-        } catch (e: RuntimeException) {
-            0.0
-        }
-    private val yawAngleRad: Double
-        /**
-         * @return The angle of the navX on the Z axis (perpendicular to earth, "yaw")
-         * in radians. Rotating
-         * counter-clockwise makes the angle increase, and rotating clockwise
-         * makes the angle decrease, according to
-         * WPILib's coordinate system conventions.
-         */
-        get() = Math.toRadians(yawAngleDeg)
-    val yawRotation2d: Rotation2d
-        /**
-         * @return The angle of the navX on the Z axis (perpendicular to earth, "yaw")
-         * as a Rotation2d. Rotating
-         * counter-clockwise makes the angle increase, and rotating clockwise
-         * makes the angle decrease, according to
-         * WPILib's coordinate system conventions.
-         */
-        get() = Rotation2d.fromDegrees(yawAngleDeg)
-    private val pitchAngleDeg: Double
-        /**
-         *
-         * @return The angle of the navX on the X axis (forward-backward tilt) in
-         * degrees. Tilting backwards makes the angle
-         * increase, and tilting forwards makes the angle decrease. If the angle
-         * returned is incorrect, verify that
-         * the navX axises are matching to the robot axises, or use the
-         * omnimount feature (as specified in
-         * Kauailabs's website).
-         */
-        get() = try {
-            navX!!.pitch.toDouble()
-        } catch (E: RuntimeException) {
-            0.0
-        }
-    val pitchAngleRad: Double
-        /**
-         * @return The angle of the navX on the X axis (forward-backward tilt) in
-         * radians. Tilting backwards makes the angle
-         * increase, and tilting forwards makes the angle decrease. If the angle
-         * returned is incorrect, verify that
-         * the navX axises are matching to the robot axises, or use the
-         * omnimount feature (as specified in
-         * kauailabs's website).
-         */
-        get() = Math.toRadians(pitchAngleDeg)
-    val pitchRotation2d: Rotation2d
-        /**
-         * @return The angle of the navX on the X axis (forward-backward tilt) as a
-         * Rotation2d. Tilting backwards makes the
-         * angle increase, and tilting forwards makes the angle decrease. If the
-         * angle returned is incorrect, verify
-         * that the navX axises are matching to the robot axises, or use the
-         * omnimount feature (as specified in
-         * kauailabs's website).
-         */
-        get() = Rotation2d.fromDegrees(pitchAngleDeg)
-    private val rollAngleDeg: Double
-        /**
-         * @return The angle of the navX on the Y axis (left-right tilt) in degrees.
-         * Tilting left makes the angle increase,
-         * and tilting right makes the angle decrease. If the angle returned is
-         * incorrect, verify that the navX
-         * axises are matching to the robot axises, or use the omnimount feature
-         * (as specified in kauailabs's
-         * website).
-         */
-        get() = try {
-            navX!!.roll.toDouble()
-        } catch (E: RuntimeException) {
-            0.0
-        }
-    val rollAngleRad: Double
-        /**
-         * @return The angle of the navX on the Y axis (left-right tilt) in radians.
-         * Tilting left makes the angle increase,
-         * and tilting right makes the angle decrease.If the angle returned is
-         * incorrect, verify that the navX
-         * axises are matching to the robot axises, or use the omnimount feature
-         * (as specified in kauailabs's
-         * website).
-         */
-        get() = Math.toRadians(rollAngleDeg)
-    val rollRotation2d: Rotation2d
-        /**
-         * @return The angle of the navX on the Y axis (left-right tilt) as a
-         * Rotation2d. Tilting left makes the angle
-         * increase, and tilting right makes the angle decrease. If the angle
-         * returned is incorrect, verify that the
-         * navX axises are matching to the robot axises, or use the omnimount
-         * feature (as specified in kauailabs's
-         * website).
-         */
-        get() = Rotation2d.fromDegrees(rollAngleDeg)
-    private val angularVelocityDegPS: Double
-        /**
-         * @return the rate of change in the angle on the Z axis (perpendicular to
-         * earth, "yaw") in degrees. Rotating
-         * counter-clockwise returns a positive value, and clockwise returns a
-         * negative value.
-         */
-        get() = try {
-            -navX!!.rate
-        } catch (E: RuntimeException) {
-            0.0
-        }
-    val angularVelocityRadPS: Double
-        /**
-         * @return the rate of change in the angle on the Z axis (perpendicular to
-         * earth, "yaw") in radians. Rotating
-         * counter-clockwise returns a positive value, and clockwise returns a
-         * negative value.
-         */
-        get() = Math.toRadians(angularVelocityDegPS)
+	/** The angle of the navX in range [[-180, 180]] on the Longitudinal-axis (lean right / lean left rotation).
+	 *
+	 * Larger value is counter-clockwise, according to WPILib's coordinate system. */
+	val rollDeg get() = navX!!.roll.toDouble()
 
-    override fun initSendable(builder: SendableBuilder) {
-        builder.setSmartDashboardType("HaNavx")
-        builder.addDoubleProperty("YawAngleDeg", { yawAngleDeg }, null)
-        builder.addDoubleProperty("YawAngleRad", { yawAngleRad }, null)
-        builder.addDoubleProperty("PitchAngleDeg", { pitchAngleDeg }, null)
-        builder.addDoubleProperty("RollAngleDeg", { rollAngleDeg }, null)
-        builder.addDoubleProperty("Offset", { yawOffsetDeg }, null)
-    }
+	/** The angle of the navX in range [[-PI, PI]] on the Longitudinal-axis (lean right / lean left rotation).
+	 *
+	 * Larger value is counter-clockwise, according to WPILib's coordinate system. */
+	val rollRad get() = degToRad(rollDeg)
 
-    /*
-	 * Waits until the navX is connected and calibrated, or 5 seconds have passed
-	 * since startup. If the former, print
-	 * that the navX is done calibrating and continue; If the latter, print that
-	 * communication has failed or navX did
-	 * not calibrate and continue.
-	 */
-    private fun initialize(port: SerialPort.Port) {
-        commsTimoutTimer.start()
-        navX = AHRS(port, SerialDataType.kProcessedData, 60.toByte())
-        navX!!.enableLogging(true)
-        initReport()
-    }
+	/** The angle of the navX in range [[-180, 180]] on the Longitudinal-axis (lean right / lean left rotation).
+	 *
+	 * Larger value is counter-clockwise, according to WPILib's coordinate system. */
+	val roll: Rotation2d get() = Rotation2d.fromDegrees(rollDeg)
 
-    /*
-	 * Waits until the navX is connected and calibrated, or 5 seconds have passed
-	 * since startup. If the former, print
-	 * that the navX is done calibrating and continue; If the latter, print that
-	 * communication has failed or navX did
-	 * not calibrate and continue.
-	 */
-    private fun initialize(port: I2C.Port) {
-        commsTimoutTimer.start()
-        navX = AHRS(port)
-        navX!!.enableLogging(true)
-        initReport()
-    }
+	/** The rate of angle change (angular velocity) of the navX in range [[-180, 180]]
+	 * on the Vertical-axis (perpendicular to earth, left / right rotation).
+	 *
+	 * Larger value is counter-clockwise, according to WPILib's coordinate system. */
+	val yawAngularVelocity get() = AngularVelocity.fromDegPs(navX!!.rate)
 
-    /*
-	 * Waits until the navX is connected and calibrated, or 5 seconds have passed
-	 * since startup. If the former, print
-	 * that the navX is done calibrating and continue; If the latter, print that
-	 * communication has failed or navX did
-	 * not calibrate and continue.
-	 */
-    private fun initialize(port: SPI.Port) {
-        commsTimoutTimer.start()
-        navX = AHRS(port)
-        navX!!.enableLogging(true)
-        initReport()
-    }
+	/** Returns the total accumulated yaw angle (Z Axis, in degrees) reported by the sensor.
+	 *
+	 * NOTE: The angle is continuous, meaning it's range is beyond 360 degrees.
+	 * This ensures that algorithms that wouldn't want to see a discontinuity in
+	 * the gyro output as it sweeps past 0 on the second time around. */
+	val accumulatedYawDeg get() = navX!!.angle
 
-    private fun initReport() {
-        // Wait until navX is connected or 5 seconds have passed
-        while (!navX!!.isConnected) {
-            if (commsTimoutTimer.hasElapsed(kTimeoutSec)) {
-                break
-            }
-        }
-        // Wait until navX is calibrated or 5 seconds have passed
-        while (navX!!.isCalibrating) {
-            if (commsTimoutTimer.hasElapsed(kTimeoutSec)) {
-                break
-            }
-        }
+	/** Returns the total accumulated yaw angle (Z Axis) reported by the sensor.
+	 *
+	 * NOTE: The angle is continuous, meaning it's range is beyond 360 degrees.
+	 * This ensures that algorithms that wouldn't want to see a discontinuity in
+	 * the gyro output as it sweeps past 0 on the second time around. */
+	val accumulatedYaw: Rotation2d get() = navX!!.rotation2d
 
-        // If 5 seconds have passed
-        if (commsTimoutTimer.hasElapsed(kTimeoutSec)) {
-            DriverStation.reportError(
-                "Failed to connect to navX, or navX didn't calibrate, within "
-                        + kTimeoutSec.toString() + " seconds from startup.", true
-            )
-        } else {
-            print(
-                "navX done calibrating in " + commsTimoutTimer.get().toString()
-                        + " seconds from startup."
-            )
-        }
-        commsTimoutTimer.stop()
-    }
+	/** Indicates if the sensor is currently detecting motion, based upon the X and Y-axis
+	 * world linear acceleration values. If the sum of the absolute values of the X and Y
+	 * axis exceed a "motion threshold", the motion state is indicated. */
+	val isMoving get() = navX!!.isMoving
 
-    companion object {
-        private const val kTimeoutSec = 5.0
-    }
+	/** Indicates if the sensor is currently detecting yaw rotation, based upon whether
+	 * the change in yaw over the last second exceeds the "Rotation Threshold." */
+	val isRotating get() = navX!!.isRotating
+
+	constructor(port: SerialPort.Port) {
+		try {
+			navX = AHRS(port)
+			this.initialize()
+		} catch (e: RuntimeException) {
+			robotPrintError("Failed to initialize navX.", printStackTrace = true)
+		}
+	}
+
+	constructor(port: SPI.Port) {
+
+		try {
+			navX = AHRS(port)
+			this.initialize()
+		} catch (e: RuntimeException) {
+			robotPrintError("Failed to initialize navX.", printStackTrace = true)
+		}
+	}
+
+	/** Using the onboard I2C port is [not recommended](
+		https://docs.wpilib.org/en/stable/docs/yearly-overview/known-issues.html#onboard-i2c-causing-system-lockups) */
+	constructor(port: I2C.Port) {
+		try {
+			navX = AHRS(port)
+			this.initialize()
+		} catch (e: RuntimeException) {
+			robotPrintError("Failed to initialize navX.", printStackTrace = true)
+		}
+	}
+
+	/** Enables logging to the RioLog & Driver Station, then waits until
+	 * the navX is connected and calibrated, or 5 seconds have passed. */
+	private fun initialize() {
+		navX!!.enableLogging(true)
+
+		val connectionTimeoutTimer = Timer()
+		connectionTimeoutTimer.start()
+		while ((!navX!!.isConnected || navX!!.isCalibrating) && !connectionTimeoutTimer.hasElapsed(TIMEOUT_SECONDS)) {
+			// Wait until navX is connected and calibrated or 5 seconds have passed
+		}
+		connectionTimeoutTimer.stop()
+
+		if (connectionTimeoutTimer.hasElapsed(TIMEOUT_SECONDS)) {
+			robotPrintError(
+				"Failed to connect to navX or navX didn't calibrate within $TIMEOUT_SECONDS seconds from startup.",
+				printStackTrace = true
+			)
+		} else {
+			robotPrint("NavX done calibrating in ${connectionTimeoutTimer.get()} seconds from startup.")
+		}
+	}
+
+	/** Sets the currently facing yaw angle as zero.*/
+	fun zeroYaw() {
+		yawOffsetDeg = 0.0
+		try {
+			navX!!.zeroYaw()
+			robotPrint("NavX zeroed.")
+		} catch (e: RuntimeException) {
+			robotPrintError("Failed to zero navX yaw.", printStackTrace = true)
+		}
+	}
+
+	/** Sets the currently facing yaw angle as the zero minus the offset. */
+	fun setYaw(offsetDeg: Double) {
+		try {
+			navX!!.zeroYaw()
+			yawOffsetDeg = offsetDeg
+			robotPrint("NavX offset set to $offsetDeg.")
+		} catch (e: RuntimeException) {
+			robotPrintError("Failed to set navX yaw offset.", printStackTrace = true)
+		}
+	}
+
+	/** Sets the currently facing yaw angle as the zero minus the offset. */
+	fun setYaw(offset: Rotation2d) = this.setYaw(offset.degrees)
+	override fun initSendable(builder: SendableBuilder) {
+		builder.setSmartDashboardType("HaNavX")
+		builder.addDoubleProperty("Yaw Angle Degrees", { yawDeg }, null)
+		builder.addDoubleProperty("Yaw Angle Radians", { yawRad }, null)
+		builder.addDoubleProperty("Pitch Angle Degrees", { pitchDeg }, null)
+		builder.addDoubleProperty("Pitch Angle Radians", { pitchRad }, null)
+		builder.addDoubleProperty("Roll Angle Degrees", { rollDeg }, null)
+		builder.addDoubleProperty("Roll Angle Radians", { rollRad }, null)
+		builder.addDoubleProperty("Yaw Angular Velocity DegPs", { yawAngularVelocity.degPs }, null)
+		builder.addDoubleProperty("Yaw Offset Degrees", { yawOffsetDeg }, null)
+	}
+
+	companion object {
+		private const val TIMEOUT_SECONDS = 5.0
+	}
 }
+
