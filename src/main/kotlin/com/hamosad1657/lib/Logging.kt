@@ -8,6 +8,3 @@ fun robotPrint(message: Any?, printStackTrace: Boolean = false) =
 
 fun robotPrintError(message: Any?, printStackTrace: Boolean = false) =
 	DriverStation.reportError(message.toString(), printStackTrace)
-
-fun RobotBase.print(message: Any?, printStackTrace: Boolean = false) = robotPrint(message, printStackTrace)
-fun RobotBase.printError(message: Any?, printStackTrace: Boolean = false) = robotPrintError(message, printStackTrace)
