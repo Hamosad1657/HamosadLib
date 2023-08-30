@@ -1,6 +1,6 @@
 package com.hamosad1657.lib.units
 
-/** Represents a linear length.
+/** Represents a length.
  *
  * Can be created from or converted to any of the following units:
  * - Meters
@@ -9,12 +9,12 @@ package com.hamosad1657.lib.units
  * - Feet
  * - Inches
  */
-class Length private constructor(length: Double, lengthUnit: Length.Unit) : Comparable<Length> {
+class Length private constructor(length: Double, lengthUnit: Unit) : Comparable<Length> {
 	var meters = 0.0
 		set(value) {
-			require(!value.isNaN())
-			require(value.isFinite())
-			require(value >= 0.0)
+			require(!value.isNaN()) {"Length cannot contain NaN."}
+			require(value.isFinite()) {"Length cannot contain infinite values."}
+			require(value >= 0.0) {"Length cannot be negative."}
 			field = value
 		}
 
@@ -67,7 +67,7 @@ class Length private constructor(length: Double, lengthUnit: Length.Unit) : Comp
 			meters + centimeters * 100.0 + millimeters * 1000.0 + feetToMeters(feet) + inchesToMeters(inches)
 	}
 
-	private fun inUnit(lengthUnit: Length.Unit) =
+	private fun inUnit(lengthUnit: Unit) =
 		when (lengthUnit) {
 			Length.Unit.Meters -> meters
 			Length.Unit.Centimeters -> meters * 100.0
