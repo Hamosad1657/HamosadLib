@@ -3,7 +3,7 @@ package com.hamosad1657.lib.motors
 import com.ctre.phoenix.motorcontrol.ControlMode
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX
 import com.hamosad1657.lib.math.clamp
-import com.hamosad1657.lib.math.modifyPositionSetpoint
+import com.hamosad1657.lib.math.wrapPositionSetpoint
 
 class HaTalonSRX(deviceID: Int) : WPI_TalonSRX(deviceID) {
 	init {
@@ -25,6 +25,7 @@ class HaTalonSRX(deviceID: Int) : WPI_TalonSRX(deviceID) {
 	private var minPossibleMeasurement: Double = 0.0
 	private var maxPossibleMeasurement: Double = 0.0
 	private var isPositionWrapEnabled = false
+	private var ticksPerRotation = 0
 
 	/**
 	 * percentOutput is clamped between properties minPercentOutput and maxPercentOutput.
@@ -53,7 +54,7 @@ class HaTalonSRX(deviceID: Int) : WPI_TalonSRX(deviceID) {
 			this.set(value)
 		} else if (isPositionWrapEnabled && mode == ControlMode.Position) {
 			val newValue =
-				modifyPositionSetpoint(value, selectedSensorPosition, minPossibleMeasurement, maxPossibleMeasurement)
+				wrapPositionSetpoint(value, selectedSensorPosition, minPossibleMeasurement, maxPossibleMeasurement, ticksPerRotation)
 			super.set(ControlMode.Position, newValue)
 		} else {
 			super.set(mode, value)
@@ -69,10 +70,11 @@ class HaTalonSRX(deviceID: Int) : WPI_TalonSRX(deviceID) {
 	 * @param minPossibleMeasurement The smallest possible measurement.
 	 * @param maxPossibleMeasurement The largest possible measurement.
 	 */
-	fun enablePositionWrap(minPossibleMeasurement: Double, maxPossibleMeasurement: Double) {
+	fun enablePositionWrap(minPossibleMeasurement: Double, maxPossibleMeasurement: Double, ticksPerRotation: Int) {
 		require(minPossibleMeasurement < maxPossibleMeasurement)
 		this.minPossibleMeasurement = minPossibleMeasurement
 		this.maxPossibleMeasurement = maxPossibleMeasurement
+		this.ticksPerRotation = ticksPerRotation
 		isPositionWrapEnabled = true
 	}
 

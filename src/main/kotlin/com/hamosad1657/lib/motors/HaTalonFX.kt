@@ -3,7 +3,8 @@ package com.hamosad1657.lib.motors
 import com.ctre.phoenix.motorcontrol.ControlMode
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX
 import com.hamosad1657.lib.math.clamp
-import com.hamosad1657.lib.math.modifyPositionSetpoint
+import com.hamosad1657.lib.math.wrapPositionSetpoint
+import com.hamosad1657.lib.units.FALCON_TICKS_PER_ROTATION
 
 /**
  * Max safe temperature for the time span of a match.
@@ -24,11 +25,11 @@ class HaTalonFX(deviceNumber: Int) : WPI_TalonFX(deviceNumber) {
 
 	var minPercentOutput = -1.0
 		set(value) {
-			field = if (value <= -1.0) -1.0 else value
+			field = value.coerceAtLeast(-1.0)
 		}
 	var maxPercentOutput = 1.0
 		set(value) {
-			field = if (value >= 1.0) 1.0 else value
+			field = value.coerceAtMost(1.0)
 		}
 
 	var isTempSafe = true
@@ -38,6 +39,7 @@ class HaTalonFX(deviceNumber: Int) : WPI_TalonFX(deviceNumber) {
 	private var minPossibleMeasurement: Double = 0.0
 	private var maxPossibleMeasurement: Double = 0.0
 	private var isPositionWrapEnabled = false
+	private var ticksPerRotation = FALCON_TICKS_PER_ROTATION.toInt()
 
 	/**
 	 * percentOutput is clamped between properties minPercentOutput and maxPercentOutput.
@@ -55,7 +57,7 @@ class HaTalonFX(deviceNumber: Int) : WPI_TalonFX(deviceNumber) {
 			this.set(value)
 		} else if (isPositionWrapEnabled && mode == ControlMode.Position) {
 			val newValue =
-				modifyPositionSetpoint(value, selectedSensorPosition, minPossibleMeasurement, maxPossibleMeasurement)
+				wrapPositionSetpoint(value, selectedSensorPosition, minPossibleMeasurement, maxPossibleMeasurement, ticksPerRotation)
 			super.set(ControlMode.Position, newValue)
 		} else {
 			super.set(mode, value)
@@ -82,10 +84,11 @@ class HaTalonFX(deviceNumber: Int) : WPI_TalonFX(deviceNumber) {
 	 * @param minPossibleMeasurement The smallest possible measurement.
 	 * @param maxPossibleMeasurement The largest possible measurement.
 	 */
-	fun enablePositionWrap(minPossibleMeasurement: Double, maxPossibleMeasurement: Double) {
+	fun enablePositionWrap(minPossibleMeasurement: Double, maxPossibleMeasurement: Double, ticksPerRotation: Int) {
 		require(minPossibleMeasurement < maxPossibleMeasurement)
 		this.minPossibleMeasurement = minPossibleMeasurement
 		this.maxPossibleMeasurement = maxPossibleMeasurement
+		this.ticksPerRotation = ticksPerRotation
 		isPositionWrapEnabled = true
 	}
 

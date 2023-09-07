@@ -2,6 +2,8 @@ package com.hamosad1657.lib.math
 
 import edu.wpi.first.math.MathUtil
 import kotlin.math.abs
+import kotlin.math.ceil
+import kotlin.math.floor
 import kotlin.math.sign
 
 fun deadband(value: Double, deadband: Double): Double {
@@ -57,26 +59,39 @@ fun median(array: DoubleArray): Double {
 }
 
 /**
- * Modify the setpoint to wrap position (see comment in HaTalonFX.enablePositionWrap()).
+ * Modify the setpoint to wrap position.
+ *
+ * Returns a new setpoint that will produce the shortest path to [realSetpoint], using the
+ * [measurement] (which isn't required to be inside of [minMeasurement] and [maxMeasurement]).
+ *
+ * The [minMeasurement] and [maxMeasurement] define the range where the wrapping will occur.
+ *
+ * ## Example
+ * TODO: Write an example.
  */
-fun modifyPositionSetpoint(
+fun wrapPositionSetpoint(
 	realSetpoint: Double,
 	measurement: Double,
-	minPossibleMeasurement: Double,
-	maxPossibleMeasurement: Double,
+	minMeasurement: Double,
+	maxMeasurement: Double,
+	ticksInRotation: Int
 ): Double {
-	require(minPossibleMeasurement < maxPossibleMeasurement)
-	require(measurement > minPossibleMeasurement && measurement < maxPossibleMeasurement)
-	require(realSetpoint > minPossibleMeasurement && realSetpoint < maxPossibleMeasurement)
+	require(minMeasurement < maxMeasurement)
+	require(realSetpoint in minMeasurement..maxMeasurement)
 
-	val realError = realSetpoint - measurement
-	val maxRealError = maxPossibleMeasurement - minPossibleMeasurement
+	// This is done in case the measurement doesn't wrap already (e.g. is accumulated forever, and could theoretically be infinite)
+	val wrappedMeasurement = MathUtil.inputModulus(measurement, minMeasurement, maxMeasurement)
+
+	val realError = realSetpoint - wrappedMeasurement
+	val maxRealError = maxMeasurement - minMeasurement
 
 	val minModifiedError = maxRealError / -2.0
 	val maxModifiedError = maxRealError / 2.0
 
 	val modifiedError = MathUtil.inputModulus(realError, minModifiedError, maxModifiedError)
 
-	val modifiedSetpoint = modifiedError + measurement // same as [error = setpoint - measurement]
-	return modifiedSetpoint
+	val modifiedSetpoint = modifiedError + wrappedMeasurement // same as [error = setpoint - measurement]
+
+	val fullRotationsFromZero = if(measurement < 0) ceil(measurement / ticksInRotation) else floor(measurement / ticksInRotation)
+	return modifiedSetpoint + fullRotationsFromZero * ticksInRotation
 }
