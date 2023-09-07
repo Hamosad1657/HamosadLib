@@ -59,7 +59,7 @@ fun median(array: DoubleArray): Double {
 }
 
 /**
- * Modify the setpoint to wrap position.
+ * Modify the setpoint to always go the shorter way in position control.
  *
  * Returns a new setpoint that will produce the shortest path to [realSetpoint], using the
  * [measurement] (which isn't required to be inside of [minMeasurement] and [maxMeasurement]).
@@ -67,7 +67,26 @@ fun median(array: DoubleArray): Double {
  * The [minMeasurement] and [maxMeasurement] define the range where the wrapping will occur.
  *
  * ## Example
- * TODO: Write an example.
+ * Say I want to control the angle of a swerve module (we'll use degrees for convenience).
+ * Zero and 360 are the same position in reality, and it can cross this position with no
+ * problem physically. The PID runs onboard the motor controller, not the RoboRIO.
+ *
+ * Now, imagine this situation: The wheel is now at 10 degrees, and the setpoint is 350.
+ * Without this function, the motor will move 340 degrees all the way around, even though
+ * in reality it's only 20 degrees away.
+ *
+ * To solve the above problem, use this function! pass 350.0 for realSetpoint, 10.0 for
+ * measurement, 0.0 for minMeasurement, 360.0 for maxMeasurement, and 360 for ticksInRotation.
+ * This function will return a new setpoint, which is then set to the motor controller in
+ * position control mode and will make it go the shorter way.
+ *
+ * - Note that measurement is allowed to accumulate beyond minMeasurement and maxMeasurement,
+ * but it needs to correspond to the same position in the original scope. for example, a
+ * measurement of 361 must be the same module angle as measurement 1.
+ *
+ * * DO NOT use this function if your mechanism cannot move freely in every direction, like
+ * in a turret with finite rotation. Also don't use it for controlling linear motion, like
+ * a telescopic arm or an elevator.
  */
 fun wrapPositionSetpoint(
 	realSetpoint: Double,
