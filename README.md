@@ -1,1 +1,1 @@
-## The WPI Java library for the FRC team Hamosad 1657.
+## The Java library for FRC team Hamosad 1657.
