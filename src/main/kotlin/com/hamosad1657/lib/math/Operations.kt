@@ -120,6 +120,6 @@ fun wrapPositionSetpoint(
 
 	val modifiedSetpoint = modifiedError + wrappedMeasurement // same as [error = setpoint - measurement]
 
-	val fullRotationsFromZero = if(measurement < 0) ceil(measurement / ticksInRotation) else floor(measurement / ticksInRotation)
+	val fullRotationsFromZero = if(measurement < minMeasurement) ceil(measurement / ticksInRotation) else floor(measurement / ticksInRotation)
 	return modifiedSetpoint + fullRotationsFromZero * ticksInRotation
 }
