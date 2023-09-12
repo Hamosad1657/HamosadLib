@@ -20,19 +20,19 @@ fun radToDeg(rad: Double) = Math.toDegrees(rad)
 /// --- Angular Velocities to Angular Velocities Conversions ---
 
 /** Rotations per minute to radians per second. */
-fun rpmToRadPs(rpm: Double) = rpm * 60.0 * (Math.PI * 2.0)
+fun rpmToRadPs(rpm: Double) = rpm / 60.0 * (Math.PI * 2.0)
 
 /** Rotations per minute to degrees per seconds. */
-fun rpmToDegPs(rpm: Double) = rpm * 60.0 * 360.0
+fun rpmToDegPs(rpm: Double) = rpm / 60.0 * 360.0
 
 /** Radians per second to rotations per minute. */
-fun radPsToRpm(radPs: Double) = radPs / (Math.PI * 2.0) / 60.0
+fun radPsToRpm(radPs: Double) = radPs / (Math.PI * 2.0) * 60.0
 
 /** Radians per second to degrees per second. */
 fun radPsToDegPs(radPs: Double) = Math.toDegrees(radPs)
 
 /** Degrees per second to rotations per minute. */
-fun degPsToRpm(degPs: Double) = degPs / 360.0 / 60.0
+fun degPsToRpm(degPs: Double) = degPs / 360.0 * 60.0
 
 /** Degrees per second to radians per second. */
 fun degPsToRadPs(degPs: Double) = Math.toRadians(degPs)
@@ -44,7 +44,7 @@ fun degPsToRadPs(degPs: Double) = Math.toRadians(degPs)
  *
  * Wheel radius should be greater than 0. */
 fun rpmToMps(rpm: Double, wheelRadius: Length) =
-	require(wheelRadius.meters > 0.0).run { rpm * 60.0 * wheelRadius.meters * 2.0 * Math.PI }
+	require(wheelRadius.meters > 0.0).run { rpm / 60.0 * (wheelRadius.meters * 2.0 * Math.PI) }
 
 /** Radians per second to meters per second.
  *
@@ -60,7 +60,7 @@ fun degPsToMps(degPs: Double, wheelRadius: Length) = rpmToMps(degPsToRpm(degPs),
  *
  * Wheel radius should be greater than 0. */
 fun mpsToRpm(mps: Double, wheelRadius: Length) =
-	require(wheelRadius.meters > 0.0).run { mps / 60.0 / (wheelRadius.meters * 2.0 * Math.PI) }
+	require(wheelRadius.meters > 0.0).run { mps * 60.0 / (wheelRadius.meters * 2.0 * Math.PI) }
 
 /** Meters per second to radians per second.
  *
