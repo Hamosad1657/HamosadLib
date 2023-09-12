@@ -20,7 +20,23 @@ class HaTalonFX(deviceNumber: Int) : WPI_TalonFX(deviceNumber) {
 		isSafetyEnabled = true
 	}
 
+	/**
+	 * Software forward limit.
+	 *
+	 * May be jittery in control modes that aren't percent-output, so if using  other control
+	 * modes, it is recommended to implement limits through the logic of your own code as well.
+	 *
+	 * - If possible, use hardware limits by wiring switches to the JST connector.
+	 */
 	var forwardLimit: () -> Boolean = { false }
+	/**
+	 * Software reverse limit.
+	 *
+	 * May be jittery in control modes that aren't percent-output, so if using  other control
+	 * modes, it is recommended to implement limits through the logic of your own code as well.
+	 *
+	 * - If possible, use hardware limits by wiring switches to the JST connector.
+	 */
 	var reverseLimit: () -> Boolean = { false }
 
 	var minPercentOutput = -1.0
@@ -41,13 +57,6 @@ class HaTalonFX(deviceNumber: Int) : WPI_TalonFX(deviceNumber) {
 	private var isPositionWrapEnabled = false
 	private var ticksPerRotation = FALCON_TICKS_PER_ROTATION.toInt()
 
-	/**
-	 * percentOutput is clamped between properties minPercentOutput and maxPercentOutput.
-	 */
-	override fun set(percentOutput: Double) {
-		require(maxPercentOutput >= minPercentOutput)
-		super.set(clamp(percentOutput, minPercentOutput, maxPercentOutput))
-	}
 
 	/**
 	 * In PercentOutput control mode, value is clamped between properties minPercentOutput and maxPercentOutput
@@ -55,6 +64,9 @@ class HaTalonFX(deviceNumber: Int) : WPI_TalonFX(deviceNumber) {
 	override fun set(mode: ControlMode, value: Double) {
 		if (mode == ControlMode.PercentOutput) {
 			this.set(value)
+		}
+		else if(isAtLimit_ForOtherControlModes()) {
+			super.stopMotor()
 		} else if (isPositionWrapEnabled && mode == ControlMode.Position) {
 			val newValue =
 				wrapPositionSetpoint(value, selectedSensorPosition, minPossibleMeasurement, maxPossibleMeasurement, ticksPerRotation)
@@ -67,11 +79,12 @@ class HaTalonFX(deviceNumber: Int) : WPI_TalonFX(deviceNumber) {
 	/**
 	 * percentOutput is clamped between properties minPercentOutput and maxPercentOutput.
 	 */
-	fun setWithLimits(percentOutput: Double) {
+	override fun set(percentOutput: Double) {
+		require(maxPercentOutput >= minPercentOutput)
 		if ((forwardLimit() && percentOutput > 0.0) || (reverseLimit() && percentOutput < 0.0)) {
-			this.set(0.0)
+			super.set(0.0)
 		} else {
-			this.set(percentOutput)
+			super.set(clamp(percentOutput, minPercentOutput, maxPercentOutput))
 		}
 	}
 
@@ -95,4 +108,6 @@ class HaTalonFX(deviceNumber: Int) : WPI_TalonFX(deviceNumber) {
 	fun disablePositionWrap() {
 		isPositionWrapEnabled = false
 	}
+
+	private fun isAtLimit_ForOtherControlModes() = (forwardLimit() && super.get() > 0.0) || (reverseLimit() && super.get() < 0.0)
 }

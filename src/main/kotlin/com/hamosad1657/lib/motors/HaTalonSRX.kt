@@ -10,7 +10,23 @@ class HaTalonSRX(deviceID: Int) : WPI_TalonSRX(deviceID) {
 		isSafetyEnabled = true
 	}
 
+	/**
+	 * Software forward limit.
+	 *
+	 * May be jittery in control modes that aren't percent-output, so if using  other control
+	 * modes, it is recommended to implement limits through the logic of your own code as well.
+	 *
+	 * - If possible, use hardware limits by wiring switches to the data port.
+	 */
 	var forwardLimit: () -> Boolean = { false }
+	/**
+	 * Software reverse limit.
+	 *
+	 * May be jittery in control modes that aren't percent-output, so if using  other control
+	 * modes, it is recommended to implement limits through the logic of your own code as well.
+	 *
+	 * - If possible, use hardware limits by wiring switches to the data port.
+	 */
 	var reverseLimit: () -> Boolean = { false }
 
 	var minPercentOutput = -1.0
@@ -32,17 +48,10 @@ class HaTalonSRX(deviceID: Int) : WPI_TalonSRX(deviceID) {
 	 */
 	override fun set(percentOutput: Double) {
 		require(maxPercentOutput >= minPercentOutput)
-		super.set(clamp(percentOutput, minPercentOutput, maxPercentOutput))
-	}
-
-	/**
-	 * percentOutput is clamped between properties minPercentOutput and maxPercentOutput.
-	 */
-	fun setWithLimits(percentOutput: Double) {
 		if ((forwardLimit() && percentOutput > 0.0) || (reverseLimit() && percentOutput < 0.0)) {
-			this.set(0.0)
+			super.set(0.0)
 		} else {
-			this.set(percentOutput)
+			super.set(clamp(percentOutput, minPercentOutput, maxPercentOutput))
 		}
 	}
 
@@ -52,6 +61,9 @@ class HaTalonSRX(deviceID: Int) : WPI_TalonSRX(deviceID) {
 	override fun set(mode: ControlMode, value: Double) {
 		if (mode == ControlMode.PercentOutput) {
 			this.set(value)
+		}
+		else if(isAtLimit_ForOtherControlModes()) {
+			super.stopMotor()
 		} else if (isPositionWrapEnabled && mode == ControlMode.Position) {
 			val newValue =
 				wrapPositionSetpoint(value, selectedSensorPosition, minPossibleMeasurement, maxPossibleMeasurement, ticksPerRotation)
@@ -81,4 +93,6 @@ class HaTalonSRX(deviceID: Int) : WPI_TalonSRX(deviceID) {
 	fun disablePositionWrap() {
 		isPositionWrapEnabled = false
 	}
+
+	private fun isAtLimit_ForOtherControlModes() = (forwardLimit() && super.get() > 0.0) || (reverseLimit() && super.get() < 0.0)
 }
