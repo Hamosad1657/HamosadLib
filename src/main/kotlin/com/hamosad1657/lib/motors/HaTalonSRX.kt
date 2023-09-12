@@ -31,15 +31,15 @@ class HaTalonSRX(deviceID: Int) : WPI_TalonSRX(deviceID) {
 
 	var minPercentOutput = -1.0
 		set(value) {
-			field = if (value <= -1.0) -1.0 else value
+			field = value.coerceAtLeast(-1.0)
 		}
 	var maxPercentOutput = 1.0
 		set(value) {
-			field = if (value >= 1.0) 1.0 else value
+			field = value.coerceAtMost(1.0)
 		}
 
-	private var minPossibleMeasurement: Double = 0.0
-	private var maxPossibleMeasurement: Double = 0.0
+	private var minMeasurement: Double = 0.0
+	private var maxMeasurement: Double = 0.0
 	private var isPositionWrapEnabled = false
 	private var ticksPerRotation = 0
 
@@ -66,7 +66,7 @@ class HaTalonSRX(deviceID: Int) : WPI_TalonSRX(deviceID) {
 			super.stopMotor()
 		} else if (isPositionWrapEnabled && mode == ControlMode.Position) {
 			val newValue =
-				wrapPositionSetpoint(value, selectedSensorPosition, minPossibleMeasurement, maxPossibleMeasurement, ticksPerRotation)
+				wrapPositionSetpoint(value, selectedSensorPosition, minMeasurement, maxMeasurement, ticksPerRotation)
 			super.set(ControlMode.Position, newValue)
 		} else {
 			super.set(mode, value)
@@ -79,13 +79,13 @@ class HaTalonSRX(deviceID: Int) : WPI_TalonSRX(deviceID) {
 	 * it would just move three degrees to the setpoint (while without position wrap it
 	 * would go all the way around).
 	 *
-	 * @param minPossibleMeasurement The smallest possible measurement.
-	 * @param maxPossibleMeasurement The largest possible measurement.
+	 * @param minMeasurement The smallest measurement.
+	 * @param maxMeasurement The largest measurement.
 	 */
-	fun enablePositionWrap(minPossibleMeasurement: Double, maxPossibleMeasurement: Double, ticksPerRotation: Int) {
-		require(minPossibleMeasurement < maxPossibleMeasurement)
-		this.minPossibleMeasurement = minPossibleMeasurement
-		this.maxPossibleMeasurement = maxPossibleMeasurement
+	fun enablePositionWrap(minMeasurement: Double, maxMeasurement: Double, ticksPerRotation: Int) {
+		require(minMeasurement < maxMeasurement)
+		this.minMeasurement = minMeasurement
+		this.maxMeasurement = maxMeasurement
 		this.ticksPerRotation = ticksPerRotation
 		isPositionWrapEnabled = true
 	}

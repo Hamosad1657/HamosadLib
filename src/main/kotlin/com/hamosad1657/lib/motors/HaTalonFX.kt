@@ -52,8 +52,8 @@ class HaTalonFX(deviceNumber: Int) : WPI_TalonFX(deviceNumber) {
 		get() = temperature < FalconSafeTempC
 		private set
 
-	private var minPossibleMeasurement: Double = 0.0
-	private var maxPossibleMeasurement: Double = 0.0
+	private var minMeasurement: Double = 0.0
+	private var maxMeasurement: Double = 2048.0
 	private var isPositionWrapEnabled = false
 	private var ticksPerRotation = FALCON_TICKS_PER_ROTATION.toInt()
 
@@ -69,7 +69,7 @@ class HaTalonFX(deviceNumber: Int) : WPI_TalonFX(deviceNumber) {
 			super.stopMotor()
 		} else if (isPositionWrapEnabled && mode == ControlMode.Position) {
 			val newValue =
-				wrapPositionSetpoint(value, selectedSensorPosition, minPossibleMeasurement, maxPossibleMeasurement, ticksPerRotation)
+				wrapPositionSetpoint(value, selectedSensorPosition, minMeasurement, maxMeasurement, ticksPerRotation)
 			super.set(ControlMode.Position, newValue)
 		} else {
 			super.set(mode, value)
@@ -94,13 +94,13 @@ class HaTalonFX(deviceNumber: Int) : WPI_TalonFX(deviceNumber) {
 	 * it would just move three degrees to the setpoint (while without position wrap it
 	 * would go all the way around).
 	 *
-	 * @param minPossibleMeasurement The smallest possible measurement.
-	 * @param maxPossibleMeasurement The largest possible measurement.
+	 * @param minMeasurement The smallest measurement.
+	 * @param maxMeasurement The largest measurement.
 	 */
-	fun enablePositionWrap(minPossibleMeasurement: Double, maxPossibleMeasurement: Double, ticksPerRotation: Int) {
-		require(minPossibleMeasurement < maxPossibleMeasurement)
-		this.minPossibleMeasurement = minPossibleMeasurement
-		this.maxPossibleMeasurement = maxPossibleMeasurement
+	fun enablePositionWrap(minMeasurement: Double, maxMeasurement: Double, ticksPerRotation: Int) {
+		require(minMeasurement < maxMeasurement)
+		this.minMeasurement = minMeasurement
+		this.maxMeasurement = maxMeasurement
 		this.ticksPerRotation = ticksPerRotation
 		isPositionWrapEnabled = true
 	}
