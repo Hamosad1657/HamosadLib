@@ -3,11 +3,10 @@ package com.hamosad1657.lib.units
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.wpilibj.DriverStation
 
-const val ChargedUpFieldLengthM = 16.7 // TODO: Update to current field's length.
 const val INCHES_IN_METER = 39.3700787402
 const val CANCODER_TICKS_PER_ROTATION = 4096.0
 const val FALCON_TICKS_PER_ROTATION = 2048.0
-
+val ChargedUpFieldLength = Length.fromMeters(16.7) // TODO: Update to current field's length.
 
 /// --- Angles to Angles Conversions ---
 
@@ -187,7 +186,7 @@ fun matchPoseToAlliance(position: Pose2d): Pose2d =
 		DriverStation.Alliance.Blue -> position
 		DriverStation.Alliance.Red ->
 			Pose2d(
-				ChargedUpFieldLengthM - position.x,
+				ChargedUpFieldLength.meters - position.x,
 				position.y,
 				position.rotation.rotateBy(180.degrees)
 			)
