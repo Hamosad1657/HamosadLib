@@ -9,12 +9,12 @@ package com.hamosad1657.lib.units
  * - Feet
  * - Inches
  */
-class Length private constructor(length: Double, lengthUnit: Unit) : Comparable<Length> {
+class Length private constructor(length: Number, lengthUnit: Unit) : Comparable<Length> {
 	var meters = 0.0
 		set(value) {
-			require(!value.isNaN()) {"Length cannot contain NaN."}
-			require(value.isFinite()) {"Length cannot contain infinite values."}
-			require(value >= 0.0) {"Length cannot be negative."}
+			require(!value.isNaN()) { "Length cannot contain NaN." }
+			require(value.isFinite()) { "Length cannot contain infinite values." }
+			require(value >= 0.0) { "Length cannot be negative." }
 			field = value
 		}
 
@@ -48,9 +48,9 @@ class Length private constructor(length: Double, lengthUnit: Unit) : Comparable<
 
 	init {
 		meters = when (lengthUnit) {
-			Length.Unit.Meters -> length
-			Length.Unit.Centimeters -> length / 100.0
-			Length.Unit.Millimeters -> length / 1000.0
+			Length.Unit.Meters -> length.toDouble()
+			Length.Unit.Centimeters -> length.toDouble() / 100.0
+			Length.Unit.Millimeters -> length.toDouble() / 1000.0
 			Length.Unit.Feet -> feetToMeters(length)
 			Length.Unit.Inches -> inchesToMeters(length)
 		}
@@ -93,11 +93,11 @@ class Length private constructor(length: Double, lengthUnit: Unit) : Comparable<
 	}
 
 	companion object {
-		fun fromMeters(meters: Double) = Length(meters, Length.Unit.Meters)
-		fun fromCentimeters(centimeters: Double) = Length(centimeters, Length.Unit.Centimeters)
-		fun fromMillimeters(millimeters: Double) = Length(millimeters, Length.Unit.Millimeters)
-		fun fromFeet(feet: Double) = Length(feet, Length.Unit.Feet)
-		fun fromInches(inches: Double) = Length(inches, Length.Unit.Inches)
+		fun fromMeters(meters: Number) = Length(meters.toDouble(), Length.Unit.Meters)
+		fun fromCentimeters(centimeters: Number) = Length(centimeters.toDouble(), Length.Unit.Centimeters)
+		fun fromMillimeters(millimeters: Number) = Length(millimeters.toDouble(), Length.Unit.Millimeters)
+		fun fromFeet(feet: Number) = Length(feet.toDouble(), Length.Unit.Feet)
+		fun fromInches(inches: Number) = Length(inches.toDouble(), Length.Unit.Inches)
 	}
 }
 
