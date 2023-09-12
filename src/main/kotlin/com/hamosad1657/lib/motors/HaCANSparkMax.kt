@@ -2,6 +2,8 @@ package com.hamosad1657.lib.motors
 
 import com.hamosad1657.lib.math.clamp
 import com.revrobotics.CANSparkMax
+import com.revrobotics.SparkMaxPIDController
+import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.util.sendable.Sendable
 import edu.wpi.first.util.sendable.SendableBuilder
 
@@ -15,7 +17,22 @@ import edu.wpi.first.util.sendable.SendableBuilder
 const val NEOSafeTempC = 90
 
 class HaCANSparkMax(deviceID: Int) : CANSparkMax(deviceID, MotorType.kBrushless), Sendable {
+	/**
+	 * Software forward limit, ONLY for percent-output control.
+	 * WILL NOT work in closed-loop control onboard the motor controller, since that
+	 * uses SparkMaxPIDController, which is package-private and cannot be extended by us.
+	 *
+	 * - If possible, use hardware limits by wiring switches to the data port.
+	 */
 	var forwardLimit: () -> Boolean = { false }
+
+	/**
+	 * Software forward limit, ONLY for percent-output control.
+	 * WILL NOT work in closed-loop control onboard the motor controller, since that
+	 * uses SparkMaxPIDController, which is package-private and cannot be extended by us.
+	 *
+	 * - If possible, use hardware limits by wiring switches to the data port.
+	 */
 	var reverseLimit: () -> Boolean = { false }
 
 	var minPercentOutput = -1.0
@@ -35,17 +52,10 @@ class HaCANSparkMax(deviceID: Int) : CANSparkMax(deviceID, MotorType.kBrushless)
 	 */
 	override fun set(percentOutput: Double) {
 		require(maxPercentOutput >= minPercentOutput)
-		super.set(clamp(percentOutput, minPercentOutput, maxPercentOutput))
-	}
-
-	/**
-	 * percentOutput is clamped between properties minPercentOutput and maxPercentOutput.
-	 */
-	fun setWithLimits(percentOutput: Double) {
 		if ((forwardLimit() && percentOutput > 0.0) || (reverseLimit() && percentOutput < 0.0)) {
-			this.set(0.0)
+			super.set(0.0)
 		} else {
-			this.set(percentOutput)
+			super.set(clamp(percentOutput, minPercentOutput, maxPercentOutput))
 		}
 	}
 
