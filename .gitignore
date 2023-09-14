@@ -163,3 +163,6 @@ bin/
 .idea/workspace.xml
 .idea/HamosadLib.iml
 .idea/modules.xml
+src/main/kotlin/frc/robot/Main.kt
+src/main/kotlin/frc/robot/Robot.kt
+
