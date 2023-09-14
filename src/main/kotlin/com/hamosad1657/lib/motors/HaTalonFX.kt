@@ -84,11 +84,11 @@ class HaTalonFX(deviceNumber: Int) : WPI_TalonFX(deviceNumber) {
 	override fun set(percentOutput: Double) {
 		require(maxPercentOutput >= minPercentOutput)
 		if ((forwardLimit() && percentOutput > 0.0) || (reverseLimit() && percentOutput < 0.0)) {
-			speed = 0.0
+			this.speed = 0.0
 			super.set(ControlMode.PercentOutput, 0.0)
 		} else {
-			speed = clamp(percentOutput, minPercentOutput, maxPercentOutput)
-			super.set(ControlMode.PercentOutput, speed)
+			this.speed = clamp(percentOutput, minPercentOutput, maxPercentOutput)
+			super.set(ControlMode.PercentOutput, this.speed)
 		}
 	}
 
