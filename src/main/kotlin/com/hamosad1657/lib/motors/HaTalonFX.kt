@@ -21,21 +21,16 @@ class HaTalonFX(deviceNumber: Int) : WPI_TalonFX(deviceNumber) {
 	}
 
 	/**
-	 * Software forward limit.
+	 * Software forward limit. Only used for [ControlMode.PercentOutput].
 	 *
-	 * May be jittery in control modes that aren't percent-output, so if using  other control
-	 * modes, it is recommended to implement limits through the logic of your own code as well.
-	 *
-	 * - If possible, use hardware limits by wiring switches to the JST connector.
+	 * If possible, use hardware limits by wiring limit switches to the JST connector.
 	 */
 	var forwardLimit: () -> Boolean = { false }
+
 	/**
-	 * Software reverse limit.
+	 * Software reverse limit. Only used for [ControlMode.PercentOutput].
 	 *
-	 * May be jittery in control modes that aren't percent-output, so if using  other control
-	 * modes, it is recommended to implement limits through the logic of your own code as well.
-	 *
-	 * - If possible, use hardware limits by wiring switches to the JST connector.
+	 * If possible, use hardware limits by wiring limit switches to the JST connector.
 	 */
 	var reverseLimit: () -> Boolean = { false }
 
@@ -56,18 +51,25 @@ class HaTalonFX(deviceNumber: Int) : WPI_TalonFX(deviceNumber) {
 	private var maxMeasurement: Double = 2048.0
 	private var isPositionWrapEnabled = false
 	private var ticksPerRotation = FALCON_TICKS_PER_ROTATION.toInt()
-
+	private var speed = 0.0
 
 	/**
-	 * In PercentOutput control mode, value is clamped between properties minPercentOutput and maxPercentOutput
+	 * Common interface for getting the current set speed of a speed controller.
+	 *
+	 * @return The current set speed. Value is between -1.0 and 1.0.
+	 */
+	override fun get() = speed
+
+	/**
+	 * In PercentOutput control mode, value is clamped between [minPercentOutput] and [maxPercentOutput].
+	 *
+	 * In Position control mode, if [isPositionWrapEnabled] is true,
+	 * the position is wrapped using [wrapPositionSetpoint].
 	 */
 	override fun set(mode: ControlMode, value: Double) {
 		if (mode == ControlMode.PercentOutput) {
 			this.set(value)
-		}
-		else if(isAtLimit_ForOtherControlModes()) {
-			super.stopMotor()
-		} else if (isPositionWrapEnabled && mode == ControlMode.Position) {
+		} else if (mode == ControlMode.Position && isPositionWrapEnabled) {
 			val newValue =
 				wrapPositionSetpoint(value, selectedSensorPosition, minMeasurement, maxMeasurement, ticksPerRotation)
 			super.set(ControlMode.Position, newValue)
@@ -77,14 +79,16 @@ class HaTalonFX(deviceNumber: Int) : WPI_TalonFX(deviceNumber) {
 	}
 
 	/**
-	 * percentOutput is clamped between properties minPercentOutput and maxPercentOutput.
+	 * [percentOutput] is clamped between [minPercentOutput] and [maxPercentOutput].
 	 */
 	override fun set(percentOutput: Double) {
 		require(maxPercentOutput >= minPercentOutput)
 		if ((forwardLimit() && percentOutput > 0.0) || (reverseLimit() && percentOutput < 0.0)) {
-			super.set(0.0)
+			speed = 0.0
+			super.set(ControlMode.PercentOutput, 0.0)
 		} else {
-			super.set(clamp(percentOutput, minPercentOutput, maxPercentOutput))
+			speed = clamp(percentOutput, minPercentOutput, maxPercentOutput)
+			super.set(ControlMode.PercentOutput, speed)
 		}
 	}
 
@@ -108,6 +112,4 @@ class HaTalonFX(deviceNumber: Int) : WPI_TalonFX(deviceNumber) {
 	fun disablePositionWrap() {
 		isPositionWrapEnabled = false
 	}
-
-	private fun isAtLimit_ForOtherControlModes() = (forwardLimit() && super.get() > 0.0) || (reverseLimit() && super.get() < 0.0)
 }
