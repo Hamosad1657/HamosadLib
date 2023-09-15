@@ -94,9 +94,11 @@ class HaTalonFX(deviceNumber: Int) : WPI_TalonFX(deviceNumber) {
 
 	/**
 	 * "Position wrap" means always going the shorter way. For example, if the current
-	 * position is 359 degrees and the setpoint is 2 degrees, then with position wrap
-	 * it would just move three degrees to the setpoint (while without position wrap it
+	 * position is 10 degrees and the setpoint is 350 degrees, then with position wrap
+	 * it would just move 20 degrees to the setpoint (while without position wrap it
 	 * would go all the way around).
+	 *
+	 * - For more information, see [com.hamosad1657.lib.math.wrapPositionSetpoint].
 	 *
 	 * @param minMeasurement The smallest measurement.
 	 * @param maxMeasurement The largest measurement.
