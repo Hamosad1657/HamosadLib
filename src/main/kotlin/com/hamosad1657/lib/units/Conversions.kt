@@ -19,20 +19,38 @@ fun radToDeg(rad: Number) = Math.toDegrees(rad.toDouble())
 
 /// --- Angular Velocities to Angular Velocities Conversions ---
 
+/** Rotations per minute to rotations per second. */
+fun rpmToRps(rpm: Number) = rpm.toDouble() / 60.0
+
 /** Rotations per minute to radians per second. */
 fun rpmToRadPs(rpm: Number) = rpm.toDouble() / 60.0 * (Math.PI * 2.0)
 
 /** Rotations per minute to degrees per seconds. */
 fun rpmToDegPs(rpm: Number) = rpm.toDouble() / 60.0 * 360.0
 
+/** Rotations per second to rotations per minute. */
+fun rpsToRpm(rps: Number) = rps.toDouble() * 60.0
+
+/** Rotations per second to radians per second. */
+fun rpsToRadPs(rps: Number) = rps.toDouble() * Math.PI * 2.0
+
+/** Rotations per second to degrees per second. */
+fun rpsToDegPs(rps: Number) = rps.toDouble() * 360.0
+
 /** Radians per second to rotations per minute. */
 fun radPsToRpm(radPs: Number) = radPs.toDouble() / (Math.PI * 2.0) * 60.0
+
+/** Radians per second ro rotations per second. */
+fun radPsToRps(radPs: Number) = radPs.toDouble() / (Math.PI * 2.0)
 
 /** Radians per second to degrees per second. */
 fun radPsToDegPs(radPs: Number) = Math.toDegrees(radPs.toDouble())
 
 /** Degrees per second to rotations per minute. */
 fun degPsToRpm(degPs: Number) = degPs.toDouble() / 360.0 * 60.0
+
+/** Degrees per second to rotations per second. */
+fun degPsToRps(degPs: Number) = degPs.toDouble() / 360.0
 
 /** Degrees per second to radians per second. */
 fun degPsToRadPs(degPs: Number) = Math.toRadians(degPs.toDouble())

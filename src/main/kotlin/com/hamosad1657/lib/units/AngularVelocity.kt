@@ -25,7 +25,7 @@ private constructor(velocity: Double, velocityUnit: AngularVelocity.Unit) : Comp
 	var rps = this.inUnit(AngularVelocity.Unit.Rps)
 		get() = this.inUnit(AngularVelocity.Unit.Rps)
 		set(value) {
-			rpm = value * 60.0
+			rpm = rpsToRpm(value)
 			field = value
 		}
 
@@ -46,7 +46,7 @@ private constructor(velocity: Double, velocityUnit: AngularVelocity.Unit) : Comp
 	init {
 		rpm = when (velocityUnit) {
 			AngularVelocity.Unit.Rpm -> velocity
-			AngularVelocity.Unit.Rps -> velocity * 60
+			AngularVelocity.Unit.Rps -> rpsToRpm(velocity)
 			AngularVelocity.Unit.RadPs -> radPsToRpm(velocity)
 			AngularVelocity.Unit.DegPs -> degPsToRpm(velocity)
 		}
@@ -55,7 +55,7 @@ private constructor(velocity: Double, velocityUnit: AngularVelocity.Unit) : Comp
 	private fun inUnit(velocityUnit: AngularVelocity.Unit) =
 		when (velocityUnit) {
 			Unit.Rpm -> rpm
-			Unit.Rps -> rpm / 60.0
+			Unit.Rps -> rpmToRps(rpm)
 			Unit.RadPs -> rpmToRadPs(rpm)
 			Unit.DegPs -> rpmToDegPs(rpm)
 		}
