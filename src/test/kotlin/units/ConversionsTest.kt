@@ -22,6 +22,12 @@ class ConversionsTest {
 	/// --- Angular Velocities to Angular Velocities Conversions ---
 
 	@Test
+	fun rpmToRpsTest() {
+		assertEqualsWithPrecision(rpmToRps(0.0), 0.0)
+		assertEqualsWithPrecision(rpmToRps(3.0), 0.05)
+	}
+
+	@Test
 	fun rpmToRadPsTest() {
 		assertEqualsWithPrecision(rpmToRadPs(0.0), 0.0)
 		assertEqualsWithPrecision(rpmToRadPs(3.0), 0.3141)
@@ -34,9 +40,33 @@ class ConversionsTest {
 	}
 
 	@Test
+	fun rpsToRpmTest() {
+		assertEqualsWithPrecision(rpsToRpm(0.0), 0.0)
+		assertEqualsWithPrecision(rpsToRpm(3.0), 180.0)
+	}
+
+	@Test
+	fun rpsToRadPsTest() {
+		assertEqualsWithPrecision(rpsToRadPs(0.0), 0.0)
+		assertEqualsWithPrecision(rpsToRadPs(3.0), 18.8495)
+	}
+
+	@Test
+	fun rpsToDegPsTest() {
+		assertEqualsWithPrecision(rpsToDegPs(0.0), 0.0)
+		assertEqualsWithPrecision(rpsToDegPs(3.0), 1080.0)
+	}
+
+	@Test
 	fun radPsToRpmTest() {
 		assertEqualsWithPrecision(radPsToRpm(0.0), 0.0)
 		assertEqualsWithPrecision(radPsToRpm(3.0), 28.6478)
+	}
+
+	@Test
+	fun radPsToRpsTest() {
+		assertEqualsWithPrecision(radPsToRps(0.0), 0.0)
+		assertEqualsWithPrecision(radPsToRps(3.0), 0.4774)
 	}
 
 	@Test
@@ -49,6 +79,12 @@ class ConversionsTest {
 	fun degPsToRpmTest() {
 		assertEqualsWithPrecision(degPsToRpm(0.0), 0.0)
 		assertEqualsWithPrecision(degPsToRpm(3.0), 0.5)
+	}
+
+	@Test
+	fun degPsToRpsTest() {
+		assertEqualsWithPrecision(degPsToRps(0.0), 0.0)
+		assertEqualsWithPrecision(degPsToRps(3.0), 0.0083)
 	}
 
 	@Test
