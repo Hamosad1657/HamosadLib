@@ -3,7 +3,8 @@ package com.hamosad1657.lib.units
 /** Represents an angular velocity.
  *
  * Can be created from or converted to any of the following units:
- * - Revolutions per Minute (Rpm)
+ * - Rotations per Minute (Rpm)
+ * - Rotations per Second (Rps)
  * - Radians per Second (RadPs)
  * - Degrees per Second (DegPs)
  *
@@ -18,6 +19,13 @@ private constructor(velocity: Double, velocityUnit: AngularVelocity.Unit) : Comp
 			require(!value.isNaN())
 			require(value.isFinite())
 			require(value >= 0.0)
+			field = value
+		}
+
+	var rps = this.inUnit(AngularVelocity.Unit.Rps)
+		get() = this.inUnit(AngularVelocity.Unit.Rps)
+		set(value) {
+			rpm = value * 60.0
 			field = value
 		}
 
@@ -38,6 +46,7 @@ private constructor(velocity: Double, velocityUnit: AngularVelocity.Unit) : Comp
 	init {
 		rpm = when (velocityUnit) {
 			AngularVelocity.Unit.Rpm -> velocity
+			AngularVelocity.Unit.Rps -> velocity * 60
 			AngularVelocity.Unit.RadPs -> radPsToRpm(velocity)
 			AngularVelocity.Unit.DegPs -> degPsToRpm(velocity)
 		}
@@ -46,6 +55,7 @@ private constructor(velocity: Double, velocityUnit: AngularVelocity.Unit) : Comp
 	private fun inUnit(velocityUnit: AngularVelocity.Unit) =
 		when (velocityUnit) {
 			Unit.Rpm -> rpm
+			Unit.Rps -> rpm / 60.0
 			Unit.RadPs -> rpmToRadPs(rpm)
 			Unit.DegPs -> rpmToDegPs(rpm)
 		}
@@ -63,12 +73,14 @@ private constructor(velocity: Double, velocityUnit: AngularVelocity.Unit) : Comp
 
 	enum class Unit {
 		Rpm,
+		Rps,
 		RadPs,
 		DegPs,
 	}
 
 	companion object {
 		fun fromRpm(rpm: Double) = AngularVelocity(rpm, AngularVelocity.Unit.Rpm)
+		fun fromRps(rps: Double) = AngularVelocity(rps, AngularVelocity.Unit.Rps)
 		fun fromRadPs(radPs: Double) = AngularVelocity(radPs, AngularVelocity.Unit.RadPs)
 		fun fromDegPs(degPs: Double) = AngularVelocity(degPs, AngularVelocity.Unit.DegPs)
 		fun fromMps(mps: Double, wheelRadius: Length) = fromRpm(mpsToRpm(mps, wheelRadius))

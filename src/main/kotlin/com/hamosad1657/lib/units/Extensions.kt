@@ -25,6 +25,9 @@ inline val Int.inches get() = Length.fromInches(this.toDouble())
 inline val Double.rpm get() = AngularVelocity.fromRpm(this)
 inline val Int.rpm get() = AngularVelocity.fromRpm(this.toDouble())
 
+inline val Double.rps get() = AngularVelocity.fromRps(this)
+inline val Int.rps get() = AngularVelocity.fromRps(this.toDouble())
+
 inline val Double.radPs get() = AngularVelocity.fromRadPs(this)
 inline val Int.radPs get() = AngularVelocity.fromRadPs(this.toDouble())
 
