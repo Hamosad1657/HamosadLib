@@ -1,5 +1,3 @@
-// Credit to team 6328 Mechanical Advantage. Thanks!
-
 package com.hamosad1657.lib;
 
 import java.util.ArrayList;
@@ -14,6 +12,17 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+/*
+ * Credit to team 6328 Mechanical Advantage.
+ *
+ * Here is a link to their GitHub repository:
+ * https://github.com/Mechanical-Advantage/NetworkAlerts
+ *
+ * Here is a link to their explanation on Chief Delphi:
+ * https://www.chiefdelphi.com/t/systems-checks-tips-tricks-stories/440369/3
+ */
+
 
 /** Class for managing persistent alerts to be sent over NetworkTables. */
 public class Alert {
