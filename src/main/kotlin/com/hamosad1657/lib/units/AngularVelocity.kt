@@ -18,7 +18,6 @@ private constructor(velocity: Double, velocityUnit: AngularVelocity.Unit) : Comp
 		set(value) {
 			require(!value.isNaN())
 			require(value.isFinite())
-			require(value >= 0.0)
 			field = value
 		}
 
