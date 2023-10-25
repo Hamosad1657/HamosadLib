@@ -1,4 +1,4 @@
-package kotlin.math
+package math
 
 import com.hamosad1657.lib.math.*
 import org.junit.jupiter.api.Assertions.assertEquals
