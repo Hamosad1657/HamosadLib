@@ -6,6 +6,12 @@ import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.sign
 
+/**
+ * If the absolute value is smaller than the deadband, the value becomes 0.
+ * Otherwise, it stays the same.
+ *
+ * - [deadband] must be positive. [value] can be anything.
+ */
 fun simpleDeadband(value: Double, deadband: Double): Double {
 	require(deadband >= 0.0)
 	return if (abs(value) >= deadband) {
@@ -15,9 +21,22 @@ fun simpleDeadband(value: Double, deadband: Double): Double {
 	}
 }
 
+/**
+ * If the absolute value is smaller than the deadband, it becomes 0.
+ * Otherwise, it is mapped to a range where the deadband is the minimum and 1 is the maximum
+ * (or, if the value is negative, -deadband is the maximum and -1 is the minimum).
+ *
+ * - [deadband] must be between 0 and 1. [value] must be between -1 and 1.
+ */
 fun continuousDeadband(value: Double, deadband: Double): Double {
-	return if (abs(value) > deadband) {
-		(value - deadband * sign(value)) / (1.0 - deadband)
+	require(deadband in 0.0..1.0)
+	require(value in -1.0..1.0)
+
+	return if (value > deadband) {
+		mapRange(value, 0.0, 1.0, deadband, 1.0)
+	}
+	else if (value < -deadband) {
+		mapRange(value, -1.0, 0.0, -1.0, -deadband)
 	}
 	else {
 		0.0
