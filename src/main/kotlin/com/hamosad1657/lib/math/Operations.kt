@@ -4,6 +4,7 @@ import edu.wpi.first.math.MathUtil
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.floor
+import kotlin.math.sign
 
 fun simpleDeadband(value: Double, deadband: Double): Double {
 	require(deadband >= 0.0)
@@ -14,7 +15,7 @@ fun simpleDeadband(value: Double, deadband: Double): Double {
 	}
 }
 
-fun continousDeadband(value: Double, deadband: Double): Double {
+fun continuousDeadband(value: Double, deadband: Double): Double {
 	return if (abs(value) > deadband) {
 		(value - deadband * sign(value)) / (1.0 - deadband)
 	}
