@@ -1,4 +1,4 @@
-package units
+package kotlin.units
 
 import com.hamosad1657.lib.units.*
 import org.junit.jupiter.api.Assertions
