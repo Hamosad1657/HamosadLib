@@ -8,16 +8,16 @@ class OperationsTest {
 
 	@Test
 	fun testDeadband() {
-		assertEquals(deadband(0.0, 0.0), 0.0)
-		assertEquals(deadband(3.0, 0.0), 3.0)
-		assertEquals(deadband(0.0, 3.0), 0.0)
-		assertEquals(deadband(3.0, 3.0), 3.0)
-		assertEquals(deadband(3.0, 4.0), 0.0)
-		assertEquals(deadband(4.0, 3.0), 4.0)
-		assertEquals(deadband(-3.0, 0.0), -3.0)
-		assertEquals(deadband(-3.0, 3.0), -3.0)
-		assertEquals(deadband(-3.0, 4.0), 0.0)
-		assertEquals(deadband(-4.0, 3.0), -4.0)
+		assertEquals(simpleDeadband(0.0, 0.0), 0.0)
+		assertEquals(simpleDeadband(3.0, 0.0), 3.0)
+		assertEquals(simpleDeadband(0.0, 3.0), 0.0)
+		assertEquals(simpleDeadband(3.0, 3.0), 3.0)
+		assertEquals(simpleDeadband(3.0, 4.0), 0.0)
+		assertEquals(simpleDeadband(4.0, 3.0), 4.0)
+		assertEquals(simpleDeadband(-3.0, 0.0), -3.0)
+		assertEquals(simpleDeadband(-3.0, 3.0), -3.0)
+		assertEquals(simpleDeadband(-3.0, 4.0), 0.0)
+		assertEquals(simpleDeadband(-4.0, 3.0), -4.0)
 	}
 
 	@Test
