@@ -7,15 +7,16 @@ import kotlin.math.floor
 import kotlin.math.sign
 
 fun deadband(value: Double, deadband: Double): Double {
-	return if (abs(value) > deadband) {
-		(value - deadband * sign(value)) / (1.0 - deadband)
+	require(deadband >= 0.0)
+	return if (abs(value) >= deadband) {
+		value
 	} else {
 		0.0
 	}
 }
 
 fun clamp(value: Double, min: Double, max: Double): Double {
-	return if (min >= max) 0.0 else MathUtil.clamp(value, min, max)
+	return if (min > max) 0.0 else MathUtil.clamp(value, min, max)
 }
 
 /**
@@ -25,6 +26,9 @@ fun clamp(value: Double, min: Double, max: Double): Double {
  * @return The value relative to the end range.
  */
 fun mapRange(value: Double, startMin: Double, startMax: Double, endMin: Double, endMax: Double): Double {
+	require(startMin < startMax)
+	require(endMin < endMax)
+	require(value in startMin..startMax)
 	return endMin + (endMax - endMin) / (startMax - startMin) * (value - startMin)
 }
 
@@ -35,7 +39,12 @@ fun mapRange(value: Double, startMin: Double, startMax: Double, endMin: Double, 
  * @return The value relative to the end range.
  */
 fun mapRange(value: Int, startMin: Int, startMax: Int, endMin: Int, endMax: Int): Int {
-	return endMin + (endMax - endMin) / (startMax - startMin) * (value - startMin)
+	return mapRange(value.toDouble(),
+					startMin.toDouble(),
+					startMax.toDouble(),
+					endMin.toDouble(),
+					endMax.toDouble()
+					).toInt()
 }
 
 fun median(collection: Collection<Double>): Double {
@@ -54,7 +63,7 @@ fun median(array: DoubleArray): Double {
 	return if (size % 2 == 0) {
 		(sortedArray[size / 2] + sortedArray[(size / 2) - 1]) / 2.0
 	} else {
-		array[((size / 2) - 0.5).toInt()]
+		array[(size / 2)]
 	}
 }
 
