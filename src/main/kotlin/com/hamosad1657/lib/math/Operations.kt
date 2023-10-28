@@ -23,20 +23,27 @@ fun simpleDeadband(value: Double, deadband: Double): Double {
 
 /**
  * If the absolute value is smaller than the deadband, it becomes 0.
- * Otherwise, it is mapped to a range where the deadband is the minimum and 1 is the maximum
- * (or, if the value is negative, -deadband is the maximum and -1 is the minimum).
- *
+ * Otherwise, it is mapped from a range where deadband is the minimum and 1 is the maximum,
+ * to a range where zero is the minimum and 1 is the maximum. (Or, if the value is negative,
+ * from a range where -1 is the minimum and -deadband is the maximum, to a range where -1 is
+ * the minimum and zero is the maximum.)
  * - [deadband] must be between 0 and 1. [value] must be between -1 and 1.
+ *
+ * Some examples:
+ * - continuousDeadband(0.05, 0.1) will return 0.0.
+ * - continuousDeadband(0.1, 0.1) will return 0.0.
+ * - continuousDeadband(0.5, 0.1) will return 0.44444
+ * - continuousDeadband(1, 0.1) will return 1.0.
  */
 fun continuousDeadband(value: Double, deadband: Double): Double {
 	require(deadband in 0.0..1.0)
 	require(value in -1.0..1.0)
 
 	return if (value > deadband) {
-		mapRange(value, 0.0, 1.0, deadband, 1.0)
+		mapRange(value, deadband, 1.0, 0.0, 1.0)
 	}
 	else if (value < -deadband) {
-		mapRange(value, -1.0, 0.0, -1.0, -deadband)
+		mapRange(value, -1.0, -deadband, -1.0, 0.0)
 	}
 	else {
 		0.0
