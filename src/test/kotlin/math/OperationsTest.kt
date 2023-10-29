@@ -7,18 +7,9 @@ import org.junit.jupiter.api.Test
 import kotlin.math.floor
 import kotlin.math.pow
 
-class OperationsTest {
-	private fun Double.roundWithPrecision(decimals: Int): Double {
-		val multiplier = 10.0.pow(decimals)
-		return floor(this * multiplier) / multiplier
-	}
+private const val allowableFloatingPointError = 0.0001
 
-	private fun assertEqualsWithRounding(expected: Double, actual: Double) {
-		Assertions.assertEquals(
-			expected.roundWithPrecision(5),
-			actual.roundWithPrecision(5)
-		)
-	}
+class OperationsTest {
 
 	@Test
 	fun testSimpleDeadband() {
@@ -42,12 +33,12 @@ class OperationsTest {
 		assertEquals(0.0, continuousDeadband(0.05, 0.1))
 		assertEquals(0.0, continuousDeadband(0.1, 0.1))
 		assertEquals(1.0, continuousDeadband(1.0, 0.1))
-		assertEqualsWithRounding(0.44444, continuousDeadband(0.5, 0.1))
+		assertEquals(0.4444, continuousDeadband(0.5, 0.1), allowableFloatingPointError)
 
 		assertEquals(0.0, continuousDeadband(-0.05, 0.1))
 		assertEquals(0.0, continuousDeadband(-0.1, 0.1))
 		assertEquals(-1.0, continuousDeadband(-1.0, 0.1))
-		assertEqualsWithRounding(-0.44445, continuousDeadband(-0.5, 0.1))
+		assertEquals(-0.4444, continuousDeadband(-0.5, 0.1), allowableFloatingPointError)
 	}
 
 	@Test

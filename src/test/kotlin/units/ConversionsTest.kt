@@ -1,135 +1,124 @@
 package units
 
 import com.hamosad1657.lib.units.*
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import kotlin.math.floor
-import kotlin.math.pow
+
+private const val allowableFloatingPointError = 0.0001
 
 class ConversionsTest {
-	private fun Double.roundWithPrecision(decimals: Int): Double {
-		val multiplier = 10.0.pow(decimals)
-		return floor(this * multiplier) / multiplier
-	}
-
-	private fun assertEqualsWithPrecision(actual: Double, expected: Double) {
-		Assertions.assertEquals(
-			expected.roundWithPrecision(4),
-			actual.roundWithPrecision(4)
-		)
-	}
 
 	/// --- Angular Velocities to Angular Velocities Conversions ---
 
 	@Test
 	fun rpmToRpsTest() {
-		assertEqualsWithPrecision(rpmToRps(0.0), 0.0)
-		assertEqualsWithPrecision(rpmToRps(3.0), 0.05)
+		assertEquals(0.0, rpmToRps(0.0))
+		assertEquals(0.05, rpmToRps(3.0), allowableFloatingPointError)
 	}
 
 	@Test
 	fun rpmToRadPsTest() {
-		assertEqualsWithPrecision(rpmToRadPs(0.0), 0.0)
-		assertEqualsWithPrecision(rpmToRadPs(3.0), 0.3141)
+		assertEquals(0.0, rpmToRadPs(0.0))
+		assertEquals(0.3141, rpmToRadPs(3.0), allowableFloatingPointError)
 	}
 
 	@Test
 	fun rpmToDegPsTest() {
-		assertEqualsWithPrecision(rpmToDegPs(0.0), 0.0)
-		assertEqualsWithPrecision(rpmToDegPs(3.0), 18.0)
+		assertEquals(0.0, rpmToDegPs(0.0))
+		assertEquals(18.0, rpmToDegPs(3.0), allowableFloatingPointError)
 	}
 
 	@Test
 	fun rpsToRpmTest() {
-		assertEqualsWithPrecision(rpsToRpm(0.0), 0.0)
-		assertEqualsWithPrecision(rpsToRpm(3.0), 180.0)
+		assertEquals(0.0, rpsToRpm(0.0))
+		assertEquals(180.0, rpsToRpm(3.0), allowableFloatingPointError)
 	}
 
 	@Test
 	fun rpsToRadPsTest() {
-		assertEqualsWithPrecision(rpsToRadPs(0.0), 0.0)
-		assertEqualsWithPrecision(rpsToRadPs(3.0), 18.8495)
+		assertEquals(0.0, rpsToRadPs(0.0))
+		assertEquals(18.8495, rpsToRadPs(3.0), allowableFloatingPointError)
 	}
 
 	@Test
 	fun rpsToDegPsTest() {
-		assertEqualsWithPrecision(rpsToDegPs(0.0), 0.0)
-		assertEqualsWithPrecision(rpsToDegPs(3.0), 1080.0)
+		assertEquals(0.0, rpsToDegPs(0.0))
+		assertEquals(1080.0, rpsToDegPs(3.0), allowableFloatingPointError)
 	}
 
 	@Test
 	fun radPsToRpmTest() {
-		assertEqualsWithPrecision(radPsToRpm(0.0), 0.0)
-		assertEqualsWithPrecision(radPsToRpm(3.0), 28.6478)
+		assertEquals(0.0, radPsToRpm(0.0), 0.0)
+		assertEquals(28.6478, radPsToRpm(3.0), allowableFloatingPointError)
 	}
 
 	@Test
 	fun radPsToRpsTest() {
-		assertEqualsWithPrecision(radPsToRps(0.0), 0.0)
-		assertEqualsWithPrecision(radPsToRps(3.0), 0.4774)
+		assertEquals(0.0, radPsToRps(0.0))
+		assertEquals(0.4774, radPsToRps(3.0), allowableFloatingPointError)
 	}
 
 	@Test
 	fun radPsToDegPsTest() {
-		assertEqualsWithPrecision(radPsToDegPs(0.0), 0.0)
-		assertEqualsWithPrecision(radPsToDegPs(3.0), 171.8873)
+		assertEquals(0.0, radPsToDegPs(0.0))
+		assertEquals(171.8873, radPsToDegPs(3.0), allowableFloatingPointError)
 	}
 
 	@Test
 	fun degPsToRpmTest() {
-		assertEqualsWithPrecision(degPsToRpm(0.0), 0.0)
-		assertEqualsWithPrecision(degPsToRpm(3.0), 0.5)
+		assertEquals(0.0, degPsToRpm(0.0))
+		assertEquals(0.5, degPsToRpm(3.0), allowableFloatingPointError)
 	}
 
 	@Test
 	fun degPsToRpsTest() {
-		assertEqualsWithPrecision(degPsToRps(0.0), 0.0)
-		assertEqualsWithPrecision(degPsToRps(3.0), 0.0083)
+		assertEquals(0.0, degPsToRps(0.0))
+		assertEquals(0.0083, degPsToRps(3.0), allowableFloatingPointError)
 	}
 
 	@Test
 	fun degPsToRadPsTest() {
-		assertEqualsWithPrecision(degPsToRadPs(0.0), 0.0)
-		assertEqualsWithPrecision(degPsToRadPs(3.0), 0.0523)
+		assertEquals(0.0, degPsToRadPs(0.0))
+		assertEquals(0.0523, degPsToRadPs(3.0), allowableFloatingPointError)
 	}
 
 	/// --- Angular Velocities to Linear Velocity Conversions ---
 
 	@Test
 	fun rpmToMpsTest() {
-		assertEqualsWithPrecision(rpmToMps(0.0, Length.fromCentimeters(10.0)), 0.0)
-		assertEqualsWithPrecision(rpmToMps(3.0, Length.fromCentimeters(10.0)), 0.0314)
+		assertEquals(0.0, rpmToMps(0.0, Length.fromCentimeters(10.0)))
+		assertEquals(0.0314, rpmToMps(3.0, Length.fromCentimeters(10.0)), allowableFloatingPointError)
 	}
 
 	@Test
 	fun mpsToRpmTest() {
-		assertEqualsWithPrecision(mpsToRpm(0.0, Length.fromCentimeters(10.0)), 0.0)
-		assertEqualsWithPrecision(mpsToRpm(3.0, Length.fromCentimeters(10.0)), 286.4788)
+		assertEquals(0.0, mpsToRpm(0.0, Length.fromCentimeters(10.0)))
+		assertEquals(286.4788, mpsToRpm(3.0, Length.fromCentimeters(10.0)), allowableFloatingPointError)
 	}
 
 	/// --- Lengths to Lengths Conversions ---
 
 	@Test
 	fun metersToInchesTest() {
-		assertEqualsWithPrecision(metersToInches(0.0), 0.0)
-		assertEqualsWithPrecision(metersToInches(3.0), 118.1102)
+		assertEquals(0.0, metersToInches(0.0))
+		assertEquals(118.1102, metersToInches(3.0), allowableFloatingPointError)
 	}
 
 	@Test
 	fun inchesToMetersTest() {
-		assertEqualsWithPrecision(inchesToMeters(0.0), 0.0)
-		assertEqualsWithPrecision(inchesToMeters(30.0), 0.7619)
+		assertEquals(0.0, inchesToMeters(0.0))
+		assertEquals(0.7619, inchesToMeters(30.0), allowableFloatingPointError)
 	}
 
 	@Test
 	fun inchesToFeetTest() {
-		assertEqualsWithPrecision(inchesToFeet(0.0), 0.0)
-		assertEqualsWithPrecision(inchesToFeet(3.0), 0.25)
+		assertEquals(0.0, inchesToFeet(0.0))
+		assertEquals(0.25, inchesToFeet(3.0), allowableFloatingPointError)
 	}
 
 	@Test
 	fun feetToInchesTest() {
-		assertEqualsWithPrecision(feetToInches(0.0), 0.0)
-		assertEqualsWithPrecision(feetToInches(3.0), 36.0)
+		assertEquals(0.0, feetToInches(0.0))
+		assertEquals(36.0, feetToInches(3.0), allowableFloatingPointError)
 	}
 }
