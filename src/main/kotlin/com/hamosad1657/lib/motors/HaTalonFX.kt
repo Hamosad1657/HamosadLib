@@ -4,7 +4,6 @@ import com.ctre.phoenix.motorcontrol.ControlMode
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX
 import com.hamosad1657.lib.math.clamp
 import com.hamosad1657.lib.math.wrapPositionSetpoint
-import com.hamosad1657.lib.units.FALCON_TICKS_PER_ROTATION
 
 /**
  * Max safe temperature for the time span of a match.
@@ -47,10 +46,9 @@ class HaTalonFX(deviceNumber: Int) : WPI_TalonFX(deviceNumber) {
 		get() = temperature < FalconSafeTempC
 		private set
 
-	private var minMeasurement: Double = 0.0
-	private var maxMeasurement: Double = 2048.0
+	private var minPositionSetpoint: Double = 0.0
+	private var maxPositionSetpoint: Double = 2048.0
 	private var isPositionWrapEnabled = false
-	private var ticksPerRotation = FALCON_TICKS_PER_ROTATION.toInt()
 	private var speed = 0.0
 
 	/**
@@ -71,7 +69,7 @@ class HaTalonFX(deviceNumber: Int) : WPI_TalonFX(deviceNumber) {
 			this.set(value)
 		} else if (mode == ControlMode.Position && isPositionWrapEnabled) {
 			val newValue =
-				wrapPositionSetpoint(value, selectedSensorPosition, minMeasurement, maxMeasurement, ticksPerRotation)
+				wrapPositionSetpoint(value, selectedSensorPosition, minPositionSetpoint, maxPositionSetpoint)
 			super.set(ControlMode.Position, newValue)
 		} else {
 			super.set(mode, value)
@@ -100,14 +98,13 @@ class HaTalonFX(deviceNumber: Int) : WPI_TalonFX(deviceNumber) {
 	 *
 	 * - For more information, see [com.hamosad1657.lib.math.wrapPositionSetpoint].
 	 *
-	 * @param minMeasurement The smallest measurement.
-	 * @param maxMeasurement The largest measurement.
+	 * @param minPossibleSetpoint The smallest setpoint.
+	 * @param maxPossibleSetpoint The largest setpoint.
 	 */
-	fun enablePositionWrap(minMeasurement: Double, maxMeasurement: Double, ticksPerRotation: Int) {
-		require(minMeasurement < maxMeasurement)
-		this.minMeasurement = minMeasurement
-		this.maxMeasurement = maxMeasurement
-		this.ticksPerRotation = ticksPerRotation
+	fun enablePositionWrap(minPossibleSetpoint: Double, maxPossibleSetpoint: Double) {
+		require(minPossibleSetpoint < maxPossibleSetpoint)
+		this.minPositionSetpoint = minPossibleSetpoint
+		this.maxPositionSetpoint = maxPossibleSetpoint
 		isPositionWrapEnabled = true
 	}
 

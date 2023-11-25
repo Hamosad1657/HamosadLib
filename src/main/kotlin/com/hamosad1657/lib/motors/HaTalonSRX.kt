@@ -33,10 +33,9 @@ class HaTalonSRX(deviceID: Int) : WPI_TalonSRX(deviceID) {
 			field = value.coerceAtMost(1.0)
 		}
 
-	private var minMeasurement: Double = 0.0
-	private var maxMeasurement: Double = 0.0
+	private var minPositionSetpoint: Double = 0.0
+	private var maxPositionSetpoint: Double = 0.0
 	private var isPositionWrapEnabled = false
-	private var ticksPerRotation = 0
 	private var speed = 0.0
 
 	/**
@@ -57,7 +56,7 @@ class HaTalonSRX(deviceID: Int) : WPI_TalonSRX(deviceID) {
 			this.set(value)
 		} else if (mode == ControlMode.Position && isPositionWrapEnabled) {
 			val newValue =
-				wrapPositionSetpoint(value, selectedSensorPosition, minMeasurement, maxMeasurement, ticksPerRotation)
+				wrapPositionSetpoint(value, selectedSensorPosition, minPositionSetpoint, maxPositionSetpoint)
 			super.set(ControlMode.Position, newValue)
 		} else {
 			super.set(mode, value)
@@ -86,14 +85,13 @@ class HaTalonSRX(deviceID: Int) : WPI_TalonSRX(deviceID) {
 	 *
 	 * - For more information, see [com.hamosad1657.lib.math.wrapPositionSetpoint].
 	 *
-	 * @param minMeasurement The smallest measurement.
-	 * @param maxMeasurement The largest measurement.
+	 * @param minPossibleSetpoint The smallest setpoint.
+	 * @param maxPossibleSetpoint The largest setpoint.
 	 */
-	fun enablePositionWrap(minMeasurement: Double, maxMeasurement: Double, ticksPerRotation: Int) {
-		require(minMeasurement < maxMeasurement)
-		this.minMeasurement = minMeasurement
-		this.maxMeasurement = maxMeasurement
-		this.ticksPerRotation = ticksPerRotation
+	fun enablePositionWrap(minPossibleSetpoint: Double, maxPossibleSetpoint: Double, ticksPerRotation: Int) {
+		require(minPossibleSetpoint < maxPossibleSetpoint)
+		this.minPositionSetpoint = minPossibleSetpoint
+		this.maxPositionSetpoint = maxPossibleSetpoint
 		isPositionWrapEnabled = true
 	}
 
