@@ -4,7 +4,6 @@ import edu.wpi.first.math.MathUtil
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.floor
-import kotlin.math.sign
 
 /**
  * If the absolute value is smaller than the deadband, the value becomes 0.
@@ -104,11 +103,13 @@ fun median(array: DoubleArray): Double {
 
 /**
  * Modify the setpoint to always go the shorter way when controlling position on a circle.
+ * The output of this function changes according to the measurement, so it must be updated every
+ * loop iteration.
  *
  * Returns a new setpoint that will produce the shortest path to [realSetpoint], using the
- * [measurement] (which isn't required to be inside of [minMeasurement] and [maxMeasurement]).
+ * [measurement] (which isn't required to be inside of [minPossibleSetpoint] and [maxPossibleSetpoint]).
  *
- * The [minMeasurement] and [maxMeasurement] define the range where the wrapping will occur.
+ * The [minPossibleSetpoint] and [maxPossibleSetpoint] define the range where the wrapping will occur.
  *
  * # Example
  * Say I want to control the angle of a swerve module (we'll use degrees for convenience).
@@ -120,13 +121,13 @@ fun median(array: DoubleArray): Double {
  * reality it's only 20 degrees away, because it does not know that zero and 360 are the same.
  *
  * ||||| To solve the above problem, use this function! pass 350.0 for [realSetpoint], 10.0 for
- * [measurement], 0.0 for [minMeasurement], 360.0 for [maxMeasurement], and 360 for
- * [ticksInRotation]. This function will return a new setpoint in degrees, which is then set to
+ * [measurement], 0.0 for [minPossibleSetpoint], 360.0 for [maxPossibleSetpoint], and 360 for
+ * [countsInRotation]. This function will return a new setpoint in degrees, which is then set to
  * the motor controller in position control mode (you convert units if needed, this function is
  * not responsible for unit conversions) and the new setpoint will make it go the shorter way.
  *
- * - Note that the measurement is allowed to accumulate beyond [minMeasurement] and
- * [maxMeasurement], but it needs to correspond to the same position in the original scope.
+ * - Note that the measurement is allowed to accumulate beyond [minPossibleSetpoint] and
+ * [maxPossibleSetpoint], but it needs to correspond to the same position in the original scope.
  * For example, a measurement of 361 must be the same module angle as measurement 1.
  *
  * * Note that the new setpoint returned is NOT "set and forget": it changes according to the
@@ -144,18 +145,18 @@ fun median(array: DoubleArray): Double {
 fun wrapPositionSetpoint(
 	realSetpoint: Double,
 	measurement: Double,
-	minMeasurement: Double,
-	maxMeasurement: Double,
-	ticksInRotation: Int
+	minPossibleSetpoint: Double,
+	maxPossibleSetpoint: Double,
+	countsInRotation: Int
 ): Double {
-	require(minMeasurement < maxMeasurement)
-	require(realSetpoint in minMeasurement..maxMeasurement)
+	require(minPossibleSetpoint < maxPossibleSetpoint)
+	require(realSetpoint in minPossibleSetpoint..maxPossibleSetpoint)
 
 	// This is done in case the measurement doesn't wrap already (e.g. is accumulated forever, and could theoretically be infinite)
-	val wrappedMeasurement = MathUtil.inputModulus(measurement, minMeasurement, maxMeasurement)
+	val wrappedMeasurement = MathUtil.inputModulus(measurement, minPossibleSetpoint, maxPossibleSetpoint)
 
 	val realError = realSetpoint - wrappedMeasurement
-	val maxRealError = maxMeasurement - minMeasurement
+	val maxRealError = maxPossibleSetpoint - minPossibleSetpoint
 
 	val minModifiedError = maxRealError / -2.0
 	val maxModifiedError = maxRealError / 2.0
@@ -164,6 +165,6 @@ fun wrapPositionSetpoint(
 
 	val modifiedSetpoint = modifiedError + wrappedMeasurement // same as [error = setpoint - measurement]
 
-	val fullRotationsFromZero = if(measurement < minMeasurement) ceil(measurement / ticksInRotation) else floor(measurement / ticksInRotation)
-	return modifiedSetpoint + fullRotationsFromZero * ticksInRotation
+	val fullRotationsFromZero = if(measurement < minPossibleSetpoint) ceil(measurement / countsInRotation) else floor(measurement / countsInRotation)
+	return modifiedSetpoint + fullRotationsFromZero * countsInRotation
 }
