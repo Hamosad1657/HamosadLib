@@ -151,7 +151,7 @@ fun wrapPositionSetpoint(
 	require(minPossibleSetpoint < maxPossibleSetpoint)
 	require(realSetpoint in minPossibleSetpoint..maxPossibleSetpoint)
 
-	val countsInRotation = maxPossibleSetpoint - maxPossibleSetpoint
+	val countsInRotation = maxPossibleSetpoint - minPossibleSetpoint
 
 	// This is done in case the measurement doesn't wrap already (e.g. is accumulated forever, and could theoretically be infinite)
 	val wrappedMeasurement = MathUtil.inputModulus(measurement, minPossibleSetpoint, maxPossibleSetpoint)
