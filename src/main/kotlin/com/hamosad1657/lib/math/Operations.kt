@@ -121,10 +121,10 @@ fun median(array: DoubleArray): Double {
  * reality it's only 20 degrees away, because it does not know that zero and 360 are the same.
  *
  * ||||| To solve the above problem, use this function! pass 350.0 for [realSetpoint], 10.0 for
- * [measurement], 0.0 for [minPossibleSetpoint], 360.0 for [maxPossibleSetpoint], and 360 for
- * [countsInRotation]. This function will return a new setpoint in degrees, which is then set to
- * the motor controller in position control mode (you convert units if needed, this function is
- * not responsible for unit conversions) and the new setpoint will make it go the shorter way.
+ * [measurement], 0.0 for [minPossibleSetpoint], and 360.0 for [maxPossibleSetpoint].
+ * This function will return a new setpoint in degrees, which is then set to the motor controller
+ * in position control mode (you convert units if needed, this function is not responsible for unit
+ * conversions) and the new setpoint will make it go the shorter way.
  *
  * - Note that the measurement is allowed to accumulate beyond [minPossibleSetpoint] and
  * [maxPossibleSetpoint], but it needs to correspond to the same position in the original scope.
@@ -147,10 +147,11 @@ fun wrapPositionSetpoint(
 	measurement: Double,
 	minPossibleSetpoint: Double,
 	maxPossibleSetpoint: Double,
-	countsInRotation: Int
 ): Double {
 	require(minPossibleSetpoint < maxPossibleSetpoint)
 	require(realSetpoint in minPossibleSetpoint..maxPossibleSetpoint)
+
+	val countsInRotation = maxPossibleSetpoint - maxPossibleSetpoint
 
 	// This is done in case the measurement doesn't wrap already (e.g. is accumulated forever, and could theoretically be infinite)
 	val wrappedMeasurement = MathUtil.inputModulus(measurement, minPossibleSetpoint, maxPossibleSetpoint)
