@@ -2,12 +2,12 @@ import edu.wpi.first.gradlerio.deploy.roborio.RoboRIO
 
 plugins {
     id "java"
-    id "org.jetbrains.kotlin.jvm" version "1.8.20"
+    id "org.jetbrains.kotlin.jvm" version "1.8.0"
     id "edu.wpi.first.GradleRIO" version "2023.4.3"
     id "idea"
 }
 
-def javaVersion = JavaVersion.VERSION_17
+def javaVersion = JavaVersion.VERSION_11
 sourceCompatibility = javaVersion
 targetCompatibility = javaVersion
 
@@ -48,7 +48,7 @@ def deployArtifact = deploy.targets.roborio.artifacts.frcJava
 wpi.java.debugJni = false
 
 // Set this to true to enable desktop support.
-def includeDesktopSupport = false
+def includeDesktopSupport = true
 
 dependencies {
     implementation wpi.java.deps.wpilib()
