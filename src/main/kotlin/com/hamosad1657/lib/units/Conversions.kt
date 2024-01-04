@@ -199,8 +199,12 @@ fun falconTicksPer100msToRpm(ticksPer100ms: Number, gearRatio: Number = 1.0) =
  * @param position - MUST be Blue Alliance.
  * @return New position relative to robot's alliance.
  */
-fun matchPoseToAlliance(position: Pose2d): Pose2d =
-	when (DriverStation.getAlliance()) {
+fun matchPoseToAlliance(position: Pose2d): Pose2d {
+	val alliance = DriverStation.getAlliance();
+	if (alliance.isEmpty) {
+		throw NoSuchElementException("Alliance invalid or can't fetch alliance from DriverStation")
+	}
+	return when (alliance.get()) {
 		DriverStation.Alliance.Blue -> position
 		DriverStation.Alliance.Red ->
 			Pose2d(
@@ -208,6 +212,5 @@ fun matchPoseToAlliance(position: Pose2d): Pose2d =
 				position.y,
 				position.rotation.rotateBy(180.degrees)
 			)
-
-		else -> throw IllegalStateException("Alliance invalid or can't fetch alliance from DriverStation")
 	}
+}

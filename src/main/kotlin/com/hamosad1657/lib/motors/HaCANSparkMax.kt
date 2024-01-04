@@ -1,5 +1,6 @@
 package com.hamosad1657.lib.motors
 
+import com.hamosad1657.lib.math.PIDGains
 import com.hamosad1657.lib.math.clamp
 import com.revrobotics.CANSparkMax
 import com.revrobotics.SparkMaxPIDController
@@ -46,6 +47,15 @@ class HaCANSparkMax(deviceID: Int) : CANSparkMax(deviceID, MotorType.kBrushless)
 
 	/** The NEO motor has a temperature sensor inside it.*/
 	val isMotorTempSafe get() = motorTemperature < NEOSafeTempC
+
+	fun configPIDGains(gains: PIDGains) {
+		pidController.apply {
+			p = gains.kP
+			i = gains.kI
+			d = gains.kD
+			iZone = gains.kIZone
+		}
+	}
 
 	/**
 	 * percentOutput is clamped between properties minPercentOutput and maxPercentOutput.

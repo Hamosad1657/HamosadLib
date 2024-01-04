@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX
 import com.hamosad1657.lib.math.clamp
 import com.hamosad1657.lib.math.wrapPositionSetpoint
+import com.hamosad1657.lib.math.PIDGains
 
 class HaTalonSRX(deviceID: Int) : WPI_TalonSRX(deviceID) {
 	init {
@@ -38,6 +39,14 @@ class HaTalonSRX(deviceID: Int) : WPI_TalonSRX(deviceID) {
 	private var isPositionWrapEnabled = false
 	private var speed = 0.0
 
+	fun configPIDGains(gains: PIDGains, slotIndex: Int = 0) {
+		require(slotIndex in 0..2)
+		config_kP(slotIndex, gains.kP)
+		config_kI(slotIndex, gains.kI)
+		config_kD(slotIndex, gains.kD)
+		config_IntegralZone(0, gains.kIZone)
+	}
+
 	/**
 	 * Common interface for getting the current set speed of a speed controller.
 	 *
@@ -69,16 +78,12 @@ class HaTalonSRX(deviceID: Int) : WPI_TalonSRX(deviceID) {
 	override fun set(percentOutput: Double) {
 		require(maxPercentOutput >= minPercentOutput)
 		if ((forwardLimit() && percentOutput > 0.0) || (reverseLimit() && percentOutput < 0.0)) {
-			this.stopMotor()
+			speed = 0.0
+			super.set(ControlMode.PercentOutput, 0.0)
 		} else {
 			speed = clamp(percentOutput, minPercentOutput, maxPercentOutput)
 			super.set(ControlMode.PercentOutput, speed)
 		}
-	}
-
-	override fun stopMotor() {
-		this.speed = 0.0
-		super.stopMotor()
 	}
 
 	/**
@@ -92,7 +97,7 @@ class HaTalonSRX(deviceID: Int) : WPI_TalonSRX(deviceID) {
 	 * @param minPossibleSetpoint The smallest setpoint.
 	 * @param maxPossibleSetpoint The largest setpoint.
 	 */
-	fun enablePositionWrap(minPossibleSetpoint: Double, maxPossibleSetpoint: Double, ticksPerRotation: Int) {
+	fun enablePositionWrap(minPossibleSetpoint: Double, maxPossibleSetpoint: Double) {
 		require(minPossibleSetpoint < maxPossibleSetpoint)
 		this.minPositionSetpoint = minPossibleSetpoint
 		this.maxPositionSetpoint = maxPossibleSetpoint
