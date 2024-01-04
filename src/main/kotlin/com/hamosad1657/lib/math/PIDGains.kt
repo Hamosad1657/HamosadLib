@@ -1,6 +1,6 @@
 package com.hamosad1657.lib.math
 
-import com.pathplanner.lib.auto.PIDConstants
+import com.pathplanner.lib.util.PIDConstants
 import edu.wpi.first.math.controller.PIDController
 import edu.wpi.first.math.controller.ProfiledPIDController
 import edu.wpi.first.math.trajectory.TrapezoidProfile
