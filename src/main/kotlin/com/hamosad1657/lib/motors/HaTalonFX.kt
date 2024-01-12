@@ -1,6 +1,5 @@
 package com.hamosad1657.lib.motors
 
-import com.ctre.phoenix.motorcontrol.ControlMode
 import com.ctre.phoenix6.configs.ClosedLoopGeneralConfigs
 import com.ctre.phoenix6.configs.TalonFXConfiguration
 import com.ctre.phoenix6.hardware.TalonFX
