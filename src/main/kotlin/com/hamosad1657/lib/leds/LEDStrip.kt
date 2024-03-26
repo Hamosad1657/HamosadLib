@@ -5,6 +5,8 @@ import edu.wpi.first.wpilibj.AddressableLED
 import edu.wpi.first.wpilibj.AddressableLEDBuffer
 import edu.wpi.first.wpilibj.Timer
 
+@OptIn(ExperimentalStdlibApi::class)
+
 /** ONLY CREATE ONE INSTANCE OF THIS CLASS. */
 class LEDStrip(private val length: Int, pwmPort: Int) {
 	// --- LEDs ---
