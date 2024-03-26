@@ -9,7 +9,6 @@ import edu.wpi.first.math.Nat
 import edu.wpi.first.math.geometry.Transform3d
 import edu.wpi.first.math.numbers.N1
 import edu.wpi.first.math.numbers.N3
-import frc.robot.Robot
 import org.photonvision.EstimatedRobotPose
 import org.photonvision.PhotonCamera
 import org.photonvision.PhotonPoseEstimator
@@ -25,6 +24,7 @@ abstract class AprilTagCamera(val cameraName: String) {
 
 	abstract val maxTagTrustingDistance: Length
 	abstract val stdDevs: AprilTagsStdDevs
+	abstract val isAutonomousSupplier: () -> Boolean
 
 	private var _camera: PhotonCamera? = null
 	protected val camera: PhotonCamera
@@ -76,7 +76,7 @@ abstract class AprilTagCamera(val cameraName: String) {
 	val poseEstimationStdDevs
 		get() = if (latestResult?.targets?.size == 1) {
 			stdDevs.oneTag
-		} else if (Robot.isAutonomous) {
+		} else if (isAutonomousSupplier()) {
 			stdDevs.twoTagsAuto
 		} else {
 			stdDevs.twoTagsTeleop
