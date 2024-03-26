@@ -1,7 +1,8 @@
 package com.hamosad1657.lib.units
 
+import com.hamosad1657.lib.robotPrintError
 import edu.wpi.first.math.geometry.Pose2d
-import edu.wpi.first.wpilibj.DriverStation
+import edu.wpi.first.wpilibj.DriverStation.Alliance
 
 const val INCHES_IN_METER = 39.3700787402
 const val CANCODER_TICKS_PER_ROTATION = 4096.0
@@ -62,8 +63,13 @@ fun degPsToRadPs(degPs: Number) = Math.toRadians(degPs.toDouble())
 /** Rotations per minute to meters per second.
  *
  * Wheel radius should be greater than 0. */
-fun rpmToMps(rpm: Number, wheelRadius: Length) =
-	require(wheelRadius.meters > 0.0).run { rpm.toDouble() / 60.0 * (wheelRadius.meters * 2.0 * Math.PI) }
+fun rpmToMps(rpm: Number, wheelRadius: Length): Double {
+	if (wheelRadius.asMeters <= 0.0) {
+		robotPrintError("wheelRadius is negative", true)
+		return 0.0
+	}
+	return rpm.toDouble() / 60.0 * (wheelRadius.asMeters * 2.0 * Math.PI)
+}
 
 /** Radians per second to meters per second.
  *
@@ -78,8 +84,13 @@ fun degPsToMps(degPs: Number, wheelRadius: Length) = rpmToMps(degPsToRpm(degPs),
 /** Meters per second to rotations per minute.
  *
  * Wheel radius should be greater than 0. */
-fun mpsToRpm(mps: Number, wheelRadius: Length) =
-	require(wheelRadius.meters > 0.0).run { mps.toDouble() * 60.0 / (wheelRadius.meters * 2.0 * Math.PI) }
+fun mpsToRpm(mps: Number, wheelRadius: Length): Double {
+	if (wheelRadius.asMeters <= 0.0) {
+		robotPrintError("wheelRadius is negative", true)
+		return 0.0
+	}
+	return mps.toDouble() * 60.0 / (wheelRadius.asMeters * 2.0 * Math.PI)
+}
 
 /** Meters per second to radians per second.
  *
@@ -134,6 +145,7 @@ fun degToCANCoderTicks(mechanismDeg: Number, gearRatio: Number = 1.0) =
  *
  * @return The angle of the mechanism in degrees.
  */
+@Suppress("FunctionName")
 fun CANCoderTicksToDeg(ticks: Number, gearRatio: Number = 1.0) =
 	ticks.toDouble() / CANCODER_TICKS_PER_ROTATION / gearRatio.toDouble() * 360.0
 
@@ -196,20 +208,16 @@ fun falconTicksPer100msToRpm(ticksPer100ms: Number, gearRatio: Number = 1.0) =
 	ticksPer100ms.toDouble() / gearRatio.toDouble() / FALCON_TICKS_PER_ROTATION * 600.0
 
 /**
- *
- * @param position - MUST be Blue Alliance.
+ * @param position - MUST be blue alliance.
+ * @param alliance - The current alliance.
  * @return New position relative to robot's alliance.
  */
-fun matchPoseToAlliance(position: Pose2d): Pose2d {
-	val alliance = DriverStation.getAlliance();
-	if (alliance.isEmpty) {
-		throw NoSuchElementException("Alliance invalid or can't fetch alliance from DriverStation")
-	}
-	return when (alliance.get()) {
-		DriverStation.Alliance.Blue -> position
-		DriverStation.Alliance.Red ->
+fun matchPoseToAlliance(position: Pose2d, alliance: Alliance): Pose2d {
+	return when (alliance) {
+		Alliance.Blue -> position
+		Alliance.Red ->
 			Pose2d(
-				CRESCENDO_FIELD_LENGTH.meters - position.x,
+				CRESCENDO_FIELD_LENGTH.asMeters - position.x,
 				position.y,
 				position.rotation.rotateBy(180.degrees)
 			)
