@@ -35,7 +35,6 @@ private constructor(velocity: Double, velocityUnit: AngularVelocityUnit) : Compa
 	val asDegPs get() = this.inUnit(AngularVelocityUnit.DegPs)
 
 	fun asMps(wheelRadius: Length) = rpmToMps(rpm, wheelRadius)
-	fun asFalconTicksPer100ms(gearRatio: Double = 1.0) = rpmToFalconTicksPer100ms(rpm, gearRatio)
 
 	init {
 		rpm = when (velocityUnit) {
@@ -77,7 +76,5 @@ private constructor(velocity: Double, velocityUnit: AngularVelocityUnit) : Compa
 		fun fromRadPs(radPs: Double) = AngularVelocity(radPs, AngularVelocityUnit.RadPs)
 		fun fromDegPs(degPs: Double) = AngularVelocity(degPs, AngularVelocityUnit.DegPs)
 		fun fromMps(mps: Double, wheelRadius: Length) = fromRpm(mpsToRpm(mps, wheelRadius))
-		fun fromFalconTicksPer100ms(ticksPer100ms: Double, gearRatio: Double = 1.0) =
-			fromRpm(falconTicksPer100msToRpm(ticksPer100ms, gearRatio))
 	}
 }
