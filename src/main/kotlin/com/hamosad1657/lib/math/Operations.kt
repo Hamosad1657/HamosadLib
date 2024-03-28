@@ -1,5 +1,6 @@
 package com.hamosad1657.lib.math
 
+import com.hamosad1657.lib.robotPrintError
 import edu.wpi.first.math.MathUtil
 import kotlin.math.abs
 import kotlin.math.ceil
@@ -12,12 +13,11 @@ import kotlin.math.floor
  * - [deadband] must be positive. [value] can be anything.
  */
 fun simpleDeadband(value: Double, deadband: Double): Double {
-	require(deadband >= 0.0)
-	return if (abs(value) >= deadband) {
-		value
-	} else {
-		0.0
+	if (deadband < 0.0) {
+		robotPrintError("deadband is negative", true)
+		return value
 	}
+	return if (abs(value) >= deadband) value else 0.0
 }
 
 /**
@@ -35,16 +35,20 @@ fun simpleDeadband(value: Double, deadband: Double): Double {
  * - continuousDeadband(1, 0.1) will return 1.0.
  */
 fun continuousDeadband(value: Double, deadband: Double): Double {
-	require(deadband in 0.0..1.0)
-	require(value in -1.0..1.0)
+	if (deadband !in 0.0..1.0) {
+		robotPrintError("deadband is out of bounds: $deadband", true)
+		return value
+	}
+	if (value !in -1.0..1.0) {
+		robotPrintError("value is out of bounds: $value", true)
+		return value
+	}
 
 	return if (value > deadband) {
 		mapRange(value, deadband, 1.0, 0.0, 1.0)
-	}
-	else if (value < -deadband) {
+	} else if (value < -deadband) {
 		mapRange(value, -1.0, -deadband, -1.0, 0.0)
-	}
-	else {
+	} else {
 		0.0
 	}
 }
@@ -60,9 +64,14 @@ fun clamp(value: Double, min: Double, max: Double): Double {
  * @return The value relative to the end range.
  */
 fun mapRange(value: Double, startMin: Double, startMax: Double, endMin: Double, endMax: Double): Double {
-	require(startMin < startMax)
-	require(endMin < endMax)
-	require(value in startMin..startMax)
+	if (startMin >= startMax) {
+		robotPrintError("startMin is equal/bigger than starMax", true)
+		return value
+	}
+	if (endMin >= endMax) {
+		robotPrintError("endMin is equal/bigger than endMax", true)
+		return value
+	}
 	return endMin + (endMax - endMin) / (startMax - startMin) * (value - startMin)
 }
 
@@ -73,12 +82,13 @@ fun mapRange(value: Double, startMin: Double, startMax: Double, endMin: Double, 
  * @return The value relative to the end range.
  */
 fun mapRange(value: Int, startMin: Int, startMax: Int, endMin: Int, endMax: Int): Int {
-	return mapRange(value.toDouble(),
-					startMin.toDouble(),
-					startMax.toDouble(),
-					endMin.toDouble(),
-					endMax.toDouble()
-					).toInt()
+	return mapRange(
+		value.toDouble(),
+		startMin.toDouble(),
+		startMax.toDouble(),
+		endMin.toDouble(),
+		endMax.toDouble()
+	).toInt()
 }
 
 fun median(collection: Collection<Double>): Double {
@@ -148,8 +158,14 @@ fun wrapPositionSetpoint(
 	minPossibleSetpoint: Double,
 	maxPossibleSetpoint: Double,
 ): Double {
-	require(minPossibleSetpoint < maxPossibleSetpoint)
-	require(realSetpoint in minPossibleSetpoint..maxPossibleSetpoint)
+	if (!(minPossibleSetpoint < maxPossibleSetpoint)) {
+		robotPrintError("minPossibleSetpoint is equal/bigger than maxPossibleSetpoint")
+		return realSetpoint
+	}
+	if (realSetpoint !in minPossibleSetpoint..maxPossibleSetpoint) {
+		robotPrintError("realSetpoint is out of bounds: $realSetpoint", true)
+		return realSetpoint
+	}
 
 	val countsInRotation = maxPossibleSetpoint - minPossibleSetpoint
 
@@ -166,6 +182,7 @@ fun wrapPositionSetpoint(
 
 	val modifiedSetpoint = modifiedError + wrappedMeasurement // same as [error = setpoint - measurement]
 
-	val fullRotationsFromZero = if(measurement < minPossibleSetpoint) ceil(measurement / countsInRotation) else floor(measurement / countsInRotation)
+	val fullRotationsFromZero =
+		if (measurement < minPossibleSetpoint) ceil(measurement / countsInRotation) else floor(measurement / countsInRotation)
 	return modifiedSetpoint + fullRotationsFromZero * countsInRotation
 }
