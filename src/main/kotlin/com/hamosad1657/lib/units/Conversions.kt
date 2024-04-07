@@ -5,8 +5,6 @@ import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.wpilibj.DriverStation.Alliance
 
 const val INCHES_IN_METER = 39.3700787402
-const val CANCODER_TICKS_PER_ROTATION = 4096.0
-const val FALCON_TICKS_PER_ROTATION = 2048.0
 val CRESCENDO_FIELD_LENGTH = Length.fromMeters(16.54)
 val CRESCENDO_FIELD_WIDTH = Length.fromMeters(8.21)
 
@@ -122,90 +120,6 @@ fun feetToMeters(feet: Number) = inchesToMeters(feetToInches(feet))
 
 /** Feet to inches.  */
 fun feetToInches(feet: Number) = feet.toDouble() * 12.0
-
-
-/// --- CANCoder Ticks to Degrees Conversions ---
-
-/**
- * Convert degrees to CANCoder ticks.
- * @param mechanismDeg
- * @param gearRatio Gear ratio between motor and mechanism
- * (e.g. 3.0 means that for each 3 rotations the motor makes, the mechanism makes 1).
- *
- * @return The angle of the motor in CANCoder ticks.
- */
-fun degToCANCoderTicks(mechanismDeg: Number, gearRatio: Number = 1.0) =
-	mechanismDeg.toDouble() / 360.0 * gearRatio.toDouble() * CANCODER_TICKS_PER_ROTATION
-
-/**
- * CANCoder ticks to degrees.
- * @param ticks The angle of the motor in CANCoder ticks.
- * @param gearRatio Gear ratio between motor and mechanism
- * (e.g. 3.0 means that for each 3 rotations the motor makes, the mechanism makes 1).
- *
- * @return The angle of the mechanism in degrees.
- */
-@Suppress("FunctionName")
-fun CANCoderTicksToDeg(ticks: Number, gearRatio: Number = 1.0) =
-	ticks.toDouble() / CANCODER_TICKS_PER_ROTATION / gearRatio.toDouble() * 360.0
-
-/**
- * Degrees per second to CANCoder ticks per 100ms.
- * @param mechanismDegPs
- * @param gearRatio Gear ratio between motor and mechanism.
- * (e.g. 3.0 means that for each 3 rotations the motor makes, the mechanism makes 1).
- *
- * @return The velocity of the motor in CANCoder ticks per 100 milliseconds.
- */
-fun degPsToCANCoderTicksPer100ms(mechanismDegPs: Number, gearRatio: Number = 1.0) =
-	degToCANCoderTicks(mechanismDegPs, gearRatio) / 10.0
-
-
-/// --- Falcon Ticks to Angles and Angular Velocities Conversions ---
-
-/**
- * Falcon's integrated encoder ticks (2048 per rotation) to degrees.
- * @param mechanismDeg
- * @param gearRatio Gear ratio between Falcon and mechanism.
- * (e.g. 3.0 means that for each 3 rotations the Falcon makes, the mechanism makes 1).
- *
- * @return The angle of the Falcon in integrated encoder ticks.
- */
-fun degToFalconTicks(mechanismDeg: Number, gearRatio: Number = 1.0) =
-	mechanismDeg.toDouble() / 360.0 * gearRatio.toDouble() * FALCON_TICKS_PER_ROTATION
-
-/**
- * Falcon's integrated encoder ticks (2048 per rotation) to degrees.
- * @param ticks The angle of the Falcon in integrated encoder ticks.
- * @param gearRatio Gear ratio between Falcon and mechanism.
- * (e.g. 3.0 means that for each 3 rotations the Falcon makes, the mechanism makes 1).
- *
- * @return The angle of the mechanism in degrees.
- */
-fun falconTicksToDeg(ticks: Number, gearRatio: Number = 1.0) =
-	ticks.toDouble() / FALCON_TICKS_PER_ROTATION / gearRatio.toDouble() * 360.0
-
-/**
- * Rotations per minute to Falcon's integrated encoder ticks (2048 per rotation) per 100ms.
- * @param mechanismRpm
- * @param gearRatio Gear ratio between Falcon and mechanism.
- * (e.g. 3.0 means that for each 3 rotations the Falcon makes, the mechanism makes 1).
- *
- * @return The velocity of the falcon in integrated encoder ticks per 100 milliseconds.
- */
-fun rpmToFalconTicksPer100ms(mechanismRpm: Number, gearRatio: Number = 1.0) =
-	mechanismRpm.toDouble() / 600.0 * gearRatio.toDouble() * FALCON_TICKS_PER_ROTATION
-
-/**
- * Falcon's integrated encoder ticks (2048 per rotation) per 100ms tp rotation per minute.
- * @param ticksPer100ms The velocity of the Falcon in integrated encoder ticks per 100 milliseconds.
- * @param gearRatio Gear ratio between Falcon and mechanism.
- * (e.g. 3.0 means that for each 3 rotations the Falcon makes, the mechanism makes 1).
- *
- * @return The velocity of the mechanism in rotations per minute.
- */
-fun falconTicksPer100msToRpm(ticksPer100ms: Number, gearRatio: Number = 1.0) =
-	ticksPer100ms.toDouble() / gearRatio.toDouble() / FALCON_TICKS_PER_ROTATION * 600.0
 
 /**
  * @param position - MUST be blue alliance.
