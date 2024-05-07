@@ -46,8 +46,8 @@ class LEDStrip(private val length: Int, pwmPort: Int) {
 		if (color != LEDS_OFF) currentColor = color
 	}
 
-	fun setColorAlternating(color: RGBColor) {
-		for (i in 0..<length step 5) {
+	fun setColorAlternating(color: RGBColor, step: Int = 5) {
+		for (i in 0..<length step step) {
 			ledBuffer.setRGB(i, color.red, color.green, color.blue)
 		}
 		ledStrip.setData(ledBuffer)
