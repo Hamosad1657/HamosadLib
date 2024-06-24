@@ -138,6 +138,33 @@ class LEDStrip(val length: Int, pwmPort: Int) {
 	fun blink(blinkTime: Seconds, step: Int = 1, startIndex: Int = 0, endIndex: Int = maxIndex) {
 		blink(blinkTime, lastAppliedColor, step, startIndex, endIndex)
 	}
+	
+
+	fun applyGradient(startColor: RGBColor, endColor: RGBColor, startIndex: Int = 0, endIndex: Int = maxIndex) {
+		val start = clampAndReportIndex(startIndex)
+		val end = clampAndReportIndex(endIndex)
+		val range = end - start
+
+		val redStep = (endColor.red - startColor.red) / range
+		val greenStep = (endColor.green - startColor.green) / range
+		val blueStep = (endColor.blue - startColor.blue) / range
+
+		var red = startColor.red
+		var green = startColor.green
+		var blue = startColor.blue
+
+		for (i in start..<end) {
+			red += redStep
+			green += greenStep
+			blue += blueStep
+			ledBuffer.setRGB(i, red, green, blue)
+		}
+		ledStrip.setData(ledBuffer)
+
+		// value == 0 means LEDs are off
+		if (endColor != LEDS_OFF) lastAppliedColor = getColorForIndex(end)
+		else if (startColor != LEDS_OFF) lastAppliedColor = getColorForIndex(start)
+	}
 
 	companion object {
 		val LEDS_OFF = RGBColor.BLACK
