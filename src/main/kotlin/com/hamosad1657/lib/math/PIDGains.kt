@@ -10,7 +10,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile
  * - [kP] Proportional gain.
  * - [kI] Integral gain.
  * - [kD] Derivative gain.
- * - [kFF] Feed Forward gain calculation function.
  * - [kIZone] If the absolute error is above IZone, the integral accumulator is cleared
  * (making it ineffective). Motor controllers have this feature, but WPILib don't.
  *
@@ -23,7 +22,6 @@ class PIDGains @JvmOverloads constructor(
 	var kP: Double = 0.0,
 	var kI: Double = 0.0,
 	var kD: Double = 0.0,
-	var kFF: (setpoint: Double) -> Double = { 0.0 },
 	var kIZone: Double = 0.0,
 ) {
 	/** Creates a WPILib [PIDController] with the P, I and D gains. */

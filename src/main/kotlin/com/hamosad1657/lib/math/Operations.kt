@@ -5,6 +5,8 @@ import edu.wpi.first.math.MathUtil
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.floor
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * If the absolute value is smaller than the deadband, the value becomes 0.
@@ -55,6 +57,10 @@ fun continuousDeadband(value: Double, deadband: Double): Double {
 
 fun clamp(value: Double, min: Double, max: Double): Double {
 	return if (min > max) 0.0 else MathUtil.clamp(value, min, max)
+}
+
+fun clamp(value: Int, min: Int, max: Int): Int {
+	return if (min > max) 0 else max(min, min(value, max))
 }
 
 /**
