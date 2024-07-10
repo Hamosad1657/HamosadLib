@@ -77,4 +77,9 @@ private constructor(velocity: Double, velocityUnit: AngularVelocityUnit) : Compa
 		fun fromDegPs(degPs: Double) = AngularVelocity(degPs, AngularVelocityUnit.DegPs)
 		fun fromMps(mps: Double, wheelRadius: Length) = fromRpm(mpsToRpm(mps, wheelRadius))
 	}
+
+	override fun equals(other: Any?): Boolean {
+		if (other !is AngularVelocity) return false
+		return this.rpm == other.rpm
+	}
 }
