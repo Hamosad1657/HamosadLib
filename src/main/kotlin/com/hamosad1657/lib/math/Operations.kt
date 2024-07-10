@@ -56,7 +56,7 @@ fun continuousDeadband(value: Double, deadband: Double): Double {
 }
 
 fun clamp(value: Double, min: Double, max: Double): Double {
-	return if (min > max) 0.0 else MathUtil.clamp(value, min, max)
+	return if (min > max) 0.0 else max(min, min(value, max))
 }
 
 fun clamp(value: Int, min: Int, max: Int): Int {
