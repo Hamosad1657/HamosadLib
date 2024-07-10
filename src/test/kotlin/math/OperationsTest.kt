@@ -1,11 +1,8 @@
 package math
 
 import com.hamosad1657.lib.math.*
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import kotlin.math.floor
-import kotlin.math.pow
 
 private const val allowableFloatingPointError = 0.0001
 
