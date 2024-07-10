@@ -1,6 +1,7 @@
 package com.hamosad1657.lib.units
 
 import com.hamosad1657.lib.robotPrintError
+import java.util.Objects
 
 /** Represents a length.
  *
@@ -88,4 +89,11 @@ class Length private constructor(length: Number, lengthUnit: Unit) : Comparable<
 		fun fromFeet(feet: Number) = Length(feet, Length.Unit.Feet)
 		fun fromInches(inches: Number) = Length(inches, Length.Unit.Inches)
 	}
+
+	override fun equals(other: Any?): Boolean {
+		if (other !is Length) return false
+		return this.meters == other.meters
+	}
+
+	override fun hashCode(): Int = Objects.hash(meters)
 }

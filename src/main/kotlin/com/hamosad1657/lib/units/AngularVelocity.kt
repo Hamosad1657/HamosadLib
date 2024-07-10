@@ -1,6 +1,7 @@
 package com.hamosad1657.lib.units
 
 import com.hamosad1657.lib.robotPrintError
+import java.util.Objects
 import kotlin.math.absoluteValue
 import com.hamosad1657.lib.units.AngularVelocity.Unit as AngularVelocityUnit
 
@@ -77,4 +78,11 @@ private constructor(velocity: Double, velocityUnit: AngularVelocityUnit) : Compa
 		fun fromDegPs(degPs: Double) = AngularVelocity(degPs, AngularVelocityUnit.DegPs)
 		fun fromMps(mps: Double, wheelRadius: Length) = fromRpm(mpsToRpm(mps, wheelRadius))
 	}
+
+	override fun equals(other: Any?): Boolean {
+		if (other !is AngularVelocity) return false
+		return this.rpm == other.rpm
+	}
+
+	override fun hashCode(): Int = Objects.hash(rpm)
 }
