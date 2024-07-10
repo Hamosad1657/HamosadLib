@@ -87,14 +87,14 @@ fun mapRange(value: Double, startMin: Double, startMax: Double, endMin: Double, 
  *
  * @return The value relative to the end range.
  */
-fun mapRange(value: Int, startMin: Int, startMax: Int, endMin: Int, endMax: Int): Int {
+fun mapRange(value: Int, startMin: Int, startMax: Int, endMin: Int, endMax: Int): Double {
 	return mapRange(
 		value.toDouble(),
 		startMin.toDouble(),
 		startMax.toDouble(),
 		endMin.toDouble(),
 		endMax.toDouble()
-	).toInt()
+	)
 }
 
 fun median(collection: Collection<Double>): Double {
