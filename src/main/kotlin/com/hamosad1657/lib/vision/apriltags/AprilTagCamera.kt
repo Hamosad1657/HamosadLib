@@ -1,6 +1,7 @@
-package com.hamosad1657.lib.vision
+package com.hamosad1657.lib.vision.apriltags
 
 import com.hamosad1657.lib.units.Length
+import com.hamosad1657.lib.vision.HaPhotonCamera
 import edu.wpi.first.apriltag.AprilTagFields
 import edu.wpi.first.math.Matrix
 import edu.wpi.first.math.Nat
@@ -8,14 +9,21 @@ import edu.wpi.first.math.geometry.Transform3d
 import edu.wpi.first.math.numbers.N1
 import edu.wpi.first.math.numbers.N3
 import org.photonvision.EstimatedRobotPose
-import org.photonvision.PhotonCamera
 import org.photonvision.PhotonPoseEstimator
 import org.photonvision.PhotonPoseEstimator.PoseStrategy
 import org.photonvision.PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR
+import org.photonvision.targeting.PhotonPipelineResult
 import org.photonvision.targeting.PhotonTrackedTarget
 import kotlin.jvm.optionals.getOrNull
 
+// TODO: Change AprilTag field layout to 2025 Reefscape when it becomes relevant.
 private val TAGS_LAYOUT = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField()
+
+val PhotonPipelineResult.bestTag: PhotonTrackedTarget? get() = bestTarget
+fun PhotonPipelineResult.getTag(tagID: Int): PhotonTrackedTarget? = targets?.find { it.fiducialId == tagID }
+val PhotonPipelineResult.amountOfTagsDetected: Int get() = if (hasTargets())targets?.size ?: 0 else 0
+fun PhotonPipelineResult.isTagDetected(tagID: Int): Boolean = getTag(tagID) != null
+fun PhotonPipelineResult.isAnyTagDetected(vararg tagIDs: Int): Boolean = tagIDs.any(::isTagDetected)
 
 abstract class AprilTagCamera(private val camera: HaPhotonCamera) {
 	init {
@@ -41,16 +49,16 @@ abstract class AprilTagCamera(private val camera: HaPhotonCamera) {
 				_poseEstimator = it
 			}
 
-	val isInRange: Boolean
-		get() {
-			val robotToTagDistance = bestTag?.bestCameraToTarget?.x ?: return false
-			return robotToTagDistance < maxTagTrustingDistance.asMeters
+	val latestResult: PhotonPipelineResult? get() = camera.latestResult
+
+	fun getCameraToTagDistance(pipelineResult: PhotonPipelineResult?): Length? = (pipelineResult?.bestTag?.bestCameraToTarget?.x)?.let {
+			Length.fromMeters(it)
 		}
 
-	val bestTag: PhotonTrackedTarget? get() = camera.latestResult?.bestTarget
-	fun getTag(tagID: Int): PhotonTrackedTarget? = camera.latestResult?.targets?.find { it.fiducialId == tagID }
-	fun isTagDetected(tagID: Int): Boolean = getTag(tagID) != null
-	fun isAnyTagDetected(vararg tagIDs: Int): Boolean = tagIDs.any(::isTagDetected)
+	fun isInRange(pipelineResult: PhotonPipelineResult?): Boolean {
+		val distance = getCameraToTagDistance(pipelineResult) ?: return false
+		return distance < maxTagTrustingDistance
+	}
 
 	/**
 	 * Gets the estimated robot position from the PhotonVision camera.
@@ -64,8 +72,8 @@ abstract class AprilTagCamera(private val camera: HaPhotonCamera) {
 	val estimatedPose: EstimatedRobotPose?
 		get() = if (camera.isConnected) poseEstimator.update()?.getOrNull() else null
 
-	val poseEstimationStdDevs
-		get() = if (camera.latestResult?.targets?.size == 1) {
+	fun getPoseEstimationStdDevs(pipelineResult: PhotonPipelineResult?) =
+		if (pipelineResult?.amountOfTagsDetected == 1) {
 			stdDevs.oneTag
 		} else if (isAutonomousSupplier()) {
 			stdDevs.twoTagsAuto
