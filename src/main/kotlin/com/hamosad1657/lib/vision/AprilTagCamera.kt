@@ -1,7 +1,5 @@
 package com.hamosad1657.lib.vision
 
-import com.hamosad1657.lib.Alert
-import com.hamosad1657.lib.Alert.AlertType.ERROR
 import com.hamosad1657.lib.units.Length
 import edu.wpi.first.apriltag.AprilTagFields
 import edu.wpi.first.math.Matrix
@@ -14,26 +12,23 @@ import org.photonvision.PhotonCamera
 import org.photonvision.PhotonPoseEstimator
 import org.photonvision.PhotonPoseEstimator.PoseStrategy
 import org.photonvision.PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR
-import org.photonvision.targeting.PhotonPipelineResult
 import org.photonvision.targeting.PhotonTrackedTarget
+import kotlin.jvm.optionals.getOrNull
 
 private val TAGS_LAYOUT = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField()
 
-abstract class AprilTagCamera(val cameraName: String) {
+abstract class AprilTagCamera(private val camera: HaPhotonCamera) {
+	init {
+		camera.driverMode = false
+	}
 	protected abstract val robotToCamera: Transform3d
-
 	abstract val maxTagTrustingDistance: Length
 	abstract val stdDevs: AprilTagsStdDevs
 	abstract val isAutonomousSupplier: () -> Boolean
 
-	private var _camera: PhotonCamera? = null
-	protected val camera: PhotonCamera
-		get() = _camera ?: PhotonCamera(cameraName).also { _camera = it }
-
-
-	// Try to retrieve the pose estimator again only if it is null (it will be null if the camera is)
+	// Try to retrieve the pose estimator again only if it is null.
 	private var _poseEstimator: PhotonPoseEstimator? = null
-	protected val poseEstimator: PhotonPoseEstimator
+	private val poseEstimator: PhotonPoseEstimator
 		get() =
 			_poseEstimator ?: PhotonPoseEstimator(
 				TAGS_LAYOUT,
@@ -46,35 +41,31 @@ abstract class AprilTagCamera(val cameraName: String) {
 				_poseEstimator = it
 			}
 
-	private val disconnectedAlert = Alert("$cameraName disconnected", ERROR)
-
-	val isConnected
-		get() = camera.isConnected
-			.also { disconnectedAlert.set(!it) }
-
 	val isInRange: Boolean
 		get() {
 			val robotToTagDistance = bestTag?.bestCameraToTarget?.x ?: return false
 			return robotToTagDistance < maxTagTrustingDistance.asMeters
 		}
 
-	val latestResult: PhotonPipelineResult? get() = if (isConnected) camera.latestResult else null
-	val bestTag: PhotonTrackedTarget? get() = latestResult?.bestTarget
-
-	fun getTag(tagID: Int) = latestResult?.targets?.find { it.fiducialId == tagID }
-	fun isTagDetected(tagID: Int) = getTag(tagID) != null
-	fun isAnyTagDetected(vararg tagIDs: Int) = tagIDs.any(::isTagDetected)
+	val bestTag: PhotonTrackedTarget? get() = camera.latestResult?.bestTarget
+	fun getTag(tagID: Int): PhotonTrackedTarget? = camera.latestResult?.targets?.find { it.fiducialId == tagID }
+	fun isTagDetected(tagID: Int): Boolean = getTag(tagID) != null
+	fun isAnyTagDetected(vararg tagIDs: Int): Boolean = tagIDs.any(::isTagDetected)
 
 	/**
 	 * Gets the estimated robot position from the PhotonVision camera.
+	 * Updates every time the getter is called.
 	 *
-	 * Returns null if it doesn't detect any AprilTags.
+	 * Returns null if:
+	 * - There is no camera
+	 * - No AprilTags were detected
+	 * - The RoboRIO hasn't received new data from PhotonVision since the last access.
 	 */
-	val estimatedGlobalPose: EstimatedRobotPose?
-		get() = if (isConnected) poseEstimator.update()?.orElse(null) else null
+	val estimatedPose: EstimatedRobotPose?
+		get() = if (camera.isConnected) poseEstimator.update()?.getOrNull() else null
 
 	val poseEstimationStdDevs
-		get() = if (latestResult?.targets?.size == 1) {
+		get() = if (camera.latestResult?.targets?.size == 1) {
 			stdDevs.oneTag
 		} else if (isAutonomousSupplier()) {
 			stdDevs.twoTagsAuto
