@@ -16,7 +16,7 @@ class HaPhotonCamera(val cameraName: String) : PhotonCamera(cameraName) {
 		return super.isConnected().also { disconnectedAlert.set(!it) }
 	}
 
-	override fun getLatestResult(): PhotonPipelineResult? = if (isConnected) PhotonPipelineResult() else null
+	override fun getLatestResult(): PhotonPipelineResult? = if (isConnected) super.getLatestResult() else null
 
 	/**
 	 * This function is no-op if the camera is currently disconnected.
