@@ -19,7 +19,6 @@ import kotlin.jvm.optionals.getOrNull
 // TODO: Change AprilTag field layout to 2025 Reefscape when it becomes relevant.
 private val TAGS_LAYOUT = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField()
 
-val PhotonPipelineResult.bestTag: PhotonTrackedTarget? get() = bestTarget
 fun PhotonPipelineResult.getTag(tagID: Int): PhotonTrackedTarget? = targets?.find { it.fiducialId == tagID }
 val PhotonPipelineResult.amountOfTagsDetected: Int get() = if (hasTargets())targets?.size ?: 0 else 0
 fun PhotonPipelineResult.isTagDetected(tagID: Int): Boolean = getTag(tagID) != null
@@ -58,7 +57,7 @@ abstract class AprilTagCamera(private val camera: HaPhotonCamera) {
 	 */
 	val latestResult: PhotonPipelineResult? get() = camera.latestResult
 
-	fun getCameraToTagDistance(pipelineResult: PhotonPipelineResult?): Length? = (pipelineResult?.bestTag?.bestCameraToTarget?.x)?.let {
+	fun getCameraToTagDistance(pipelineResult: PhotonPipelineResult?): Length? = (pipelineResult?.bestTarget?.bestCameraToTarget?.x)?.let {
 			Length.fromMeters(it)
 		}
 
