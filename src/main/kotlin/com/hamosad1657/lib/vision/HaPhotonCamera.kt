@@ -14,10 +14,24 @@ class HaPhotonCamera(val cameraName: String) : PhotonCamera(cameraName) {
 	 * You may also update it yourself.
 	 */
 	val disconnectedAlert = Alert("$cameraName disconnected", AlertType.ERROR)
+
+	/**
+	 * Returns whether the camera is actively sending new data.
+	 *
+	 * Rising edge (false to true) transitions happen immediately, while falling
+	 * edge (true to false) transitions are debounced by half a second, as of 2024.
+	 */
 	override fun isConnected(): Boolean {
 		return super.isConnected().also { disconnectedAlert.set(!it) }
 	}
 
+	/**
+	 * In HaPhotonCamera, latestResult will be null if the camera is disconnected.
+	 * This is done to prevent the use of data older than (as of 2024) half a second.
+	 *
+	 * Nevertheless, in timing-sensitive calculations, compensate for delay by using
+	 * the timestamp included in [PhotonPipelineResult] instances.
+	 */
 	override fun getLatestResult(): PhotonPipelineResult? = if (isConnected) super.getLatestResult() else null
 
 	/**

@@ -49,6 +49,13 @@ abstract class AprilTagCamera(private val camera: HaPhotonCamera) {
 				_poseEstimator = it
 			}
 
+	/**
+	 * In HaPhotonCamera, latestResult will be null if the camera is disconnected.
+	 * This is done to prevent the use of data older than (as of 2024) half a second.
+	 *
+	 * Nevertheless, in timing-sensitive calculations, compensate for delay by using
+	 * the timestamp included in [PhotonPipelineResult] instances.
+	 */
 	val latestResult: PhotonPipelineResult? get() = camera.latestResult
 
 	fun getCameraToTagDistance(pipelineResult: PhotonPipelineResult?): Length? = (pipelineResult?.bestTag?.bestCameraToTarget?.x)?.let {
@@ -61,16 +68,19 @@ abstract class AprilTagCamera(private val camera: HaPhotonCamera) {
 	}
 
 	/**
-	 * Gets the estimated robot position from the PhotonVision camera.
-	 * Updates every time the getter is called.
+	 * Updates the PhotonVision pose estimator with [pipelineResult] and returns
+	 * the updated [EstimatedRobotPose], which includes the position in the field,
+	 * the timestamp, the tags used and the pose estimation strategy used.
 	 *
 	 * Returns null if:
-	 * - There is no camera
-	 * - No AprilTags were detected
-	 * - The RoboRIO hasn't received new data from PhotonVision since the last access.
+	 * - [pipelineResult] is null
+	 * - There are no tags in [pipelineResult]
+	 * - The timestamp of [pipelineResult] is not newer than the previous update.
 	 */
-	val estimatedPose: EstimatedRobotPose?
-		get() = if (camera.isConnected) poseEstimator.update()?.getOrNull() else null
+	fun updatePhotonPoseEstimator(pipelineResult: PhotonPipelineResult?): EstimatedRobotPose? {
+		if (pipelineResult == null) return null
+		return poseEstimator.update(pipelineResult)?.getOrNull()
+	}
 
 	fun getPoseEstimationStdDevs(pipelineResult: PhotonPipelineResult?) =
 		if (pipelineResult?.amountOfTagsDetected == 1) {
