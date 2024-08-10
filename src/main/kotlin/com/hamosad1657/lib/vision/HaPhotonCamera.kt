@@ -2,6 +2,8 @@ package com.hamosad1657.lib.vision
 
 import com.hamosad1657.lib.Alert
 import com.hamosad1657.lib.Alert.AlertType
+import com.hamosad1657.lib.robotPrint
+import com.hamosad1657.lib.robotPrintError
 import org.photonvision.PhotonCamera
 import org.photonvision.targeting.PhotonPipelineResult
 
@@ -36,5 +38,15 @@ class HaPhotonCamera(val cameraName: String) : PhotonCamera(cameraName) {
 	fun doIfConnected(toDo: () -> Unit) {
 		if (!isConnected) return
 		toDo()
+	}
+
+	init {
+		robotPrint("Initialized HaPhotonCamera instance: $cameraName")
+		if (isConnected) {
+			robotPrint("$cameraName connected!")
+		} else {
+			robotPrintError("$cameraName disconnected!")
+		}
+		super.getLatestResult() // This triggers a call to verifyVersion() in PhotonCamera, regardless of whether the camera is connected.
 	}
 }
