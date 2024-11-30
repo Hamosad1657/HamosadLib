@@ -1,3 +1,5 @@
+@file:Suppress("DeprecatedCallableAddReplaceWith")
+
 package com.hamosad1657.lib.math
 
 import com.hamosad1657.lib.robotPrintError
@@ -55,10 +57,18 @@ fun continuousDeadband(value: Double, deadband: Double): Double {
 	}
 }
 
+@Deprecated(
+	message = "Use kotlin standard library function coerceIn.",
+	level = DeprecationLevel.WARNING
+)
 fun clamp(value: Double, min: Double, max: Double): Double {
 	return if (min > max) 0.0 else max(min, min(value, max))
 }
 
+@Deprecated(
+	message = "Use kotlin standard library function coerceIn.",
+	level = DeprecationLevel.WARNING
+)
 fun clamp(value: Int, min: Int, max: Int): Int {
 	return if (min > max) 0 else max(min, min(value, max))
 }
