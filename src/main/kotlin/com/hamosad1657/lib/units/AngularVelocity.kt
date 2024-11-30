@@ -22,10 +22,10 @@ private constructor(velocity: Double, velocityUnit: AngularVelocityUnit) : Compa
 	private var rpm = 0.0
 		set(value) {
 			field = if (value.isNaN()) {
-				robotPrintError("AngularVelocity cannot be NaN.", true)
+				robotPrintError("AngularVelocity cannot be NaN. Falling back to zero.", true)
 				0.0
 			} else if (value.isInfinite()) {
-				robotPrintError("AngularVelocity cannot be infinite.", true)
+				robotPrintError("AngularVelocity cannot be infinite. Falling back to zero.", true)
 				0.0
 			} else value
 		}
