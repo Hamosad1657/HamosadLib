@@ -18,7 +18,7 @@ import kotlin.math.min
  */
 fun simpleDeadband(value: Double, deadband: Double): Double {
 	if (deadband < 0.0) {
-		robotPrintError("deadband is negative", true)
+		robotPrintError("deadband is negative: $deadband \nReturning unchanged value $value.", true)
 		return value
 	}
 	return if (abs(value) >= deadband) value else 0.0
@@ -40,11 +40,11 @@ fun simpleDeadband(value: Double, deadband: Double): Double {
  */
 fun continuousDeadband(value: Double, deadband: Double): Double {
 	if (deadband !in 0.0..1.0) {
-		robotPrintError("deadband is out of bounds: $deadband", true)
+		robotPrintError("deadband is out of bounds: $deadband \nReturning unchanged value $value.", true)
 		return value
 	}
 	if (value !in -1.0..1.0) {
-		robotPrintError("value is out of bounds: $value", true)
+		robotPrintError("value is out of bounds: $value \nReturning unchanged value.", true)
 		return value
 	}
 
@@ -81,11 +81,11 @@ fun clamp(value: Int, min: Int, max: Int): Int {
  */
 fun mapRange(value: Double, startMin: Double, startMax: Double, endMin: Double, endMax: Double): Double {
 	if (startMin >= startMax) {
-		robotPrintError("startMin is equal/bigger than starMax", true)
+		robotPrintError("startMin: $startMin is equal/bigger than startMax: $startMax \nReturning unchanged value $value.", true)
 		return value
 	}
 	if (endMin >= endMax) {
-		robotPrintError("endMin is equal/bigger than endMax", true)
+		robotPrintError("endMin: $endMin is equal/bigger than endMax: $endMax \nReturning unchanged value $value.", true)
 		return value
 	}
 	return endMin + (endMax - endMin) / (startMax - startMin) * (value - startMin)

@@ -16,13 +16,13 @@ class Length private constructor(length: Number, lengthUnit: Unit) : Comparable<
 	private var meters = 0.0
 		set(value) {
 			field = if (value.isNaN()) {
-				robotPrintError("Length is NaN.", true)
+				robotPrintError("Length cannot be NaN. Falling back to zero.", true)
 				0.0
 			} else if (value.isInfinite()) {
-				robotPrintError("Length is infinite.", true)
+				robotPrintError("Length cannot be infinite. Falling back to zero.", true)
 				0.0
 			} else if (value < 0.0) {
-				robotPrintError("Length cannot be negative.", true)
+				robotPrintError("Length cannot be negative. Falling back to zero.", true)
 				0.0
 			} else value
 		}

@@ -63,7 +63,7 @@ fun degPsToRadPs(degPs: Number) = Math.toRadians(degPs.toDouble())
  * Wheel radius should be greater than 0. */
 fun rpmToMps(rpm: Number, wheelRadius: Length): Double {
 	if (wheelRadius.asMeters <= 0.0) {
-		robotPrintError("wheelRadius is negative", true)
+		robotPrintError("wheelRadius is negative or zero: $wheelRadius \nReturning zero MPS.", true)
 		return 0.0
 	}
 	return rpm.toDouble() / 60.0 * (wheelRadius.asMeters * 2.0 * Math.PI)
@@ -84,7 +84,7 @@ fun degPsToMps(degPs: Number, wheelRadius: Length) = rpmToMps(degPsToRpm(degPs),
  * Wheel radius should be greater than 0. */
 fun mpsToRpm(mps: Number, wheelRadius: Length): Double {
 	if (wheelRadius.asMeters <= 0.0) {
-		robotPrintError("wheelRadius is negative", true)
+		robotPrintError("wheelRadius is negative or zero: $wheelRadius \nReturning zero RPM.", true)
 		return 0.0
 	}
 	return mps.toDouble() * 60.0 / (wheelRadius.asMeters * 2.0 * Math.PI)
