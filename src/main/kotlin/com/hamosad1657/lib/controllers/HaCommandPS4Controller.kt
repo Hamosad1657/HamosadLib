@@ -28,6 +28,6 @@ class HaCommandPS4Controller(private val deadband: Double, port: Int) : CommandP
 
 fun Double.powerProfile(power: Int): Double {
 	return if (power % 2 == 0) {
-		this.pow(power)
-	} else this.pow(power) * this.sign
+		this.pow(power) * this.sign
+	} else this.pow(power)
 }
