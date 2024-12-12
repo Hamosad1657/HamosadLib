@@ -18,3 +18,9 @@ typealias Amps = Int
 
 /** Time in seconds. */
 typealias Seconds = Double
+
+/** Linear velocity in meters per second */
+typealias Mps = Double
+
+/** Linear acceleration in meters per second squared */
+typealias MpsSquared = Double
