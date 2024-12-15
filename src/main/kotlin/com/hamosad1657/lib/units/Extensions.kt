@@ -2,8 +2,10 @@ package com.hamosad1657.lib.units
 
 import com.ctre.phoenix.motorcontrol.NeutralMode
 import com.ctre.phoenix6.signals.NeutralModeValue
+import com.hamosad1657.lib.controllers.powerProfile
 import com.revrobotics.CANSparkBase.IdleMode
 import edu.wpi.first.math.geometry.Rotation2d
+import edu.wpi.first.math.geometry.Translation2d
 import kotlin.math.absoluteValue
 
 // --- Length ---
@@ -23,7 +25,7 @@ inline val Number.radPs get() = AngularVelocity.fromRadPs(this.toDouble())
 inline val Number.degPs get() = AngularVelocity.fromDegPs(this.toDouble())
 
 
-// -- Rotation2d ---
+// --- Rotation2d ---
 
 inline val Number.degrees: Rotation2d get() = Rotation2d.fromDegrees(this.toDouble())
 inline val Number.radians: Rotation2d get() = Rotation2d.fromRadians(this.toDouble())
@@ -33,6 +35,10 @@ inline val Rotation2d.absoluteValue: Rotation2d get() = Rotation2d.fromRotations
 
 infix fun Rotation2d.plus(other: Rotation2d) = (this.degrees + other.degrees).degrees
 infix fun Rotation2d.minus(other: Rotation2d) = (this.degrees - other.degrees).degrees
+
+// --- Translation2d ---
+
+fun Translation2d.powerProfile(power: Int) = Translation2d(this.x.powerProfile(power), this.y.powerProfile(power))
 
 // --- NeutralMode and IdleMode
 
