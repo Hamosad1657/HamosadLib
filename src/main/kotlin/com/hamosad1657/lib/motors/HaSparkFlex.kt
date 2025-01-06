@@ -4,7 +4,7 @@ import com.hamosad1657.lib.math.PIDGains
 import com.hamosad1657.lib.math.clamp
 import com.hamosad1657.lib.robotPrintError
 import com.hamosad1657.lib.units.PercentOutput
-import com.revrobotics.CANSparkFlex
+import com.revrobotics.spark.SparkFlex
 import edu.wpi.first.util.sendable.Sendable
 import edu.wpi.first.util.sendable.SendableBuilder
 import kotlin.math.absoluteValue
@@ -12,7 +12,7 @@ import kotlin.math.absoluteValue
 class HaSparkFlex(
 	deviceID: Int,
 	motorType: MotorType = MotorType.kBrushless,
-) : CANSparkFlex(deviceID, motorType), Sendable {
+) : SparkFlex(deviceID, motorType), Sendable {
 	/**
 	 * Software forward limit, ONLY for percent-output control.
 	 * WILL NOT work in closed-loop control onboard the motor controller, since that
@@ -45,15 +45,6 @@ class HaSparkFlex(
 
 	/** The NEO motor has a temperature sensor inside it.*/
 	val isMotorTempSafe get() = motorTemperature < NEOSafeTempC
-
-	fun configPID(gains: PIDGains) {
-		pidController.apply {
-			p = gains.kP
-			i = gains.kI
-			d = gains.kD
-			iZone = gains.kIZone
-		}
-	}
 
 	override fun setVoltage(outputVolts: Double) {
 		if (outputVolts.absoluteValue < voltageNeutralDeadband) super.stopMotor()

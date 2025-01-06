@@ -26,15 +26,6 @@ class HaPhotonCamera(val cameraName: String) : PhotonCamera(cameraName) {
 	}
 
 	/**
-	 * In HaPhotonCamera, latestResult will be null if the camera is disconnected.
-	 * This is done to prevent the use of data older than (as of 2024) half a second.
-	 *
-	 * Nevertheless, in timing-sensitive calculations, compensate for delay by using
-	 * the timestamp included in [PhotonPipelineResult] instances.
-	 */
-	override fun getLatestResult(): PhotonPipelineResult? = if (isConnected) super.getLatestResult() else null
-
-	/**
 	 * This function is no-op if the camera is currently disconnected.
 	 * - Images take up space in the disk of the coprocessor running PhotonVision.
 	 * 	 Calling take snapshot frequently will fill up disk space and eventually cause the system to stop working.
@@ -61,6 +52,6 @@ class HaPhotonCamera(val cameraName: String) : PhotonCamera(cameraName) {
 		} else {
 			robotPrintError("$cameraName disconnected!")
 		}
-		super.getLatestResult() // This triggers a call to verifyVersion() in PhotonCamera, regardless of whether the camera is connected.
+		super.getAllUnreadResults() // This triggers a call to verifyVersion() in PhotonCamera, regardless of whether the camera is connected.
 	}
 }

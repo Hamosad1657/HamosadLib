@@ -2,6 +2,7 @@ package com.hamosad1657.lib.vision.apriltags
 
 import com.hamosad1657.lib.units.Length
 import com.hamosad1657.lib.vision.HaPhotonCamera
+import edu.wpi.first.apriltag.AprilTagFieldLayout
 import edu.wpi.first.apriltag.AprilTagFields
 import edu.wpi.first.math.Matrix
 import edu.wpi.first.math.Nat
@@ -16,8 +17,8 @@ import org.photonvision.targeting.PhotonPipelineResult
 import org.photonvision.targeting.PhotonTrackedTarget
 import kotlin.jvm.optionals.getOrNull
 
-// TODO: Change AprilTag field layout to 2025 Reefscape when it becomes relevant.
-private val TAGS_LAYOUT = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField()
+// TODO: Change AprilTag field layout to 2025 Reefscape when it releases
+private val TAGS_LAYOUT = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField)
 
 /**
  * From all the detected tags in this pipeline result, finds and returns one with the specified ID.
@@ -56,7 +57,6 @@ abstract class AprilTagCamera(private val camera: HaPhotonCamera) {
 			_poseEstimator ?: PhotonPoseEstimator(
 				TAGS_LAYOUT,
 				MULTI_TAG_PNP_ON_COPROCESSOR,
-				camera,
 				robotToCamera,
 			).apply {
 				setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY)
@@ -71,7 +71,7 @@ abstract class AprilTagCamera(private val camera: HaPhotonCamera) {
 	 * Nevertheless, in timing-sensitive calculations, compensate for delay by using
 	 * the timestamp included in [PhotonPipelineResult] instances.
 	 */
-	val latestResult: PhotonPipelineResult? get() = camera.latestResult
+	val latestResult: PhotonPipelineResult? get() = camera.allUnreadResults.first()
 
 	fun getCameraToTagDistance(pipelineResult: PhotonPipelineResult?): Length? = (pipelineResult?.bestTarget?.bestCameraToTarget?.x)?.let {
 			Length.fromMeters(it)

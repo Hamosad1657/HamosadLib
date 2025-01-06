@@ -3,7 +3,8 @@ package com.hamosad1657.lib.units
 import com.ctre.phoenix.motorcontrol.NeutralMode
 import com.ctre.phoenix6.signals.NeutralModeValue
 import com.hamosad1657.lib.controllers.powerProfile
-import com.revrobotics.CANSparkBase.IdleMode
+import com.revrobotics.spark.SparkFlex
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Translation2d
 import kotlin.math.absoluteValue

@@ -1,10 +1,9 @@
 package com.hamosad1657.lib.motors
 
-import com.hamosad1657.lib.math.PIDGains
 import com.hamosad1657.lib.math.clamp
 import com.hamosad1657.lib.robotPrintError
 import com.hamosad1657.lib.units.PercentOutput
-import com.revrobotics.CANSparkMax
+import com.revrobotics.spark.SparkMax
 import edu.wpi.first.util.sendable.Sendable
 import edu.wpi.first.util.sendable.SendableBuilder
 
@@ -20,7 +19,7 @@ const val NEOSafeTempC = 90
 class HaSparkMax(
 	deviceID: Int,
 	motorType: MotorType = MotorType.kBrushless,
-) : CANSparkMax(deviceID, motorType), Sendable {
+) : SparkMax(deviceID, motorType), Sendable {
 	/**
 	 * Software forward limit, ONLY for percent-output control.
 	 * WILL NOT work in closed-loop control onboard the motor controller, since that
@@ -50,15 +49,6 @@ class HaSparkMax(
 
 	/** The NEO motor has a temperature sensor inside it.*/
 	val isMotorTempSafe get() = motorTemperature < NEOSafeTempC
-
-	fun configPID(gains: PIDGains) {
-		pidController.apply {
-			p = gains.kP
-			i = gains.kI
-			d = gains.kD
-			iZone = gains.kIZone
-		}
-	}
 
 	/**
 	 * percentOutput is clamped between properties minPercentOutput and maxPercentOutput.
