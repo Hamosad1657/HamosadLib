@@ -3,7 +3,6 @@ package com.hamosad1657.lib.units
 import com.ctre.phoenix.motorcontrol.NeutralMode
 import com.ctre.phoenix6.signals.NeutralModeValue
 import com.hamosad1657.lib.controllers.powerProfile
-import com.revrobotics.spark.SparkFlex
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Translation2d
@@ -34,7 +33,7 @@ inline val Number.rotations: Rotation2d get() = Rotation2d.fromRotations(this.to
 
 inline val Rotation2d.absoluteValue: Rotation2d get() = Rotation2d.fromRotations(this.rotations.absoluteValue)
 
-infix fun Rotation2d.compareTo(other: Rotation2d) = (this.degrees - other.degrees).toInt()
+operator fun Rotation2d.compareTo(other: Rotation2d) = (this.degrees - other.degrees).toInt()
 infix fun Rotation2d.plus(other: Rotation2d) = (this.degrees + other.degrees).degrees
 infix fun Rotation2d.minus(other: Rotation2d) = (this.degrees - other.degrees).degrees
 
