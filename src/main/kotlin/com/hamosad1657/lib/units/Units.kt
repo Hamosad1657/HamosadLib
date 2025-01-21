@@ -1,8 +1,5 @@
 package com.hamosad1657.lib.units
 
-/** 2π radians, 360 degrees. */
-typealias Rotations = Double
-
 /**
  * In range [[-1.0, 1.0]].
  *
