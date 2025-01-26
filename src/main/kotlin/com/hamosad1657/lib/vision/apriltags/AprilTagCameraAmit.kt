@@ -1,11 +1,15 @@
 package frc.robot.vision
 
+import com.ctre.phoenix6.hardware.Pigeon2
 import com.hamosad1657.lib.units.Length
+import com.hamosad1657.lib.units.degrees
 import com.hamosad1657.lib.units.meters
 import edu.wpi.first.apriltag.AprilTagFieldLayout
 import edu.wpi.first.apriltag.AprilTagFields.k2025Reefscape
 import edu.wpi.first.math.Matrix
 import edu.wpi.first.math.Nat
+import edu.wpi.first.math.geometry.Pose3d
+import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.geometry.Rotation3d
 import edu.wpi.first.math.geometry.Transform3d
 import edu.wpi.first.math.geometry.Translation3d
@@ -21,6 +25,7 @@ import org.photonvision.PhotonUtils
 import org.photonvision.targeting.PhotonPipelineResult
 import org.photonvision.targeting.PhotonTrackedTarget
 import kotlin.jvm.optionals.getOrNull
+import kotlin.math.absoluteValue
 
 
 object AprilTagCameraAmit {
@@ -33,6 +38,18 @@ object AprilTagCameraAmit {
 		val bestTarget: PhotonTrackedTarget? get() = result?.bestTarget
 		private val targetID get() = bestTarget?.fiducialId
 		private val isAtAutonomous get() = Robot.isAutonomous
+
+		//Find StdDevs
+		var lastEstimatedPose: Pose3d? = null
+		var lastPigeonAngle: Rotation2d = 0.0.degrees
+		val xErrorsList: MutableList<Double> = emptyList<Double>().toMutableList()
+		val yErrorsList: MutableList<Double> = emptyList<Double>().toMutableList()
+		val rotationErrorsList: MutableList<Double> = emptyList<Double>().toMutableList()
+		val timer = edu.wpi.first.wpilibj.Timer()
+		val xStdDevs = calculateGeneralStdDevs(xErrorsList.toDoubleArray())
+		val yStdDevs = calculateGeneralStdDevs(yErrorsList.toDoubleArray())
+		val rotationStdDevs = calculateGeneralStdDevs(rotationErrorsList.toDoubleArray())
+		val cameraPoseStdDevs = RobotPoseStdDevs(xStdDevs, yStdDevs, rotationStdDevs)
 
 		private val MAX_RANGE = 5.0
 		private val MAX_TAG_TRUSTING_DISTANCE: Length = 5.meters
@@ -115,6 +132,47 @@ object AprilTagCameraAmit {
 				robotToCamera.rotation.y,
 				bestTarget?.let { Units.degreesToRadians(it.pitch) } ?: 0.0,
 			)
+		}
+
+		fun calculateGeneralStdDevs(numArray: DoubleArray): Double {
+			var sum = 0.0
+			var standardDeviation = 0.0
+
+			for (num in numArray) {
+				sum += num
+			}
+
+			val mean = sum / 10
+
+			for (num in numArray) {
+				standardDeviation += Math.pow(num - mean, 2.0)
+			}
+
+			return Math.sqrt(standardDeviation / 10)
+		}
+
+		fun calculatePositionStdDevs(pigeon: Pigeon2) {
+			lastEstimatedPose?.let {
+				timer.start()
+				if (timer.hasElapsed(0.2)) {
+					rotationErrorsList.add(((estimatedGlobalPose!!.estimatedPose.rotation.angle - lastEstimatedPose!!.rotation.angle).absoluteValue / 0.02) - ((pigeon.getYaw().valueAsDouble - lastPigeonAngle.degrees).absoluteValue / 0.02))
+					xErrorsList.add(((estimatedGlobalPose!!.estimatedPose.x - lastEstimatedPose!!.x).absoluteValue / 0.02) - pigeon.accelerationX.valueAsDouble)
+					yErrorsList.add(((estimatedGlobalPose!!.estimatedPose.y - lastEstimatedPose!!.y).absoluteValue / 0.02) - pigeon.accelerationY.valueAsDouble)
+
+					if (xErrorsList.size > 10) {
+						xErrorsList.removeAt(10)
+					}
+					if (yErrorsList.size > 10) {
+						yErrorsList.removeAt(10)
+					}
+					if (rotationErrorsList.size > 10) {
+						rotationErrorsList.removeAt(10)
+					}
+
+					timer.reset()
+					timer.stop()
+				}
+			}
 		}
 
 		val estimatedGlobalPose: EstimatedRobotPose?
